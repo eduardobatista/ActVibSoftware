@@ -59,6 +59,7 @@ class BaseFigQtGraph(GraphicsLayoutWidget):
             self.npontosjanela[k] = int(self.janelax[k] / self.samplingperiod)
             self.vetoreixox[k] = np.linspace(-self.janelax[k], 0, self.npontosjanela[k])
 
+
     def getConfigString(self):
         mvars = vars(self)
         d = {}
@@ -68,10 +69,11 @@ class BaseFigQtGraph(GraphicsLayoutWidget):
 
     def parseConfigString(self, strdata):
         d = json.loads(strdata)
-        self.janelax = d['janelax']
-        self.miny = d['miny']
-        self.maxy = d['maxy']
-        self.autoy = d['autoy']
+        ll = len(d['janelax'])
+        self.janelax[0:ll] = d['janelax']
+        self.miny[0:ll] = d['miny']
+        self.maxy[0:ll] = d['maxy']
+        self.autoy[0:ll] = d['autoy']
         self.flagchangeranges = False
         for k, pi in enumerate(self.pitens):
             self.pitens[k].setXRange(-self.janelax[k], 0.0, padding=0.01)

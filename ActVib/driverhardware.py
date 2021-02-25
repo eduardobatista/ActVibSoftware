@@ -18,14 +18,19 @@ class driverhardware:
         self.buf = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         self.accreadings = [0.0, 0.0, 0.0]  # x,y,z
         self.gyroreadings = [0.0, 0.0, 0.0]  # x,y,z
-        self.dacout = [0, 0]
-        self.gentipo = [0, 0]
-        self.genamp = [0.0, 0.0]
-        self.genfreq = [0.0, 0.0]
-        self.chirpconf = [[0, 0, 0, 0, 0], [0, 0, 0, 0, 0]]
-        self.genConfigWritten = [False, False]
+        self.dacout = [0, 0, 0, 0]
+        self.gentipo = [0, 0, 0, 0]
+        self.genamp = [0.0, 0.0, 0.0, 0.0]
+        self.genfreq = [0.0, 0.0, 0.0, 0.0]
+        self.chirpconf = [[0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]]
+        self.genConfigWritten = [False, False, False, False]
+        self.adcconfig = [0, 0, 0, 0]
+        self.adcin = 0.0
+        self.adcmultiplier = 0
         self.setGeneratorConfig(id=0)
         self.setGeneratorConfig(id=1)
+        self.setGeneratorConfig(id=2)
+        self.setGeneratorConfig(id=3)
         self.serial = serial.Serial(port=None,
                                     baudrate=115200,
                                     parity=serial.PARITY_NONE,
@@ -48,22 +53,33 @@ class driverhardware:
         self.xerro = 0
         self.algonchanged = False
         self.calctime = 0
-        self.algontime = 0.0
+        self.algontime = 0.0        
 
     def openSerial(self):
         self.serial.port = self.mwindow.porta
         self.serial.open()
 
-    def setGeneratorConfig(self, id=0, tipo=0, amp=0, freq=10, chirpconf=[0, 0, 0, 0, 0]):
+    def setGeneratorConfig(self, id=0, tipo=0, amp=0.0, freq=10.0, chirpconf=[0, 0, 0, 0, 0]):
         if tipo != 2:
             if (self.gentipo[id] != tipo) or (self.genamp[id] != amp) or (self.genfreq[id] != freq):
                 self.genConfigWritten[id] = False
         else:
+            if chirpconf[4] > 1.0:
+                chirpconf[4] = 1.0
+            if id <= 2:  # MCP4725
+                ampaux = int(chirpconf[4] * 2047)
+            else:  # Saída ESP32
+                ampaux = int(chirpconf[4] * 127)
             self.chirpconf[id] = [int(chirpconf[0]), int(10 * chirpconf[1]),
-                                  int(chirpconf[2]), int(10 * chirpconf[3]), int(chirpconf[4])]
+                                  int(chirpconf[2]), int(10 * chirpconf[3]), (ampaux >> 8) & 0xFF, ampaux & 0xFF]
         self.gentipo[id] = tipo
         self.genamp[id] = amp
         self.genfreq[id] = freq
+
+    def setADCConfig(self, adcconfigs=[0, 0, 0, 0]):
+        self.adcconfig = adcconfigs
+        multipliers = [6.144, 4.096, 2.048, 1.024, 0.512, 0.256]
+        self.adcmultiplier = multipliers[adcconfigs[2]] / 2**15
 
     def setMPUFilter(self, nrange):
         self.filter = nrange
@@ -107,9 +123,13 @@ class driverhardware:
             raise Exception('Config. de gerador sem resposta.')
 
     def writeGeneratorConfig(self, id=0):
+        freqaux = [int(self.genfreq[id]), int(round((self.genfreq[id] - int(self.genfreq[id])) * 100))]
+        if id < 2:  # Saída de 12 bits, MCP4725
+            ampaux = int(round(self.genamp[id] * 2047))
+        else:  # Saída direta do ESP32, com 8 bits.
+            ampaux = int(round(self.genamp[id] * 127))
         aux = 'G'
-        aux = aux.encode() + bytes([id, self.gentipo[id], int(self.genamp[id]), int(self.genfreq[id])])
-        aux = aux + bytes([int(round((self.genfreq[id] - int(self.genfreq[id])) * 100))])
+        aux = aux.encode() + bytes([id, self.gentipo[id], (ampaux >> 8) & 0xFF, ampaux & 0xFF] + freqaux)
         if self.gentipo[id] == 2:  # Chirp, manda mais 4 bytes [tinicio,deltai,tfim,deltaf]
             aux = aux + bytes(self.chirpconf[id])
         self.serial.write(aux)
@@ -125,6 +145,12 @@ class driverhardware:
         self.serial.write(aux)
         if self.serial.read(2) != b'ok':
             raise Exception('Erro na escolha do sensor.')
+
+    def writeADCConfig(self):
+        aux = 'd'.encode() + bytes(self.adcconfig)
+        self.serial.write(aux)
+        if self.serial.read(2) != b'ok':
+            raise Exception('Erro na configuração do ADC.')
 
     def handshake(self):
         for k in range(5):
@@ -176,11 +202,11 @@ class driverhardware:
         self.algonchanged = False
 
     def startReadings(self):
-        self.packetsize = 17
+        self.packetsize = 21
         self.serial.write(b's')
         if (len(self.serial.read(10)) < 10):
             raise Exception('Sem resposta nas leituras.')
-        self.buf = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        self.buf = [0] * self.packetsize
 
     def startControl(self):
         self.packetsize = 14
@@ -243,7 +269,7 @@ class driverhardware:
             self.xerro = struct.unpack("f", bytearray(self.buf[6:10]))[0]
             self.calctime = (((self.buf[11] << 8) + self.buf[12]) << 4) / 240
         else:
-            self.buf[0:16] = self.serial.read(16)[0:16]
+            self.buf[0:22] = self.serial.read(22)[0:22]
             for k in range(3):
                 bufa = self.buf[(2 * k):(2 * k + 2)]
                 val = int((bufa[0] << 8) | bufa[1])
@@ -254,5 +280,12 @@ class driverhardware:
                 val = int((bufa[0] << 8) | bufa[1])
                 val = val if ((bufa[0] >> 7) == 0) else (-1 * (65536 - val))
                 self.gyroreadings[k] = float(val) * self.gyroscaler
-            self.dacout[0] = self.buf[14]
-            self.dacout[1] = self.buf[15]
+            self.dacout[0] = self.buf[14] << 8 | self.buf[15]
+            self.dacout[1] = self.buf[16] << 8 | self.buf[17]
+            self.dacout[2] = self.buf[18]
+            self.dacout[3] = self.buf[19]
+            if (self.buf[20] & 0x80) == 0:
+                self.adcin = float( (self.buf[20] << 8) | self.buf[21] ) * self.adcmultiplier
+            else:
+                val = - float( ( ~((self.buf[20] << 8) | self.buf[21]) ) + 1 ) * self.adcmultiplier            
+            # self.adcin = float((self.buf[20] << 8) | self.buf[21]) * self.adcmultiplier

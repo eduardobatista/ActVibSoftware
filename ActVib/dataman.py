@@ -26,7 +26,8 @@ class dataman:
         self.readtime = 0
         self.accdata = [np.zeros(self.wsize), np.zeros(self.wsize), np.zeros(self.wsize)]
         self.gyrodata = [np.zeros(self.wsize), np.zeros(self.wsize), np.zeros(self.wsize)]
-        self.dacoutdata = [np.zeros(self.wsize), np.zeros(self.wsize)]
+        self.dacoutdata = [np.zeros(self.wsize), np.zeros(self.wsize), np.zeros(self.wsize), np.zeros(self.wsize)]
+        self.adcdata = np.zeros(self.wsize)
         self.xrefdata = np.zeros(self.wsize)
         self.xerrodata = np.zeros(self.wsize)
         self.maxtime = int(self.wsize * self.samplingperiod)
@@ -45,7 +46,7 @@ class dataman:
         self.mwindow.ui.statusbar.clearMessage()
 
     def IniciaLeituras(self):
-        self.mwindow.ui.statusbar.clearMessage()
+        self.mwindow.ui.statusbar.clearMessage()        
         self.flagparar = False
         self.mythread = Thread(target=self.LeDados)
         self.mythread.start()
@@ -78,8 +79,11 @@ class dataman:
                 self.driver.initHardware()
                 self.driver.writeMPUScales()
                 self.driver.writeMPUFilter()
+                self.driver.writeADCConfig()
                 self.driver.writeGeneratorConfig(id=0)
                 self.driver.writeGeneratorConfig(id=1)
+                self.driver.writeGeneratorConfig(id=2)
+                self.driver.writeGeneratorConfig(id=3)
                 self.driver.startReadings()
             self.flagsaved = False
             self.ctreadings = 0
@@ -99,8 +103,11 @@ class dataman:
                     for k in range(3):
                         self.accdata[k][self.globalctreadings] = self.driver.accreadings[k]
                         self.gyrodata[k][self.globalctreadings] = self.driver.gyroreadings[k]
-                self.dacoutdata[0][self.globalctreadings] = self.driver.dacout[0]
-                self.dacoutdata[1][self.globalctreadings] = self.driver.dacout[1]
+                self.dacoutdata[0][self.globalctreadings] = (float(self.driver.dacout[0]) - 2048.0) / 2047.0
+                self.dacoutdata[1][self.globalctreadings] = (float(self.driver.dacout[1]) - 2048.0) / 2047.0
+                self.dacoutdata[2][self.globalctreadings] = (float(self.driver.dacout[2]) - 128.0) / 127.0
+                self.dacoutdata[3][self.globalctreadings] = (float(self.driver.dacout[3]) - 128.0) / 127.0
+                self.adcdata[self.globalctreadings] = self.driver.adcin
                 self.ctreadings += 1
                 self.globalctreadings += 1
                 if (self.readtime - lastfigrefresh) >= self.plotupdatesec:
@@ -174,7 +181,10 @@ class dataman:
                 "Gyro Y": self.gyrodata[1][0:limf],
                 "Gyro Z": self.gyrodata[2][0:limf],
                 "DAC 1": self.dacoutdata[0][0:limf],
-                "DAC 2": self.dacoutdata[1][0:limf]
+                "DAC 2": self.dacoutdata[1][0:limf],
+                "DAC 3": self.dacoutdata[2][0:limf],
+                "DAC 4": self.dacoutdata[3][0:limf],
+                "ADC in": self.adcdata[0:limf]
             })
             df.to_feather(filename)
         self.flagsaved = setsaved

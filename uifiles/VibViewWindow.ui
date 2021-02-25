@@ -17,7 +17,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>VibWorks</string>
+   <string>ActVib</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -298,10 +298,13 @@
                  </sizepolicy>
                 </property>
                 <property name="frameShape">
-                 <enum>QFrame::StyledPanel</enum>
+                 <enum>QFrame::NoFrame</enum>
                 </property>
                 <property name="frameShadow">
-                 <enum>QFrame::Raised</enum>
+                 <enum>QFrame::Plain</enum>
+                </property>
+                <property name="lineWidth">
+                 <number>0</number>
                 </property>
                 <layout class="QHBoxLayout" name="horizontalLayout_6">
                  <property name="spacing">
@@ -388,10 +391,13 @@
                     </sizepolicy>
                    </property>
                    <property name="decimals">
-                    <number>0</number>
+                    <number>3</number>
                    </property>
                    <property name="maximum">
-                    <double>127.000000000000000</double>
+                    <double>1.000000000000000</double>
+                   </property>
+                   <property name="singleStep">
+                    <double>0.100000000000000</double>
                    </property>
                    <property name="value">
                     <double>0.000000000000000</double>
@@ -451,13 +457,13 @@
                  <bool>false</bool>
                 </property>
                 <property name="styleSheet">
-                 <string notr="true">background-color: rgb(218, 218, 218);</string>
+                 <string notr="true"/>
                 </property>
                 <property name="frameShape">
-                 <enum>QFrame::StyledPanel</enum>
+                 <enum>QFrame::NoFrame</enum>
                 </property>
                 <property name="frameShadow">
-                 <enum>QFrame::Raised</enum>
+                 <enum>QFrame::Plain</enum>
                 </property>
                 <property name="lineWidth">
                  <number>0</number>
@@ -492,9 +498,15 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QSpinBox" name="chirp1A2">
+                  <widget class="QDoubleSpinBox" name="chirp1A2">
+                   <property name="decimals">
+                    <number>3</number>
+                   </property>
                    <property name="maximum">
-                    <number>127</number>
+                    <double>1.000000000000000</double>
+                   </property>
+                   <property name="singleStep">
+                    <double>0.100000000000000</double>
                    </property>
                   </widget>
                  </item>
@@ -645,10 +657,13 @@
                  </sizepolicy>
                 </property>
                 <property name="frameShape">
-                 <enum>QFrame::StyledPanel</enum>
+                 <enum>QFrame::NoFrame</enum>
                 </property>
                 <property name="frameShadow">
-                 <enum>QFrame::Raised</enum>
+                 <enum>QFrame::Plain</enum>
+                </property>
+                <property name="lineWidth">
+                 <number>0</number>
                 </property>
                 <layout class="QHBoxLayout" name="horizontalLayout_11">
                  <property name="spacing">
@@ -735,10 +750,13 @@
                     </sizepolicy>
                    </property>
                    <property name="decimals">
-                    <number>0</number>
+                    <number>3</number>
                    </property>
                    <property name="maximum">
-                    <double>127.000000000000000</double>
+                    <double>1.000000000000000</double>
+                   </property>
+                   <property name="singleStep">
+                    <double>0.100000000000000</double>
                    </property>
                    <property name="value">
                     <double>0.000000000000000</double>
@@ -798,13 +816,13 @@
                  <bool>false</bool>
                 </property>
                 <property name="styleSheet">
-                 <string notr="true">background-color: rgb(218, 218, 218);</string>
+                 <string notr="true"/>
                 </property>
                 <property name="frameShape">
-                 <enum>QFrame::StyledPanel</enum>
+                 <enum>QFrame::NoFrame</enum>
                 </property>
                 <property name="frameShadow">
-                 <enum>QFrame::Raised</enum>
+                 <enum>QFrame::Plain</enum>
                 </property>
                 <property name="lineWidth">
                  <number>0</number>
@@ -839,9 +857,15 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QSpinBox" name="chirp2A2">
+                  <widget class="QDoubleSpinBox" name="chirp2A2">
+                   <property name="decimals">
+                    <number>3</number>
+                   </property>
                    <property name="maximum">
-                    <number>127</number>
+                    <double>1.000000000000000</double>
+                   </property>
+                   <property name="singleStep">
+                    <double>0.100000000000000</double>
                    </property>
                   </widget>
                  </item>
@@ -992,10 +1016,13 @@
                  </sizepolicy>
                 </property>
                 <property name="frameShape">
-                 <enum>QFrame::StyledPanel</enum>
+                 <enum>QFrame::NoFrame</enum>
                 </property>
                 <property name="frameShadow">
-                 <enum>QFrame::Raised</enum>
+                 <enum>QFrame::Plain</enum>
+                </property>
+                <property name="lineWidth">
+                 <number>0</number>
                 </property>
                 <layout class="QHBoxLayout" name="horizontalLayout_7">
                  <property name="spacing">
@@ -1082,10 +1109,13 @@
                     </sizepolicy>
                    </property>
                    <property name="decimals">
-                    <number>0</number>
+                    <number>3</number>
                    </property>
                    <property name="maximum">
-                    <double>127.000000000000000</double>
+                    <double>1.000000000000000</double>
+                   </property>
+                   <property name="singleStep">
+                    <double>0.100000000000000</double>
                    </property>
                    <property name="value">
                     <double>0.000000000000000</double>
@@ -1145,13 +1175,13 @@
                  <bool>false</bool>
                 </property>
                 <property name="styleSheet">
-                 <string notr="true">background-color: rgb(218, 218, 218);</string>
+                 <string notr="true"/>
                 </property>
                 <property name="frameShape">
-                 <enum>QFrame::StyledPanel</enum>
+                 <enum>QFrame::NoFrame</enum>
                 </property>
                 <property name="frameShadow">
-                 <enum>QFrame::Raised</enum>
+                 <enum>QFrame::Plain</enum>
                 </property>
                 <property name="lineWidth">
                  <number>0</number>
@@ -1186,9 +1216,15 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QSpinBox" name="chirp3A2">
+                  <widget class="QDoubleSpinBox" name="chirp3A2">
+                   <property name="decimals">
+                    <number>3</number>
+                   </property>
                    <property name="maximum">
-                    <number>127</number>
+                    <double>1.000000000000000</double>
+                   </property>
+                   <property name="singleStep">
+                    <double>0.100000000000000</double>
                    </property>
                   </widget>
                  </item>
@@ -1339,10 +1375,13 @@
                  </sizepolicy>
                 </property>
                 <property name="frameShape">
-                 <enum>QFrame::StyledPanel</enum>
+                 <enum>QFrame::NoFrame</enum>
                 </property>
                 <property name="frameShadow">
-                 <enum>QFrame::Raised</enum>
+                 <enum>QFrame::Plain</enum>
+                </property>
+                <property name="lineWidth">
+                 <number>0</number>
                 </property>
                 <layout class="QHBoxLayout" name="horizontalLayout_9">
                  <property name="spacing">
@@ -1429,10 +1468,13 @@
                     </sizepolicy>
                    </property>
                    <property name="decimals">
-                    <number>0</number>
+                    <number>3</number>
                    </property>
                    <property name="maximum">
-                    <double>127.000000000000000</double>
+                    <double>1.000000000000000</double>
+                   </property>
+                   <property name="singleStep">
+                    <double>0.100000000000000</double>
                    </property>
                    <property name="value">
                     <double>0.000000000000000</double>
@@ -1492,13 +1534,13 @@
                  <bool>false</bool>
                 </property>
                 <property name="styleSheet">
-                 <string notr="true">background-color: rgb(218, 218, 218);</string>
+                 <string notr="true"/>
                 </property>
                 <property name="frameShape">
-                 <enum>QFrame::StyledPanel</enum>
+                 <enum>QFrame::NoFrame</enum>
                 </property>
                 <property name="frameShadow">
-                 <enum>QFrame::Raised</enum>
+                 <enum>QFrame::Plain</enum>
                 </property>
                 <property name="lineWidth">
                  <number>0</number>
@@ -1533,9 +1575,15 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QSpinBox" name="chirp1A2_4">
+                  <widget class="QDoubleSpinBox" name="chirp4A2">
+                   <property name="decimals">
+                    <number>3</number>
+                   </property>
                    <property name="maximum">
-                    <number>127</number>
+                    <double>1.000000000000000</double>
+                   </property>
+                   <property name="singleStep">
+                    <double>0.100000000000000</double>
                    </property>
                   </widget>
                  </item>
@@ -1553,7 +1601,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QSpinBox" name="chirp1Tinicio_4">
+                  <widget class="QSpinBox" name="chirp4Tinicio">
                    <property name="maximum">
                     <number>255</number>
                    </property>
@@ -1576,7 +1624,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QDoubleSpinBox" name="chirp1DeltaI_4">
+                  <widget class="QDoubleSpinBox" name="chirp4DeltaI">
                    <property name="decimals">
                     <number>1</number>
                    </property>
@@ -1608,7 +1656,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QSpinBox" name="chirp1Tfim_4">
+                  <widget class="QSpinBox" name="chirp4Tfim">
                    <property name="maximum">
                     <number>255</number>
                    </property>
@@ -1631,7 +1679,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QDoubleSpinBox" name="chirp1DeltaF_4">
+                  <widget class="QDoubleSpinBox" name="chirp4DeltaF">
                    <property name="decimals">
                     <number>1</number>
                    </property>
@@ -2006,7 +2054,7 @@
                    </sizepolicy>
                   </property>
                   <property name="currentText">
-                   <string>Canal 2</string>
+                   <string>Canal 1</string>
                   </property>
                   <item>
                    <property name="text">
@@ -2182,7 +2230,7 @@
            <number>3</number>
           </property>
           <item>
-           <widget class="QTabWidget" name="tabWidget_2">
+           <widget class="QTabWidget" name="tabSensors">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
               <horstretch>0</horstretch>
@@ -2192,13 +2240,25 @@
             <property name="currentIndex">
              <number>0</number>
             </property>
-            <widget class="QWidget" name="imu">
+            <widget class="QWidget" name="imutab">
              <attribute name="title">
               <string>IMU</string>
              </attribute>
              <layout class="QVBoxLayout" name="verticalLayout_12">
+              <property name="leftMargin">
+               <number>8</number>
+              </property>
+              <property name="topMargin">
+               <number>3</number>
+              </property>
+              <property name="rightMargin">
+               <number>8</number>
+              </property>
+              <property name="bottomMargin">
+               <number>3</number>
+              </property>
               <item>
-               <widget class="QFrame" name="frame_6">
+               <widget class="QFrame" name="imuframe">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -2206,10 +2266,13 @@
                  </sizepolicy>
                 </property>
                 <property name="frameShape">
-                 <enum>QFrame::StyledPanel</enum>
+                 <enum>QFrame::NoFrame</enum>
                 </property>
                 <property name="frameShadow">
-                 <enum>QFrame::Raised</enum>
+                 <enum>QFrame::Plain</enum>
+                </property>
+                <property name="lineWidth">
+                 <number>0</number>
                 </property>
                 <layout class="QGridLayout" name="gridLayout">
                  <property name="leftMargin">
@@ -2518,8 +2581,20 @@
               <string>ADC</string>
              </attribute>
              <layout class="QVBoxLayout" name="verticalLayout_13">
+              <property name="leftMargin">
+               <number>8</number>
+              </property>
+              <property name="topMargin">
+               <number>3</number>
+              </property>
+              <property name="rightMargin">
+               <number>8</number>
+              </property>
+              <property name="bottomMargin">
+               <number>3</number>
+              </property>
               <item>
-               <widget class="QFrame" name="frame_3">
+               <widget class="QFrame" name="adcframe">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
                   <horstretch>0</horstretch>
@@ -2571,17 +2646,105 @@
                   </widget>
                  </item>
                  <item>
-                  <spacer name="horizontalSpacer_4">
-                   <property name="orientation">
-                    <enum>Qt::Horizontal</enum>
+                  <widget class="QLabel" name="label_30">
+                   <property name="layoutDirection">
+                    <enum>Qt::LeftToRight</enum>
                    </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>40</width>
-                     <height>20</height>
-                    </size>
+                   <property name="text">
+                    <string>Range:</string>
                    </property>
-                  </spacer>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="comboRangeADC">
+                   <item>
+                    <property name="text">
+                     <string>±6,144 V</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>±4,096 V</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>±2,048 V</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>±1,024 V</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>±0,512 V</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>±0,256 V</string>
+                    </property>
+                   </item>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="label_33">
+                   <property name="text">
+                    <string>Rate:</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="comboADCRate">
+                   <item>
+                    <property name="text">
+                     <string>8 SPS</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>16 SPS</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>32 SPS</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>64 SPS</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>128 SPS</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>250 SPS</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>475 SPS</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>860 SPS</string>
+                    </property>
+                   </item>
+                  </widget>
                  </item>
                 </layout>
                </widget>
@@ -2668,7 +2831,7 @@
              <item>
               <widget class="QComboBox" name="comboPlot2">
                <property name="currentText">
-                <string>Gyro</string>
+                <string>Acceleration</string>
                </property>
                <item>
                 <property name="text">

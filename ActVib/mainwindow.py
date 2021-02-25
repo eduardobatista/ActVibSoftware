@@ -5,12 +5,11 @@ import time
 import pandas as pd
 
 from PyQt5 import QtWidgets, QtGui, QtCore
-from PyQt5.QtWidgets import QMessageBox, QFileDialog
+from PyQt5.QtWidgets import QMessageBox, QFileDialog, QCheckBox, QComboBox, QDoubleSpinBox, QSpinBox
 
 from VibViewWindow import Ui_MainWindow
 
 from others import (MyFigQtGraph, CtrlFigQtGraph, FigOutputQtGraph, WorkdirManager, MyUploadDialog)
-
 
 class mainwindow(QtWidgets.QMainWindow):
 
@@ -19,6 +18,7 @@ class mainwindow(QtWidgets.QMainWindow):
         self.app = app
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        self.cw = self.ui.centralwidget
         self.porta = "COM3"
         self.workdir = "D://"
         self.saveconfigtypes = [QtWidgets.QCheckBox, QtWidgets.QComboBox,
@@ -35,26 +35,29 @@ class mainwindow(QtWidgets.QMainWindow):
         self.ui.actionSalvar_dados.triggered.connect(self.saveDialog)
         self.ui.actionUpload.triggered.connect(self.openUploadDialog)
         self.ui.actionWorkdirManager.triggered.connect(self.openWorkdirManager)
-        self.ui.comboAccRange.activated.connect(self.changeMPUConfig)
-        self.ui.comboGyroRange.activated.connect(self.changeMPUConfig)
-        self.ui.comboFilter.activated.connect(self.changeMPUConfig)
-        self.ui.comboAddress.activated.connect(self.changeMPUConfig)
-        self.ui.checkAccX.toggled.connect(self.plotConfig)
-        self.ui.checkAccY.toggled.connect(self.plotConfig)
-        self.ui.checkAccZ.toggled.connect(self.plotConfig)
-        self.ui.checkGyroX.toggled.connect(self.plotConfig)
-        self.ui.checkGyroY.toggled.connect(self.plotConfig)
-        self.ui.checkGyroZ.toggled.connect(self.plotConfig)
-        self.ui.comboCanal1.activated.connect(self.changeGeneratorConfig)
-        self.ui.spinAmpl1.editingFinished.connect(self.changeGeneratorConfig)
-        self.ui.spinFreq1.editingFinished.connect(self.changeGeneratorConfig)
-        self.ui.comboCanal2.activated.connect(self.changeGeneratorConfig)
-        self.ui.spinAmpl2.editingFinished.connect(self.changeGeneratorConfig)
-        self.ui.spinFreq2.editingFinished.connect(self.changeGeneratorConfig)
-        self.ui.checkCanal1.toggled.connect(self.plotOutConfig)
-        self.ui.checkCanal1.toggled.connect(self.changeGeneratorConfig)
-        self.ui.checkCanal2.toggled.connect(self.plotOutConfig)
-        self.ui.checkCanal2.toggled.connect(self.changeGeneratorConfig)
+        
+        # IMU Connections:
+        imupanel = self.ui.imuframe      
+        for cc in imupanel.findChildren(QComboBox):
+            cc.activated.connect(self.changeMPUConfig)
+        for cc in imupanel.findChildren(QCheckBox):
+            cc.toggled.connect(self.plotConfig)
+
+        # ADC Connections
+        self.ui.checkADCOn.toggled.connect(self.changeADCConfig)
+        adcpanel = self.ui.adcframe.findChildren(QComboBox)
+        for cc in adcpanel:
+            cc.activated.connect(self.changeADCConfig)
+
+        # Signal Generator Connections:
+        for cc in self.ui.tabWidget.findChildren(QComboBox, QtCore.QRegExp("comboCanal.*")):
+            cc.activated.connect(self.changeGeneratorConfig)
+        for cc in self.ui.tabWidget.findChildren(QDoubleSpinBox, QtCore.QRegExp("spinAmpl.*|spinFreq.*")):
+            cc.editingFinished.connect(self.changeGeneratorConfig)
+        for cc in self.ui.tabWidget.findChildren(QCheckBox, QtCore.QRegExp("checkCanal.*")):
+            cc.toggled.connect(self.plotOutConfig)
+            cc.toggled.connect(self.changeGeneratorConfig)
+            
         self.ui.checkAlgOn.setChecked(False)
         self.ui.checkAlgOn.setEnabled(False)
         self.ui.checkControle.toggled.connect(self.configControl)
@@ -76,6 +79,7 @@ class mainwindow(QtWidgets.QMainWindow):
         self.ui.actionSavePlus.triggered.connect(self.savePlus)
         self.ui.actionDefineWorkdir.triggered.connect(self.defWorkdir)
         self.flagsaveplus = False
+        self.disabledwhenrunning = []
 
     def pFocus(self):
         self.ui.passoCtrl.selectAll()
@@ -127,7 +131,7 @@ class mainwindow(QtWidgets.QMainWindow):
                         'tipoperturb': (self.ui.comboCanal1.currentText()
                                         if (self.ui.comboCanaisControle.currentIndex() == 0)
                                         else self.ui.comboCanal2.currentText()),
-                        'amplperturb': (self.ui.spinAmpl1.value()
+                        'amplperturb': (self.ui.spinAmpl1.value()    # TODO!!!!
                                         if (self.ui.comboCanaisControle.currentIndex() == 0)
                                         else self.ui.spinAmpl2.value()),
                         'freqperturb': (self.ui.spinFreq1.value()
@@ -213,6 +217,7 @@ class mainwindow(QtWidgets.QMainWindow):
         self.driver = drv
         self.changeGeneratorConfig()
         self.changeMPUConfig()
+        self.changeADCConfig()
         self.configControl()
 
     def validateStep(self):
@@ -323,7 +328,8 @@ class mainwindow(QtWidgets.QMainWindow):
                 self.ctrlfig.hide()
 
     def plotOutConfig(self):
-        self.ofig.dacenable = [self.ui.checkCanal1.isChecked(), self.ui.checkCanal2.isChecked()]
+        self.ofig.dacenable = [self.ui.checkCanal1.isChecked(), self.ui.checkCanal2.isChecked(), 
+                               self.ui.checkCanal3.isChecked(), self.ui.checkCanal4.isChecked()]
 
     def plotConfig(self):
         self.mfig.accEnable = [self.ui.checkAccX.isChecked(),
@@ -335,45 +341,20 @@ class mainwindow(QtWidgets.QMainWindow):
         self.ctrlfig.plotSetup([self.ui.comboRef.currentIndex(), self.ui.comboErro.currentIndex()])
 
     def changeGeneratorConfig(self):
-        # if not self.ui.checkControle.isChecked():
-        if self.ui.comboCanal1.currentIndex() == 2:
-            self.ui.extrasCanal1.show()
-        else:
-            self.ui.extrasCanal1.hide()
-        if self.ui.comboCanal2.currentIndex() == 2:
-            self.ui.extrasCanal2.show()
-        else:
-            self.ui.extrasCanal2.hide()
-
-        generatorconfig1 = {'tipo': self.ui.comboCanal1.currentIndex(),
-                            'amp': self.ui.spinAmpl1.value() if self.ui.checkCanal1.isChecked() else 0,
-                            'freq': self.ui.spinFreq1.value()}
-        if self.ui.comboCanal1.currentIndex() == 2:  # Chirp
-            generatorconfig1['chirpconf'] = [self.ui.chirp1Tinicio.value(),
-                                             self.ui.chirp1DeltaI.value(),
-                                             self.ui.chirp1Tfim.value(),
-                                             self.ui.chirp1DeltaF.value(),
-                                             self.ui.chirp1A2.value()]
-
-        generatorconfig2 = {'tipo': self.ui.comboCanal2.currentIndex(),
-                            'amp': self.ui.spinAmpl2.value() if self.ui.checkCanal2.isChecked() else 0,
-                            'freq': self.ui.spinFreq2.value()}
-        if self.ui.comboCanal2.currentIndex() == 2:  # Chirp
-            generatorconfig2['chirpconf'] = [self.ui.chirp2Tinicio.value(),
-                                             self.ui.chirp2DeltaI.value(),
-                                             self.ui.chirp2Tfim.value(),
-                                             self.ui.chirp2DeltaF.value(),
-                                             self.ui.chirp2A2.value()]
-
-        self.driver.setGeneratorConfig(0, **generatorconfig1)
-        self.driver.setGeneratorConfig(1, **generatorconfig2)
-
-        # self.driver.setGeneratorConfig(0,self.ui.comboCanal1.currentIndex(),
-        #                                self.ui.spinAmpl1.value() if self.ui.checkCanal1.isChecked() else 0,
-        #                                self.ui.spinFreq1.value())
-        # self.driver.setGeneratorConfig(1,self.ui.comboCanal2.currentIndex(),
-        #                                self.ui.spinAmpl2.value() if self.ui.checkCanal2.isChecked() else 0,
-        #                                self.ui.spinFreq2.value())
+        for k in range(1, 5):
+            comboc = self.ui.tabWidget.findChild(QComboBox, f"comboCanal{k}")
+            spinA = self.ui.tabWidget.findChild(QDoubleSpinBox, f"spinAmpl{k}")
+            checkc = self.ui.tabWidget.findChild(QCheckBox, f"checkCanal{k}")
+            freqc = self.ui.tabWidget.findChild(QDoubleSpinBox, f"spinFreq{k}")
+            generatorconfig = {'tipo': comboc.currentIndex(),
+                               'amp': spinA.value() if checkc.isChecked() else 0.0,
+                               'freq': freqc.value()}
+            generatorconfig['chirpconf'] = [self.ui.tabWidget.findChild(QSpinBox, f"chirp{k}Tinicio").value(),
+                                            self.ui.tabWidget.findChild(QDoubleSpinBox, f"chirp{k}DeltaI").value(),
+                                            self.ui.tabWidget.findChild(QSpinBox, f"chirp{k}Tfim").value(),
+                                            self.ui.tabWidget.findChild(QDoubleSpinBox, f"chirp{k}DeltaF").value(),
+                                            self.ui.tabWidget.findChild(QDoubleSpinBox, f"chirp{k}A2").value()]
+            self.driver.setGeneratorConfig(k-1, **generatorconfig)
 
     def changeMPUConfig(self, nrange=0):
         if self.driver is not None:
@@ -381,6 +362,14 @@ class mainwindow(QtWidgets.QMainWindow):
             self.driver.setMPUFilter(self.ui.comboFilter.currentIndex())
             self.driver.setAccRange(self.ui.comboAccRange.currentIndex())
             self.driver.setGyroRange(self.ui.comboGyroRange.currentIndex())
+
+    def changeADCConfig(self):
+        if self.driver is not None:
+            adcconfig = [1 if self.ui.checkADCOn.isChecked() else 0,
+                         self.ui.comboADCChannel.currentIndex(),
+                         self.ui.comboRangeADC.currentIndex(),
+                         self.ui.comboADCRate.currentIndex()]
+            self.driver.setADCConfig(adcconfig)
 
     def addPlots(self, mfig, ctrlfig):
         settings = QtCore.QSettings("VibSoftware", "VibView")
@@ -408,7 +397,7 @@ class mainwindow(QtWidgets.QMainWindow):
             self.ofig.parseConfigString(aux)
         self.ui.plotLayout2.addWidget(self.ofig)
         # self.ofig.draw()
-
+    
     def bInit(self):
         if self.dataman.flagrodando:
             self.dataman.ParaLeituras()
@@ -418,38 +407,35 @@ class mainwindow(QtWidgets.QMainWindow):
             self.changeGeneratorConfig()
             self.changeMPUConfig(0)
             self.changeMPUConfig(1)
+            self.changeADCConfig()
             self.plotConfig()
             self.plotOutConfig()
-            self.ui.comboAddress.setEnabled(False)
-            self.ui.comboAccRange.setEnabled(False)
-            self.ui.comboGyroRange.setEnabled(False)
-            self.ui.comboFilter.setEnabled(False)
-            self.ui.checkControle.setEnabled(False)
+
+            self.disabledwhenrunning = [self.ui.comboAddress,self.ui.comboAccRange,self.ui.comboGyroRange,
+                                   self.ui.comboFilter,self.ui.checkControle,self.ui.comboCanaisControle,
+                                   self.ui.comboRef,self.ui.comboErro,self.ui.comboAlgoritmo,self.ui.spinMemCtrl,
+                                   self.ui.checkADCOn,self.ui.comboADCChannel,self.ui.comboRangeADC,self.ui.comboADCRate]
+            for cc in self.disabledwhenrunning: 
+                cc.setEnabled(False)
+
             if self.ui.checkControle.isChecked():
                 self.ui.checkAlgOn.setEnabled(True)
-            self.ui.comboCanaisControle.setEnabled(False)
-            self.ui.comboRef.setEnabled(False)
-            self.ui.comboErro.setEnabled(False)
-            self.ui.comboAlgoritmo.setEnabled(False)
-            self.ui.spinMemCtrl.setEnabled(False)
+
+            if self.driver.adcconfig[0] == 0:
+                self.mfig.removeADCPlot()
+            else:
+                self.mfig.addADCPlot()
+
             self.dataman.IniciaLeituras()
 
     # def bPara(self):
     #     self.dataman.ParaLeituras()
 
     def readingsStopped(self):
-        self.ui.comboAccRange.setEnabled(True)
-        self.ui.comboGyroRange.setEnabled(True)
-        self.ui.comboFilter.setEnabled(True)
-        self.ui.comboAddress.setEnabled(True)
-        self.ui.checkControle.setEnabled(True)
+        for cc in self.disabledwhenrunning:
+            cc.setEnabled(True)
         self.ui.checkAlgOn.setEnabled(False)
         self.ui.checkAlgOn.setChecked(False)
-        self.ui.comboCanaisControle.setEnabled(True)
-        self.ui.comboRef.setEnabled(True)
-        self.ui.comboErro.setEnabled(True)
-        self.ui.comboAlgoritmo.setEnabled(True)
-        self.ui.spinMemCtrl.setEnabled(True)
 
     def bReset(self):
         if self.dataman.flagrodando:
