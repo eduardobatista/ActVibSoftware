@@ -8,6 +8,8 @@ import struct
 class driverhardware:
 
     def __init__(self, mwindow):
+        self.DCLEVEL = [1668,1668,104,104]
+        self.iampscaler = [1/float(self.DCLEVEL[0]),1/float(self.DCLEVEL[1]),1/float(self.DCLEVEL[2]),1/float(self.DCLEVEL[3])]
         self.mwindow = mwindow
         self.accscaler = 9.80665 * 2.0 / (2**15)
         self.gyroscaler = 250.0 / (2**15)
@@ -18,7 +20,7 @@ class driverhardware:
         self.buf = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         self.accreadings = [0.0, 0.0, 0.0]  # x,y,z
         self.gyroreadings = [0.0, 0.0, 0.0]  # x,y,z
-        self.dacout = [0, 0, 0, 0]
+        self.dacout = [0.0, 0.0, 0.0, 0.0]
         self.gentipo = [0, 0, 0, 0]
         self.genamp = [0.0, 0.0, 0.0, 0.0]
         self.genfreq = [0.0, 0.0, 0.0, 0.0]
@@ -53,7 +55,7 @@ class driverhardware:
         self.xerro = 0
         self.algonchanged = False
         self.calctime = 0
-        self.algontime = 0.0        
+        self.algontime = 0.0 
 
     def openSerial(self):
         self.serial.port = self.mwindow.porta
@@ -126,10 +128,12 @@ class driverhardware:
         freqaux = [int(self.genfreq[id]), int(round((self.genfreq[id] - int(self.genfreq[id])) * 100))]
         if id < 2:  # Saída de 12 bits, MCP4725
             ampaux = int(round(self.genamp[id] * 2047))
+            dclevel = self.DCLEVEL[0]  # Para não saturar. TODO: Expor isso como configuração para o programa.
         else:  # Saída direta do ESP32, com 8 bits.
             ampaux = int(round(self.genamp[id] * 127))
+            dclevel = self.DCLEVEL[2]  # Para não saturar. TODO: Expor isso como configuração para o programa.
         aux = 'G'
-        aux = aux.encode() + bytes([id, self.gentipo[id], (ampaux >> 8) & 0xFF, ampaux & 0xFF] + freqaux)
+        aux = aux.encode() + bytes([id, self.gentipo[id], (ampaux >> 8) & 0xFF, ampaux & 0xFF] + freqaux + [dclevel >> 8, dclevel & 0xFF])
         if self.gentipo[id] == 2:  # Chirp, manda mais 4 bytes [tinicio,deltai,tfim,deltaf]
             aux = aux + bytes(self.chirpconf[id])
         self.serial.write(aux)
@@ -279,11 +283,11 @@ class driverhardware:
                 bufa = self.buf[(2 * k + 8):(2 * k + 10)]
                 val = int((bufa[0] << 8) | bufa[1])
                 val = val if ((bufa[0] >> 7) == 0) else (-1 * (65536 - val))
-                self.gyroreadings[k] = float(val) * self.gyroscaler
-            self.dacout[0] = self.buf[14] << 8 | self.buf[15]
-            self.dacout[1] = self.buf[16] << 8 | self.buf[17]
-            self.dacout[2] = self.buf[18]
-            self.dacout[3] = self.buf[19]
+                self.gyroreadings[k] = float(val) * self.gyroscaler            
+            self.dacout[0] = float(self.buf[14] << 8 | self.buf[15]) * self.iampscaler[0] - 1.0
+            self.dacout[1] = float(self.buf[16] << 8 | self.buf[17]) * self.iampscaler[1] - 1.0
+            self.dacout[2] = float(self.buf[18]) * self.iampscaler[2] - 1.0
+            self.dacout[3] = float(self.buf[19]) * self.iampscaler[3] - 1.0
             if (self.buf[20] & 0x80) == 0:
                 self.adcin = float( (self.buf[20] << 8) | self.buf[21] ) * self.adcmultiplier
             else:

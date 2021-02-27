@@ -103,10 +103,10 @@ class dataman:
                     for k in range(3):
                         self.accdata[k][self.globalctreadings] = self.driver.accreadings[k]
                         self.gyrodata[k][self.globalctreadings] = self.driver.gyroreadings[k]
-                self.dacoutdata[0][self.globalctreadings] = (float(self.driver.dacout[0]) - 2048.0) / 2047.0
-                self.dacoutdata[1][self.globalctreadings] = (float(self.driver.dacout[1]) - 2048.0) / 2047.0
-                self.dacoutdata[2][self.globalctreadings] = (float(self.driver.dacout[2]) - 128.0) / 127.0
-                self.dacoutdata[3][self.globalctreadings] = (float(self.driver.dacout[3]) - 128.0) / 127.0
+                self.dacoutdata[0][self.globalctreadings] = self.driver.dacout[0]
+                self.dacoutdata[1][self.globalctreadings] = self.driver.dacout[1]
+                self.dacoutdata[2][self.globalctreadings] = self.driver.dacout[2]
+                self.dacoutdata[3][self.globalctreadings] = self.driver.dacout[3]
                 self.adcdata[self.globalctreadings] = self.driver.adcin
                 self.ctreadings += 1
                 self.globalctreadings += 1
