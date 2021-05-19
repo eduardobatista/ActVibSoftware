@@ -5,7 +5,7 @@ import os
 from pathlib import Path
 
 from PyQt5 import (QtCore, QtWidgets)
-from PyQt5.QtWidgets import (QDialog, QFileDialog)
+from PyQt5.QtWidgets import (QDialog, QFileDialog, QWidget)
 
 import numpy as np
 import pandas as pd

@@ -11,6 +11,8 @@ from VibViewWindow import Ui_MainWindow
 
 from others import (MyFigQtGraph, CtrlFigQtGraph, FigOutputQtGraph, WorkdirManager, MyUploadDialog)
 
+from panels import (IMUPanel,GeneratorPanel)
+
 class mainwindow(QtWidgets.QMainWindow):
 
     def __init__(self, app):
@@ -23,6 +25,8 @@ class mainwindow(QtWidgets.QMainWindow):
         self.workdir = "D://"
         self.saveconfigtypes = [QtWidgets.QCheckBox, QtWidgets.QComboBox,
                                 QtWidgets.QDoubleSpinBox, QtWidgets.QSpinBox, QtWidgets.QLineEdit]
+        self.imupanel = IMUPanel(0)
+        self.genpanel = [GeneratorPanel(1),GeneratorPanel(2),GeneratorPanel(3),GeneratorPanel(4)]
         self.readConfig()
         self.mapper = QtCore.QSignalMapper(self)
         self.ui.bInit.clicked.connect(self.bInit)
@@ -37,7 +41,9 @@ class mainwindow(QtWidgets.QMainWindow):
         self.ui.actionWorkdirManager.triggered.connect(self.openWorkdirManager)
         
         # IMU Connections:
-        imupanel = self.ui.imuframe      
+        
+        self.ui.imutab.layout().addWidget(self.imupanel)
+        imupanel = self.imupanel
         for cc in imupanel.findChildren(QComboBox):
             cc.activated.connect(self.changeMPUConfig)
         for cc in imupanel.findChildren(QCheckBox):
@@ -50,11 +56,15 @@ class mainwindow(QtWidgets.QMainWindow):
             cc.activated.connect(self.changeADCConfig)
 
         # Signal Generator Connections:
-        for cc in self.ui.tabWidget.findChildren(QComboBox, QtCore.QRegExp("comboCanal.*")):
+        self.ui.canal1.layout().addWidget(self.genpanel[0])
+        self.ui.canal2.layout().addWidget(self.genpanel[1])
+        self.ui.canal3.layout().addWidget(self.genpanel[2])
+        self.ui.canal4.layout().addWidget(self.genpanel[3])
+        for cc in self.ui.tabWidget.findChildren(QComboBox, QtCore.QRegExp("comboType.*")):
             cc.activated.connect(self.changeGeneratorConfig)
         for cc in self.ui.tabWidget.findChildren(QDoubleSpinBox, QtCore.QRegExp("spinAmpl.*|spinFreq.*")):
             cc.editingFinished.connect(self.changeGeneratorConfig)
-        for cc in self.ui.tabWidget.findChildren(QCheckBox, QtCore.QRegExp("checkCanal.*")):
+        for cc in self.ui.tabWidget.findChildren(QCheckBox, QtCore.QRegExp("checkEnable.*")):
             cc.toggled.connect(self.plotOutConfig)
             cc.toggled.connect(self.changeGeneratorConfig)
             
@@ -165,9 +175,10 @@ class mainwindow(QtWidgets.QMainWindow):
                 if dirnames[0] != '':
                     self.workdir = dirnames[0]
 
-    def readConfig(self):
+    def readConfig(self):        
         settings = QtCore.QSettings("VibSoftware", "VibView")
         for w in self.app.allWidgets():
+            # print(w.objectName())
             if ((type(w) in self.saveconfigtypes) and (settings.value(w.objectName()) is not None)):
                 if (type(w) == QtWidgets.QCheckBox):
                     w.setChecked(settings.value(w.objectName()) == 'True')
@@ -183,10 +194,14 @@ class mainwindow(QtWidgets.QMainWindow):
             self.porta = settings.value("Porta")
         if (settings.value("WorkDir") is not None):
             self.workdir = settings.value("WorkDir")
+        self.imupanel.restoreState(settings)
+        for gp in self.genpanel:
+            gp.restoreState(settings)
+        
 
     def writeConfig(self):
         settings = QtCore.QSettings("VibSoftware", "VibView")
-        for w in self.app.allWidgets():
+        for w in self.app.allWidgets():            
             if (type(w) == QtWidgets.QCheckBox):
                 settings.setValue(w.objectName(), str(w.isChecked()))
             elif (type(w) == QtWidgets.QComboBox):
@@ -202,6 +217,9 @@ class mainwindow(QtWidgets.QMainWindow):
         settings.setValue("OFig", self.ofig.getConfigString())
         settings.setValue("CtrlFig", self.ctrlfig.getConfigString())
         settings.setValue('WorkDir', self.workdir)
+        self.imupanel.saveState(settings)
+        for gp in self.genpanel:
+            gp.saveState(settings)
 
     def setDataMan(self, dm):
         self.dataman = dm
@@ -257,50 +275,19 @@ class mainwindow(QtWidgets.QMainWindow):
                 self.driver.canalControle = 1
             else:
                 self.driver.canalControle = 0
-            self.ui.checkCanal2.setEnabled(not state1)
-            self.ui.comboCanal2.setEnabled(not state1)
-            self.ui.spinAmpl2.setEnabled(not state1)
-            self.ui.spinFreq2.setEnabled(not state1)
-            self.ui.checkCanal1.setEnabled(state1)
-            self.ui.comboCanal1.setEnabled(state1)
-            self.ui.spinAmpl1.setEnabled(state1)
-            self.ui.spinFreq1.setEnabled(state1)
+            
+            self.genpanel[1].setEnabled(not state1)
+            
+            self.genpanel[0].setEnabled(state1)
+            
             if state1:
-                generatorconfig1 = {'tipo': self.ui.comboCanal1.currentIndex(),
-                                    'amp': self.ui.spinAmpl1.value(),
-                                    'freq': self.ui.spinFreq1.value()}
-                if self.ui.comboCanal1.currentIndex() == 2:  # Chirp
-                    generatorconfig1['chirpconf'] = [self.ui.chirp1Tinicio.value(),
-                                                     self.ui.chirp1DeltaI.value(),
-                                                     self.ui.chirp1Tfim.value(),
-                                                     self.ui.chirp1DeltaF.value(),
-                                                     self.ui.chirp1A2.value()]
+                generatorconfig1 = self.genpanel[0].getGeneratorConfig()                
                 self.driver.setGeneratorConfig(0, **generatorconfig1)
-                # self.driver.setGeneratorConfig(0,self.ui.comboCanal1.currentIndex(),
-                #                         self.ui.spinAmpl1.value(),
-                #                         self.ui.spinFreq1.value())
-                self.driver.setGeneratorConfig(1, 0, 0, self.ui.spinFreq2.value())
-                # self.driver.setGeneratorConfig(1,self.ui.comboCanal2.currentIndex(),
-                #                             0,
-                #                             self.ui.spinFreq2.value())
+                self.driver.setGeneratorConfig(1, 0, 0, self.genpanel[1].getFreqValue())
             else:
-                self.driver.setGeneratorConfig(0, 0, 0, self.ui.spinFreq1.value())
-                # self.driver.setGeneratorConfig(0,self.ui.comboCanal1.currentIndex(),
-                #                         0,
-                #                         self.ui.spinFreq1.value())
-                generatorconfig2 = {'tipo': self.ui.comboCanal2.currentIndex(),
-                                    'amp': self.ui.spinAmpl2.value(),
-                                    'freq': self.ui.spinFreq2.value()}
-                if self.ui.comboCanal2.currentIndex() == 2:  # Chirp
-                    generatorconfig2['chirpconf'] = [self.ui.chirp2Tinicio.value(),
-                                                     self.ui.chirp2DeltaI.value(),
-                                                     self.ui.chirp2Tfim.value(),
-                                                     self.ui.chirp2DeltaF.value(),
-                                                     self.ui.chirp2A2.value()]
+                self.driver.setGeneratorConfig(0, 0, 0, self.genpanel[0].getFreqValue())
+                generatorconfig2 = self.genpanel[1].getGeneratorConfig()
                 self.driver.setGeneratorConfig(1, **generatorconfig2)
-                # self.driver.setGeneratorConfig(1,self.ui.comboCanal2.currentIndex(),
-                #                         self.ui.spinAmpl2.value(),
-                #                         self.ui.spinFreq2.value())
             self.driver.setControlConfig(
                 self.ui.comboAlgoritmo.currentIndex(),
                 int(self.ui.spinMemCtrl.value()),
@@ -314,54 +301,34 @@ class mainwindow(QtWidgets.QMainWindow):
                 self.mfig.hide()
 
         else:
-            self.ui.checkCanal2.setEnabled(True)
-            self.ui.comboCanal2.setEnabled(True)
-            self.ui.spinAmpl2.setEnabled(True)
-            self.ui.spinFreq2.setEnabled(True)
-            self.ui.checkCanal1.setEnabled(True)
-            self.ui.comboCanal1.setEnabled(True)
-            self.ui.spinAmpl1.setEnabled(True)
-            self.ui.spinFreq1.setEnabled(True)
+            self.genpanel[1].setEnabled(True)
+            self.genpanel[0].setEnabled(True)
             self.changeGeneratorConfig()
             if (self.ctrlfig is not None):
                 self.mfig.show()
                 self.ctrlfig.hide()
 
     def plotOutConfig(self):
-        self.ofig.dacenable = [self.ui.checkCanal1.isChecked(), self.ui.checkCanal2.isChecked(), 
-                               self.ui.checkCanal3.isChecked(), self.ui.checkCanal4.isChecked()]
+        self.ofig.dacenable = [aa.isGeneratorOn() for aa in self.genpanel]
+        # self.ofig.dacenable = [self.ui.checkCanal1.isChecked(), self.ui.checkCanal2.isChecked(), 
+        #                        self.ui.checkCanal3.isChecked(), self.ui.checkCanal4.isChecked()]
 
     def plotConfig(self):
-        self.mfig.accEnable = [self.ui.checkAccX.isChecked(),
-                               self.ui.checkAccY.isChecked(),
-                               self.ui.checkAccZ.isChecked()]
-        self.mfig.gyroEnable = [self.ui.checkGyroX.isChecked(),
-                                self.ui.checkGyroY.isChecked(),
-                                self.ui.checkGyroZ.isChecked()]
+        self.mfig.accEnable = self.imupanel.getAccEnableList()
+        self.mfig.gyroEnable = self.imupanel.getGyroEnableList()
         self.ctrlfig.plotSetup([self.ui.comboRef.currentIndex(), self.ui.comboErro.currentIndex()])
 
     def changeGeneratorConfig(self):
-        for k in range(1, 5):
-            comboc = self.ui.tabWidget.findChild(QComboBox, f"comboCanal{k}")
-            spinA = self.ui.tabWidget.findChild(QDoubleSpinBox, f"spinAmpl{k}")
-            checkc = self.ui.tabWidget.findChild(QCheckBox, f"checkCanal{k}")
-            freqc = self.ui.tabWidget.findChild(QDoubleSpinBox, f"spinFreq{k}")
-            generatorconfig = {'tipo': comboc.currentIndex(),
-                               'amp': spinA.value() if checkc.isChecked() else 0.0,
-                               'freq': freqc.value()}
-            generatorconfig['chirpconf'] = [self.ui.tabWidget.findChild(QSpinBox, f"chirp{k}Tinicio").value(),
-                                            self.ui.tabWidget.findChild(QDoubleSpinBox, f"chirp{k}DeltaI").value(),
-                                            self.ui.tabWidget.findChild(QSpinBox, f"chirp{k}Tfim").value(),
-                                            self.ui.tabWidget.findChild(QDoubleSpinBox, f"chirp{k}DeltaF").value(),
-                                            self.ui.tabWidget.findChild(QDoubleSpinBox, f"chirp{k}A2").value()]
-            self.driver.setGeneratorConfig(k-1, **generatorconfig)
+        for k in range(4):
+            generatorconfig = self.genpanel[k].getGeneratorConfig()
+            self.driver.setGeneratorConfig(k, **generatorconfig)
 
     def changeMPUConfig(self, nrange=0):
         if self.driver is not None:
-            self.driver.setMPUAddress(self.ui.comboAddress.currentIndex())
-            self.driver.setMPUFilter(self.ui.comboFilter.currentIndex())
-            self.driver.setAccRange(self.ui.comboAccRange.currentIndex())
-            self.driver.setGyroRange(self.ui.comboGyroRange.currentIndex())
+            self.driver.setMPUAddress(self.imupanel.getMPUAddress())
+            self.driver.setMPUFilter(self.imupanel.getMPUFilter())
+            self.driver.setAccRange(self.imupanel.getAccRange())
+            self.driver.setGyroRange(self.imupanel.getGyroRange())
 
     def changeADCConfig(self):
         if self.driver is not None:
@@ -411,8 +378,7 @@ class mainwindow(QtWidgets.QMainWindow):
             self.plotConfig()
             self.plotOutConfig()
 
-            self.disabledwhenrunning = [self.ui.comboAddress,self.ui.comboAccRange,self.ui.comboGyroRange,
-                                   self.ui.comboFilter,self.ui.checkControle,self.ui.comboCanaisControle,
+            self.disabledwhenrunning = [self.imupanel,self.ui.checkControle,self.ui.comboCanaisControle,
                                    self.ui.comboRef,self.ui.comboErro,self.ui.comboAlgoritmo,self.ui.spinMemCtrl,
                                    self.ui.checkADCOn,self.ui.comboADCChannel,self.ui.comboRangeADC,self.ui.comboADCRate]
             for cc in self.disabledwhenrunning: 
