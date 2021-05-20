@@ -922,9 +922,9 @@
             <property name="currentIndex">
              <number>0</number>
             </property>
-            <widget class="QWidget" name="imutab">
+            <widget class="QWidget" name="imutab1">
              <attribute name="title">
-              <string>IMU</string>
+              <string>IMU 1</string>
              </attribute>
              <layout class="QVBoxLayout" name="IMU1Layout">
               <property name="leftMargin">
@@ -940,6 +940,18 @@
                <number>3</number>
               </property>
              </layout>
+            </widget>
+            <widget class="QWidget" name="imutab2">
+             <attribute name="title">
+              <string>IMU 2</string>
+             </attribute>
+             <layout class="QVBoxLayout" name="verticalLayout_9"/>
+            </widget>
+            <widget class="QWidget" name="imutab3">
+             <attribute name="title">
+              <string>IMU 3</string>
+             </attribute>
+             <layout class="QVBoxLayout" name="verticalLayout_10"/>
             </widget>
             <widget class="QWidget" name="adc">
              <attribute name="title">
@@ -1165,12 +1177,32 @@
               <widget class="QComboBox" name="comboPlot1">
                <item>
                 <property name="text">
-                 <string>Accelaration</string>
+                 <string>IMU 1: Acceleration</string>
                 </property>
                </item>
                <item>
                 <property name="text">
-                 <string>Gyro</string>
+                 <string>IMU 1: Gyro</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>IMU 2: Acceleration</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>IMU 2: Gyro</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>IMU 3: Acceleration</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>IMU 3: Gyro</string>
                 </property>
                </item>
                <item>
@@ -1196,16 +1228,39 @@
              <item>
               <widget class="QComboBox" name="comboPlot2">
                <property name="currentText">
-                <string>Acceleration</string>
+                <string>IMU 2: Acceleration</string>
+               </property>
+               <property name="currentIndex">
+                <number>2</number>
                </property>
                <item>
                 <property name="text">
-                 <string>Acceleration</string>
+                 <string>IMU 1: Acceleration</string>
                 </property>
                </item>
                <item>
                 <property name="text">
-                 <string>Gyro</string>
+                 <string>IMU 1: Gyro</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>IMU 2: Acceleration</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>IMU 2: Gyro</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>IMU 3: Acceleration</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>IMU 3: Gyro</string>
                 </property>
                </item>
                <item>

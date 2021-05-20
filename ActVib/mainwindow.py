@@ -25,7 +25,7 @@ class mainwindow(QtWidgets.QMainWindow):
         self.workdir = "D://"
         self.saveconfigtypes = [QtWidgets.QCheckBox, QtWidgets.QComboBox,
                                 QtWidgets.QDoubleSpinBox, QtWidgets.QSpinBox, QtWidgets.QLineEdit]
-        self.imupanel = IMUPanel(0)
+        self.imupanel = [IMUPanel(idd) for idd in range(3)]
         self.genpanel = [GeneratorPanel(1),GeneratorPanel(2),GeneratorPanel(3),GeneratorPanel(4)]
         self.readConfig()
         self.mapper = QtCore.QSignalMapper(self)
@@ -42,12 +42,15 @@ class mainwindow(QtWidgets.QMainWindow):
         
         # IMU Connections:
         
-        self.ui.imutab.layout().addWidget(self.imupanel)
-        imupanel = self.imupanel
-        for cc in imupanel.findChildren(QComboBox):
-            cc.activated.connect(self.changeMPUConfig)
-        for cc in imupanel.findChildren(QCheckBox):
-            cc.toggled.connect(self.plotConfig)
+        self.ui.imutab1.layout().addWidget(self.imupanel[0])
+        self.ui.imutab2.layout().addWidget(self.imupanel[1])
+        self.ui.imutab3.layout().addWidget(self.imupanel[2])
+        for imupanel in self.imupanel:
+            imupanel = self.imupanel[0]
+            for cc in imupanel.findChildren(QComboBox):
+                cc.activated.connect(self.changeMPUConfig)
+            for cc in imupanel.findChildren(QCheckBox):
+                cc.toggled.connect(self.plotConfig)
 
         # ADC Connections
         self.ui.checkADCOn.toggled.connect(self.changeADCConfig)
@@ -194,7 +197,8 @@ class mainwindow(QtWidgets.QMainWindow):
             self.porta = settings.value("Porta")
         if (settings.value("WorkDir") is not None):
             self.workdir = settings.value("WorkDir")
-        self.imupanel.restoreState(settings)
+        for imp in self.imupanel:
+            imp.restoreState(settings)
         for gp in self.genpanel:
             gp.restoreState(settings)
         
@@ -217,7 +221,8 @@ class mainwindow(QtWidgets.QMainWindow):
         settings.setValue("OFig", self.ofig.getConfigString())
         settings.setValue("CtrlFig", self.ctrlfig.getConfigString())
         settings.setValue('WorkDir', self.workdir)
-        self.imupanel.saveState(settings)
+        for imp in self.imupanel:
+            imp.saveState(settings)
         for gp in self.genpanel:
             gp.saveState(settings)
 
@@ -310,12 +315,10 @@ class mainwindow(QtWidgets.QMainWindow):
 
     def plotOutConfig(self):
         self.ofig.dacenable = [aa.isGeneratorOn() for aa in self.genpanel]
-        # self.ofig.dacenable = [self.ui.checkCanal1.isChecked(), self.ui.checkCanal2.isChecked(), 
-        #                        self.ui.checkCanal3.isChecked(), self.ui.checkCanal4.isChecked()]
 
     def plotConfig(self):
-        self.mfig.accEnable = self.imupanel.getAccEnableList()
-        self.mfig.gyroEnable = self.imupanel.getGyroEnableList()
+        self.mfig.accEnable = self.imupanel[0].getAccEnableList()
+        self.mfig.gyroEnable = self.imupanel[0].getGyroEnableList()
         self.ctrlfig.plotSetup([self.ui.comboRef.currentIndex(), self.ui.comboErro.currentIndex()])
 
     def changeGeneratorConfig(self):
@@ -323,12 +326,10 @@ class mainwindow(QtWidgets.QMainWindow):
             generatorconfig = self.genpanel[k].getGeneratorConfig()
             self.driver.setGeneratorConfig(k, **generatorconfig)
 
-    def changeMPUConfig(self, nrange=0):
+    def changeMPUConfig(self):
         if self.driver is not None:
-            self.driver.setMPUAddress(self.imupanel.getMPUAddress())
-            self.driver.setMPUFilter(self.imupanel.getMPUFilter())
-            self.driver.setAccRange(self.imupanel.getAccRange())
-            self.driver.setGyroRange(self.imupanel.getGyroRange())
+            for id in range(3):
+                self.driver.setIMUConfig(id,self.imupanel[id].getIMUConfig())
 
     def changeADCConfig(self):
         if self.driver is not None:
@@ -371,14 +372,13 @@ class mainwindow(QtWidgets.QMainWindow):
         else:
             self.flagsaveplus = False
             self.configControl()
-            self.changeGeneratorConfig()
-            self.changeMPUConfig(0)
-            self.changeMPUConfig(1)
+            self.changeGeneratorConfig()                   
+            self.changeMPUConfig()
             self.changeADCConfig()
             self.plotConfig()
             self.plotOutConfig()
 
-            self.disabledwhenrunning = [self.imupanel,self.ui.checkControle,self.ui.comboCanaisControle,
+            self.disabledwhenrunning = self.imupanel + [self.ui.checkControle,self.ui.comboCanaisControle,
                                    self.ui.comboRef,self.ui.comboErro,self.ui.comboAlgoritmo,self.ui.spinMemCtrl,
                                    self.ui.checkADCOn,self.ui.comboADCChannel,self.ui.comboRangeADC,self.ui.comboADCRate]
             for cc in self.disabledwhenrunning: 

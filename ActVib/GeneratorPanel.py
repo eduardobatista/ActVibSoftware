@@ -199,5 +199,5 @@ class Ui_GeneratorPanel(object):
         self.label_26.setText(_translate("GeneratorPanel", "A2:"))
         self.label_19.setText(_translate("GeneratorPanel", "ST:"))
         self.label_18.setText(_translate("GeneratorPanel", "DI:"))
-        self.label_20.setText(_translate("GeneratorPanel", "FT:"))
+        self.label_20.setText(_translate("GeneratorPanel", "ET:"))
         self.label_25.setText(_translate("GeneratorPanel", "DF:"))

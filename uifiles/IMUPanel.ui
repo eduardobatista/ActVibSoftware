@@ -344,6 +344,16 @@
           <string>0x69</string>
          </property>
         </item>
+        <item>
+         <property name="text">
+          <string>0x6A</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>0x6B</string>
+         </property>
+        </item>
        </widget>
       </item>
       <item row="3" column="0">

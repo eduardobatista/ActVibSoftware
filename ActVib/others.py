@@ -246,13 +246,14 @@ class MyFigQtGraph(BaseFigQtGraph):
                 npontos[k] = limf[k] - limi[k]
             else:
                 npontos[k] = self.npontosjanela[k]
+        j = 0
         for k in range(3):
             if self.accEnable[k] and (npontos[0] > 0):
-                self.lineacc[k].setData(self.vetoreixox[0][-npontos[0]:], self.dman.accdata[k][limi[0]:limf[0]])
+                self.lineacc[k].setData(self.vetoreixox[0][-npontos[0]:], self.dman.accdata[j][k][limi[0]:limf[0]])
             else:
                 self.lineacc[k].setData([], [])
             if self.gyroEnable[k] and (npontos[1] > 0):
-                self.linegyr[k].setData(self.vetoreixox[1][-npontos[1]:], self.dman.gyrodata[k][limi[1]:limf[1]])
+                self.linegyr[k].setData(self.vetoreixox[1][-npontos[1]:], self.dman.gyrodata[j][k][limi[1]:limf[1]])
             else:
                 self.linegyr[k].setData([], [])
         if self.adcEnable and (npontos[2] > 0):

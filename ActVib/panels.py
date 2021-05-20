@@ -99,7 +99,6 @@ class GeneratorPanel(QtWidgets.QWidget,StateSaver):
                 aa.setEnabled(False)
             for aa in [self.ui.chirpTinicio,self.ui.chirpTfim,self.ui.spinAmpl]:
                 aa.setEnabled(True)
-
     
     def setEnabled(self,en):
         self.ui.checkEnable.setEnabled(en)
@@ -108,16 +107,19 @@ class GeneratorPanel(QtWidgets.QWidget,StateSaver):
         self.ui.spinFreq.setEnabled(en)
     
     def getGeneratorConfig(self):
-        generatorconfig = {'tipo': self.ui.comboType.currentIndex(),
-                            'amp': self.ui.spinAmpl.value(),
-                            'freq': self.ui.spinFreq.value()}
-        if self.ui.comboType.currentIndex() == 2:  # Chirp
-            generatorconfig['chirpconf'] = [self.ui.chirpTinicio.value(),
-                                            self.ui.chirpDeltaI.value(),
-                                            self.ui.chirpTfim.value(),
-                                            self.ui.chirpDeltaF.value(),
-                                            self.ui.chirpA2.value()]
-        return generatorconfig
+        if self.ui.checkEnable.isChecked():
+            generatorconfig = {'tipo': self.ui.comboType.currentIndex(),
+                                'amp': self.ui.spinAmpl.value(),
+                                'freq': self.ui.spinFreq.value()}
+            if self.ui.comboType.currentIndex() == 2:  # Chirp
+                generatorconfig['chirpconf'] = [self.ui.chirpTinicio.value(),
+                                                self.ui.chirpDeltaI.value(),
+                                                self.ui.chirpTfim.value(),
+                                                self.ui.chirpDeltaF.value(),
+                                                self.ui.chirpA2.value()]
+            return generatorconfig
+        else:
+            return {'tipo': 0, 'amp': 0, 'freq': 0}
     
     def getFreqValue(self):
         return self.ui.spinFreq.value()
@@ -131,9 +133,38 @@ class IMUPanel(QtWidgets.QWidget,StateSaver):
         self.ui = Ui_IMUPanel()
         self.ui.setupUi(self)
         self.ui.comboType.activated.connect(self.typechanged)
+        self.ui.comboAddress.highlighted.connect(self.addresshighlight)
         self.checks = [self.ui.checkAccX,self.ui.checkAccY,self.ui.checkAccZ,
                        self.ui.checkGyroX,self.ui.checkGyroY,self.ui.checkGyroZ]
         self.saveprefix = f'IMU{id}'
+
+    '''
+        IMU config data:
+
+        Byte 0 -| Enabled (1 bit) (LSB)
+                | Type: MPU, LSM (1 bit)
+                | Bus selection (2 bits, for future expansion)
+
+        Byte 1 - Address (8 bits)
+        
+        Byte 2 -| Individual sensors activation (6 bits)
+                | AccRange (2 bits)
+        
+        Byte 3 -| GyroRange (3 bits) (LSM Gyro have 5 options)
+                | Filter config (3 bits)
+    '''
+    def getIMUConfig(self):
+        configbytes = []
+        # Byte 0:
+        configbytes.append( (self.ui.comboBus.currentIndex()<<2) + (int(self.ui.comboType.currentIndex() == 2) << 1) +  int(self.ui.comboType.currentIndex() > 0)  )
+        # Byte 1:
+        configbytes.append( int(str(self.ui.comboAddress.currentText())[2:],16) )
+        # Byte 2:
+        actbitsbin = "".join( str(int(cc.isChecked())) for cc in self.checks )
+        configbytes.append( (self.getAccRange()<<6) + int(actbitsbin,2)  )
+        # Byte 3:
+        configbytes.append( (self.getMPUFilter()<<3) + (self.getGyroRange()) )
+        return configbytes
 
     def getMPUAddress(self):
         return self.ui.comboAddress.currentIndex()
@@ -162,6 +193,21 @@ class IMUPanel(QtWidgets.QWidget,StateSaver):
                 self.ui.comboFilter,self.ui.comboBus,self.ui.comboType]
         for cc in cmps:
             cc.setEnabled(en)
+    
+    def isIMUEnabled(self):
+        return self.ui.comboType.currentIndex() > 0
+
+    def addresshighlight(self):
+        if self.ui.comboType.currentIndex() == 1:
+            self.ui.comboAddress.model().item(0).setEnabled(True)
+            self.ui.comboAddress.model().item(1).setEnabled(True)
+            self.ui.comboAddress.model().item(2).setEnabled(False)
+            self.ui.comboAddress.model().item(3).setEnabled(False)
+        elif self.ui.comboType.currentIndex() == 2:
+            self.ui.comboAddress.model().item(0).setEnabled(False)
+            self.ui.comboAddress.model().item(1).setEnabled(False)
+            self.ui.comboAddress.model().item(2).setEnabled(True)
+            self.ui.comboAddress.model().item(3).setEnabled(True)
 
     def typechanged(self):
         cmps = [self.ui.comboAddress,self.ui.comboAccRange,self.ui.comboGyroRange,self.ui.comboFilter,self.ui.comboBus]
@@ -171,3 +217,8 @@ class IMUPanel(QtWidgets.QWidget,StateSaver):
             enabled = True
         for cc in cmps + self.checks:
             cc.setEnabled(enabled)
+        self.addresshighlight()
+        
+        
+
+

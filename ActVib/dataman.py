@@ -24,8 +24,12 @@ class dataman:
         self.ctreadings = 0
         self.globalctreadings = 0
         self.readtime = 0
-        self.accdata = [np.zeros(self.wsize), np.zeros(self.wsize), np.zeros(self.wsize)]
-        self.gyrodata = [np.zeros(self.wsize), np.zeros(self.wsize), np.zeros(self.wsize)]
+        self.accdata = [[np.zeros(self.wsize), np.zeros(self.wsize), np.zeros(self.wsize)],
+                        [np.zeros(self.wsize), np.zeros(self.wsize), np.zeros(self.wsize)],
+                        [np.zeros(self.wsize), np.zeros(self.wsize), np.zeros(self.wsize)]]
+        self.gyrodata = [[np.zeros(self.wsize), np.zeros(self.wsize), np.zeros(self.wsize)],
+                        [np.zeros(self.wsize), np.zeros(self.wsize), np.zeros(self.wsize)],
+                        [np.zeros(self.wsize), np.zeros(self.wsize), np.zeros(self.wsize)]]
         self.dacoutdata = [np.zeros(self.wsize), np.zeros(self.wsize), np.zeros(self.wsize), np.zeros(self.wsize)]
         self.adcdata = np.zeros(self.wsize)
         self.xrefdata = np.zeros(self.wsize)
@@ -75,15 +79,19 @@ class dataman:
                 self.driver.writeGeneratorConfig(id=1)
                 self.driver.startControl()
             else:
-                self.driver.writeSensorChoice()
-                self.driver.initHardware()
-                self.driver.writeMPUScales()
-                self.driver.writeMPUFilter()
+                # self.driver.writeSensorChoice()
+                # self.driver.initHardware()
+                # self.driver.writeMPUScales()
+                # self.driver.writeMPUFilter()
+                self.driver.enabledIMUs = 0
+                for k in range(3):
+                    self.driver.writeIMUConfig(k)
+                    if self.mwindow.imupanel[k].isIMUEnabled():
+                        self.driver.initHardware(k)
+                        self.driver.enabledIMUs += 1
                 self.driver.writeADCConfig()
-                self.driver.writeGeneratorConfig(id=0)
-                self.driver.writeGeneratorConfig(id=1)
-                self.driver.writeGeneratorConfig(id=2)
-                self.driver.writeGeneratorConfig(id=3)
+                for k in range(4):
+                    self.driver.writeGeneratorConfig(id=k)
                 self.driver.startReadings()
             self.flagsaved = False
             self.ctreadings = 0
@@ -100,9 +108,10 @@ class dataman:
                     self.xrefdata[self.globalctreadings] = self.driver.xref
                     self.xerrodata[self.globalctreadings] = self.driver.xerro
                 else:
-                    for k in range(3):
-                        self.accdata[k][self.globalctreadings] = self.driver.accreadings[k]
-                        self.gyrodata[k][self.globalctreadings] = self.driver.gyroreadings[k]
+                    for j in range(self.driver.enabledIMUs):
+                        for k in range(3):
+                            self.accdata[j][k][self.globalctreadings] = self.driver.accreadings[j][k]
+                            self.gyrodata[j][k][self.globalctreadings] = self.driver.gyroreadings[j][k]
                 self.dacoutdata[0][self.globalctreadings] = self.driver.dacout[0]
                 self.dacoutdata[1][self.globalctreadings] = self.driver.dacout[1]
                 self.dacoutdata[2][self.globalctreadings] = self.driver.dacout[2]
@@ -117,10 +126,9 @@ class dataman:
                     if self.driver.algonchanged and (self.readtime >= self.driver.algontime):
                         self.driver.writeAlgOn()
                         # print("AlgOn!!!")
-                    if not self.driver.genConfigWritten[0]:
-                        self.driver.writeGeneratorConfig(0)
-                    if not self.driver.genConfigWritten[1]:
-                        self.driver.writeGeneratorConfig(1)
+                    for k in range(4):
+                        if not self.driver.genConfigWritten[k]:
+                            self.driver.writeGeneratorConfig(k)
                     if not trd.isAlive():
                         trd = Thread(target=self.updateFigs)
                         trd.start()
@@ -174,12 +182,12 @@ class dataman:
             limf = self.globalctreadings
             df = pd.DataFrame({
                 "Tempo (s)": self.timereads[0:limf],
-                "Acc X": self.accdata[0][0:limf],
-                "Acc Y": self.accdata[1][0:limf],
-                "Acc Z": self.accdata[2][0:limf],
-                "Gyro X": self.gyrodata[0][0:limf],
-                "Gyro Y": self.gyrodata[1][0:limf],
-                "Gyro Z": self.gyrodata[2][0:limf],
+                "Acc X": self.accdata[0][0][0:limf],
+                "Acc Y": self.accdata[0][1][0:limf],
+                "Acc Z": self.accdata[0][2][0:limf],
+                "Gyro X": self.gyrodata[0][0][0:limf],
+                "Gyro Y": self.gyrodata[0][1][0:limf],
+                "Gyro Z": self.gyrodata[0][2][0:limf],
                 "DAC 1": self.dacoutdata[0][0:limf],
                 "DAC 2": self.dacoutdata[1][0:limf],
                 "DAC 3": self.dacoutdata[2][0:limf],
