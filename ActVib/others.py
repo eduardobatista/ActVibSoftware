@@ -219,13 +219,20 @@ class MyFigQtGraph(BaseFigQtGraph):
             pitem.setXRange(-self.janelax[k], 0, padding=0.01)
             pitem.setYRange(self.miny[k], self.maxy[k], padding=0.01)
             pitem.setLabel('bottom', 'Tempo (s)')
-        self.pitens[0].setLabel('left', 'Acceleration (g)')
+        self.pitens[0].setLabel('left', 'Acceleration (m/s2)')
         self.pitens[1].setLabel('left', 'Gyro (dg/s)')
         self.pitens[2].setLabel('left', 'ADC (Volts)')
         self.accEnable = [True, True, True]
         self.gyroEnable = [True, True, True]
         self.adcEnable = True
+        self.plotchoice = [0, 0]
 
+    def setPlotChoice(self, idx1, idx2):
+        if idx1 is not None:
+            self.plotchoice[0] = idx1
+        if idx2 is not None:
+            self.plotchoice[1] = idx2
+        
     def removeADCPlot(self):
         if self.getItem(2,0) is not None:
             self.removeItem(self.pitens[2])
@@ -246,14 +253,13 @@ class MyFigQtGraph(BaseFigQtGraph):
                 npontos[k] = limf[k] - limi[k]
             else:
                 npontos[k] = self.npontosjanela[k]
-        j = 0
         for k in range(3):
             if self.accEnable[k] and (npontos[0] > 0):
-                self.lineacc[k].setData(self.vetoreixox[0][-npontos[0]:], self.dman.accdata[j][k][limi[0]:limf[0]])
+                self.lineacc[k].setData(self.vetoreixox[0][-npontos[0]:], self.dman.accdata[self.plotchoice[0]][k][limi[0]:limf[0]])
             else:
                 self.lineacc[k].setData([], [])
             if self.gyroEnable[k] and (npontos[1] > 0):
-                self.linegyr[k].setData(self.vetoreixox[1][-npontos[1]:], self.dman.gyrodata[j][k][limi[1]:limf[1]])
+                self.linegyr[k].setData(self.vetoreixox[1][-npontos[1]:], self.dman.gyrodata[self.plotchoice[1]][k][limi[1]:limf[1]])
             else:
                 self.linegyr[k].setData([], [])
         if self.adcEnable and (npontos[2] > 0):

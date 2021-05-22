@@ -11,7 +11,7 @@ from VibViewWindow import Ui_MainWindow
 
 from others import (MyFigQtGraph, CtrlFigQtGraph, FigOutputQtGraph, WorkdirManager, MyUploadDialog)
 
-from panels import (IMUPanel,GeneratorPanel)
+from panels import (IMUPanel,GeneratorPanel,PlotCfgPanel)
 
 class mainwindow(QtWidgets.QMainWindow):
 
@@ -27,6 +27,7 @@ class mainwindow(QtWidgets.QMainWindow):
                                 QtWidgets.QDoubleSpinBox, QtWidgets.QSpinBox, QtWidgets.QLineEdit]
         self.imupanel = [IMUPanel(idd) for idd in range(3)]
         self.genpanel = [GeneratorPanel(1),GeneratorPanel(2),GeneratorPanel(3),GeneratorPanel(4)]
+        self.plotcfgpanel = PlotCfgPanel()
         self.readConfig()
         self.mapper = QtCore.QSignalMapper(self)
         self.ui.bInit.clicked.connect(self.bInit)
@@ -40,8 +41,7 @@ class mainwindow(QtWidgets.QMainWindow):
         self.ui.actionUpload.triggered.connect(self.openUploadDialog)
         self.ui.actionWorkdirManager.triggered.connect(self.openWorkdirManager)
         
-        # IMU Connections:
-        
+        # IMU Connections:        
         self.ui.imutab1.layout().addWidget(self.imupanel[0])
         self.ui.imutab2.layout().addWidget(self.imupanel[1])
         self.ui.imutab3.layout().addWidget(self.imupanel[2])
@@ -49,8 +49,6 @@ class mainwindow(QtWidgets.QMainWindow):
             imupanel = self.imupanel[0]
             for cc in imupanel.findChildren(QComboBox):
                 cc.activated.connect(self.changeMPUConfig)
-            for cc in imupanel.findChildren(QCheckBox):
-                cc.toggled.connect(self.plotConfig)
 
         # ADC Connections
         self.ui.checkADCOn.toggled.connect(self.changeADCConfig)
@@ -70,7 +68,14 @@ class mainwindow(QtWidgets.QMainWindow):
         for cc in self.ui.tabWidget.findChildren(QCheckBox, QtCore.QRegExp("checkEnable.*")):
             cc.toggled.connect(self.plotOutConfig)
             cc.toggled.connect(self.changeGeneratorConfig)
-            
+
+        # PlotCfg:
+        self.ui.plotCfgFrame.layout().addWidget(self.plotcfgpanel)
+        self.plotcfgpanel.ui.comboPlot1.activated.connect(lambda: self.dataman.mfig.setPlotChoice(self.plotcfgpanel.ui.comboPlot1.currentIndex(),None))
+        self.plotcfgpanel.ui.comboPlot2.activated.connect(lambda: self.dataman.mfig.setPlotChoice(None,self.plotcfgpanel.ui.comboPlot2.currentIndex()))
+        for cc in self.plotcfgpanel.findChildren(QCheckBox):
+            cc.toggled.connect(self.plotConfig)
+
         self.ui.checkAlgOn.setChecked(False)
         self.ui.checkAlgOn.setEnabled(False)
         self.ui.checkControle.toggled.connect(self.configControl)
@@ -317,8 +322,8 @@ class mainwindow(QtWidgets.QMainWindow):
         self.ofig.dacenable = [aa.isGeneratorOn() for aa in self.genpanel]
 
     def plotConfig(self):
-        self.mfig.accEnable = self.imupanel[0].getAccEnableList()
-        self.mfig.gyroEnable = self.imupanel[0].getGyroEnableList()
+        self.mfig.accEnable = self.plotcfgpanel.getAccEnableList()
+        self.mfig.gyroEnable = self.plotcfgpanel.getGyroEnableList()
         self.ctrlfig.plotSetup([self.ui.comboRef.currentIndex(), self.ui.comboErro.currentIndex()])
 
     def changeGeneratorConfig(self):

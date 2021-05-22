@@ -1,6 +1,7 @@
 from PyQt5 import (QtCore, QtWidgets)
 from IMUPanel import Ui_IMUPanel
 from GeneratorPanel import Ui_GeneratorPanel
+from PlotCfgPanel import Ui_PlotCfgForm
 
 
 class StateSaver:
@@ -125,58 +126,14 @@ class GeneratorPanel(QtWidgets.QWidget,StateSaver):
         return self.ui.spinFreq.value()
 
 
-
-class IMUPanel(QtWidgets.QWidget,StateSaver):
-
-    def __init__(self, id: int):
+class PlotCfgPanel(QtWidgets.QWidget,StateSaver):
+    def __init__(self):
         super().__init__()
-        self.ui = Ui_IMUPanel()
+        self.ui = Ui_PlotCfgForm()
         self.ui.setupUi(self)
-        self.ui.comboType.activated.connect(self.typechanged)
-        self.ui.comboAddress.highlighted.connect(self.addresshighlight)
         self.checks = [self.ui.checkAccX,self.ui.checkAccY,self.ui.checkAccZ,
                        self.ui.checkGyroX,self.ui.checkGyroY,self.ui.checkGyroZ]
-        self.saveprefix = f'IMU{id}'
-
-    '''
-        IMU config data:
-
-        Byte 0 -| Enabled (1 bit) (LSB)
-                | Type: MPU, LSM (1 bit)
-                | Bus selection (2 bits, for future expansion)
-
-        Byte 1 - Address (8 bits)
-        
-        Byte 2 -| Individual sensors activation (6 bits)
-                | AccRange (2 bits)
-        
-        Byte 3 -| GyroRange (3 bits) (LSM Gyro have 5 options)
-                | Filter config (3 bits)
-    '''
-    def getIMUConfig(self):
-        configbytes = []
-        # Byte 0:
-        configbytes.append( (self.ui.comboBus.currentIndex()<<2) + (int(self.ui.comboType.currentIndex() == 2) << 1) +  int(self.ui.comboType.currentIndex() > 0)  )
-        # Byte 1:
-        configbytes.append( int(str(self.ui.comboAddress.currentText())[2:],16) )
-        # Byte 2:
-        actbitsbin = "".join( str(int(cc.isChecked())) for cc in self.checks )
-        configbytes.append( (self.getAccRange()<<6) + int(actbitsbin,2)  )
-        # Byte 3:
-        configbytes.append( (self.getMPUFilter()<<3) + (self.getGyroRange()) )
-        return configbytes
-
-    def getMPUAddress(self):
-        return self.ui.comboAddress.currentIndex()
-    
-    def getMPUFilter(self):
-        return self.ui.comboFilter.currentIndex()
-
-    def getAccRange(self):
-        return self.ui.comboAccRange.currentIndex()
-
-    def getGyroRange(self):
-        return self.ui.comboGyroRange.currentIndex()
+        self.saveprefix = 'PlotCfg'
 
     def getAccEnableList(self):
         return [self.ui.checkAccX.isChecked(),
@@ -187,12 +144,72 @@ class IMUPanel(QtWidgets.QWidget,StateSaver):
         return [self.ui.checkGyroX.isChecked(),
                 self.ui.checkGyroY.isChecked(),
                 self.ui.checkGyroZ.isChecked()]
+
+class IMUPanel(QtWidgets.QWidget,StateSaver):
+
+    def __init__(self, id: int):
+        super().__init__()
+        self.ui = Ui_IMUPanel()
+        self.ui.setupUi(self)
+        self.ui.comboType.activated.connect(self.typechanged)
+        self.ui.comboAddress.highlighted.connect(self.addresshighlight)
+        self.saveprefix = f'IMU{id}'
+
+    '''
+        IMU config data:
+
+        Byte 0 -| Enabled (1 bit) (LSB)
+                | Type: MPU, LSM (1 bit)
+                | Bus selection (2 bits, for future expansion)
+
+        Byte 1 - Address (8 bits)
+                
+        Byte 2 -| AccRange (2 bits) (LSBs)
+                | GyroRange (3 bits) (LSM Gyro have 5 options)
+                | Filter config (3 bits)
+    '''
+    def getIMUConfig(self):
+        configbytes = []        
+        # Byte 0:
+        configbytes.append( (self.ui.comboBus.currentIndex()<<2) + (int(self.ui.comboType.currentIndex() == 2) << 1) +  int(self.ui.comboType.currentIndex() > 0)  )
+        # Byte 1:
+        configbytes.append( int(str(self.ui.comboAddress.currentText())[2:],16) )
+        # Byte 2:
+        configbytes.append( (self.getMPUFilter()<<5) + (self.getGyroRange()<<2) + self.getAccRange() )
+        return configbytes
+
+    def getMPUAddress(self):
+        return self.ui.comboAddress.currentIndex()
+    
+    def getMPUFilter(self):
+        return self.ui.comboFilter.currentIndex()
+    
+    def getLSMFilter(self):
+        return self.ui.comboFilter2.currentIndex()
+
+    def getAccRange(self):
+        return self.ui.comboAccRange.currentIndex()
+
+    def getGyroRange(self):
+        aux = self.ui.comboGyroRange.currentIndex()
+        if self.ui.comboType.currentIndex() == 1:            
+            if aux < 1: 
+                self.ui.comboGyroRange.setCurrentIndex(1)
+                aux = 1
+            return aux
+        elif self.ui.comboType.currentIndex() == 2:
+            return aux
+        else:
+            return 0
     
     def setEnabled(self,en):
-        cmps = [self.ui.comboAddress,self.ui.comboAccRange,self.ui.comboGyroRange,
-                self.ui.comboFilter,self.ui.comboBus,self.ui.comboType]
-        for cc in cmps:
-            cc.setEnabled(en)
+        if self.ui.comboType.currentIndex() > 0:
+            cmps = [self.ui.comboAddress,self.ui.comboAccRange,self.ui.comboGyroRange,
+                    self.ui.comboFilter,self.ui.comboBus,self.ui.comboType,self.ui.comboFilter2]
+            for cc in cmps:
+                cc.setEnabled(en)
+        else:
+            self.ui.comboType.setEnabled(en)
     
     def isIMUEnabled(self):
         return self.ui.comboType.currentIndex() > 0
@@ -203,11 +220,23 @@ class IMUPanel(QtWidgets.QWidget,StateSaver):
             self.ui.comboAddress.model().item(1).setEnabled(True)
             self.ui.comboAddress.model().item(2).setEnabled(False)
             self.ui.comboAddress.model().item(3).setEnabled(False)
+            self.ui.comboGyroRange.model().item(0).setEnabled(False)
+            if self.ui.comboGyroRange.currentIndex() == 0:
+                self.ui.comboGyroRange.setCurrentIndex(1)
+            if self.ui.comboAddress.currentIndex() > 1:
+                self.ui.comboAddress.setCurrentIndex(0)
+            self.ui.comboFilter.setEnabled(True)
+            self.ui.comboFilter2.setEnabled(False)
         elif self.ui.comboType.currentIndex() == 2:
             self.ui.comboAddress.model().item(0).setEnabled(False)
             self.ui.comboAddress.model().item(1).setEnabled(False)
             self.ui.comboAddress.model().item(2).setEnabled(True)
             self.ui.comboAddress.model().item(3).setEnabled(True)
+            self.ui.comboGyroRange.model().item(0).setEnabled(True)
+            if self.ui.comboAddress.currentIndex() < 2:
+                self.ui.comboAddress.setCurrentIndex(2)
+            self.ui.comboFilter.setEnabled(False)
+            self.ui.comboFilter2.setEnabled(True)
 
     def typechanged(self):
         cmps = [self.ui.comboAddress,self.ui.comboAccRange,self.ui.comboGyroRange,self.ui.comboFilter,self.ui.comboBus]
@@ -215,7 +244,7 @@ class IMUPanel(QtWidgets.QWidget,StateSaver):
             enabled = False
         else:
             enabled = True
-        for cc in cmps + self.checks:
+        for cc in cmps:
             cc.setEnabled(enabled)
         self.addresshighlight()
         

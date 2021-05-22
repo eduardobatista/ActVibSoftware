@@ -26,7 +26,8 @@ class driverhardware:
         self.genfreq = [0.0, 0.0, 0.0, 0.0]
         self.chirpconf = [[0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]]
         self.imuconfigdata = [[0, 0, 0, 0],[0, 0, 0, 0],[0, 0, 0, 0]]
-        self.enabledIMUs = 0
+        self.IMUEnableFlags = [False,False,False]
+        self.IMUTypes = [False,False,False]
         self.genConfigWritten = [False, False, False, False]
         self.adcconfig = [0, 0, 0, 0]
         self.adcin = 0.0
@@ -102,13 +103,14 @@ class driverhardware:
         self.accscaler[id] = 2.0**(nrange + 1) * 9.80665 / (2**15)
 
     """ Seta range do giroscópio:
-        0 = -250 a +250 graus/s
+        0 = -125 a +125 graus/s
+        1 = -250 a +250 graus/s
         1 = -500 a +500 graus/s
         2 = -1000 a +1000 graus/s
         3 = -2000 a +2000 graus/s """
     def setGyroRange(self, id, nrange):
         self.gyrorangeselection[id] = nrange
-        self.gyroscaler[id] = 250.0 * (2.0**nrange) / (2**15)
+        self.gyroscaler[id] = 125.0 * (2.0**nrange) / (2**15)
 
     def writeMPUScales(self):
         aux = 'c' + str(self.accrangeselection) + str(self.gyrorangeselection)
@@ -130,9 +132,16 @@ class driverhardware:
 
     def setIMUConfig(self,id: int, imucfgdata: list):
         self.imuconfigdata[id] = imucfgdata
-        self.setAccRange(id, (imucfgdata[2]>>6) & 0x03)
-        self.setGyroRange(id, imucfgdata[3] & 0x07)
-
+        self.setAccRange(id, imucfgdata[2] & 0x03)
+        self.setGyroRange(id, (imucfgdata[2]>>2) & 0x07)
+        self.IMUEnableFlags[id] = ((imucfgdata[0] & 0x01) == 1)
+        self.IMUTypes[id] = (imucfgdata[0]>>1) & 0x01 
+        self.readsize = 0
+        for k in range(3):
+            if self.IMUEnableFlags[k]:
+                self.readsize += 14 if (self.IMUTypes[k] == 0) else 12 
+        self.readsize += 8+2
+        
     def writeIMUConfig(self,id: int):
         aux = bytearray([ord('I')] + [id] + self.imuconfigdata[id])
         self.serial.write(aux)
@@ -269,11 +278,13 @@ class driverhardware:
                     self.serial.write(bytearray(struct.pack("f", w)))
                 buf = self.serial.read(2)
                 pbar.setValue(pbar.value() + (bb[0] << 8) + bb[1])
+    
+
 
     def getReading(self):
         ctaux = 0
         val = 0
-        readsize = self.enabledIMUs*14+8
+        ptr = 0
         self.buf[0] = 0        
         while not((self.buf[0] == 0xF) and (self.buf[1] == 0xF) and (self.buf[2] == 0xF)) and (ctaux < 64):
             self.buf[2] = self.buf[1]
@@ -290,31 +301,24 @@ class driverhardware:
             self.xerro = struct.unpack("f", bytearray(self.buf[6:10]))[0]
             self.calctime = (((self.buf[11] << 8) + self.buf[12]) << 4) / 240
         else:
-            # self.buf[0:readsize] = self.serial.read(readsize)[0:readsize]
-            buf = self.serial.read(readsize)
-            for j in range(self.enabledIMUs):
-                for k in range(3):
-                    # bufa = self.buf[(2 * k):(2 * k + 2)]
-                    # val = int((bufa[0] << 8) | bufa[1])
-                    # val = val if ((bufa[0] >> 7) == 0) else (-1 * (65536 - val))
-                    # self.accreadings[k] = float(val) * self.accscaler[0]
-                    self.accreadings[j][k] = float(struct.unpack_from(">h",buf,2*k+14*j)[0]) * self.accscaler[0]
-                for k in range(3):
-                    # bufa = self.buf[(2 * k + 8):(2 * k + 10)]
-                    # val = int((bufa[0] << 8) | bufa[1])
-                    # val = val if ((bufa[0] >> 7) == 0) else (-1 * (65536 - val))
-                    # self.gyroreadings[k] = float(val) * self.gyroscaler[0]   
-                    self.gyroreadings[j][k] = float(struct.unpack_from(">h",buf,2*k+8+14*j)[0]) * self.gyroscaler[0]          
-            # self.dacout[0] = float(self.buf[readsize-8] << 8 | self.buf[readsize-7]) * self.iampscaler[0] - 1.0
-            # self.dacout[1] = float(self.buf[readsize-6] << 8 | self.buf[readsize-5]) * self.iampscaler[1] - 1.0
-            # self.dacout[2] = float(self.buf[readsize-4]) * self.iampscaler[2] - 1.0
-            # self.dacout[3] = float(self.buf[readsize-3]) * self.iampscaler[3] - 1.0
-            # if (self.buf[readsize-2] & 0x80) == 0:
-            #     self.adcin = float( (self.buf[readsize-2] << 8) | self.buf[readsize-1] ) * self.adcmultiplier
-            # else:
-            #     val = - float( ( ~((self.buf[readsize-2] << 8) | self.buf[readsize-1]) ) + 1 ) * self.adcmultiplier            
-            self.dacout[0] = float(struct.unpack_from(">H",buf,readsize-8)[0]) * self.iampscaler[0] - 1.0
-            self.dacout[1] = float(struct.unpack_from(">H",buf,readsize-6)[0]) * self.iampscaler[1] - 1.0
-            self.dacout[2] = float(buf[readsize-4]) * self.iampscaler[2] - 1.0
-            self.dacout[3] = float(buf[readsize-3]) * self.iampscaler[3] - 1.0
-            self.adcin = float( struct.unpack_from(">h",buf,readsize-2)[0] ) * self.adcmultiplier
+            buf = self.serial.read(self.readsize)
+            for j in range(3):
+                if self.IMUEnableFlags[j]:
+                    if self.IMUTypes[j] == 0:
+                        for k in range(3):
+                            self.accreadings[j][k] = float(struct.unpack_from(">h",buf,2*k+ptr)[0]) * self.accscaler[j]
+                        for k in range(3): 
+                            self.gyroreadings[j][k] = float(struct.unpack_from(">h",buf,2*k+8+ptr)[0]) * self.gyroscaler[j]
+                        ptr += 14
+                    else:
+                        for k in range(3):
+                            self.gyroreadings[j][k] = float(struct.unpack_from("<h",buf,2*k+ptr)[0]) * self.gyroscaler[j]
+                        for k in range(3): 
+                            self.accreadings[j][k] = float(struct.unpack_from("<h",buf,2*k+6+ptr)[0]) * self.accscaler[j]
+                        ptr += 12    
+            self.dacout[0] = float(struct.unpack_from(">H",buf,ptr)[0]) * self.iampscaler[0] - 1.0
+            self.dacout[1] = float(struct.unpack_from(">H",buf,ptr+2)[0]) * self.iampscaler[1] - 1.0
+            self.dacout[2] = float(buf[ptr+4]) * self.iampscaler[2] - 1.0
+            self.dacout[3] = float(buf[ptr+5]) * self.iampscaler[3] - 1.0
+            self.adcin = float( struct.unpack_from(">h",buf,ptr+6)[0] ) * self.adcmultiplier
+            # print(struct.unpack_from(">H",buf,ptr+8))

@@ -79,16 +79,11 @@ class dataman:
                 self.driver.writeGeneratorConfig(id=1)
                 self.driver.startControl()
             else:
-                # self.driver.writeSensorChoice()
-                # self.driver.initHardware()
-                # self.driver.writeMPUScales()
-                # self.driver.writeMPUFilter()
-                self.driver.enabledIMUs = 0
                 for k in range(3):
+                    self.driver.setIMUConfig(k,self.mwindow.imupanel[k].getIMUConfig())
                     self.driver.writeIMUConfig(k)
-                    if self.mwindow.imupanel[k].isIMUEnabled():
+                    if self.driver.IMUEnableFlags[k]:
                         self.driver.initHardware(k)
-                        self.driver.enabledIMUs += 1
                 self.driver.writeADCConfig()
                 for k in range(4):
                     self.driver.writeGeneratorConfig(id=k)
@@ -108,10 +103,11 @@ class dataman:
                     self.xrefdata[self.globalctreadings] = self.driver.xref
                     self.xerrodata[self.globalctreadings] = self.driver.xerro
                 else:
-                    for j in range(self.driver.enabledIMUs):
-                        for k in range(3):
-                            self.accdata[j][k][self.globalctreadings] = self.driver.accreadings[j][k]
-                            self.gyrodata[j][k][self.globalctreadings] = self.driver.gyroreadings[j][k]
+                    for j in range(3):
+                        if self.driver.IMUEnableFlags[j]:
+                            for k in range(3):
+                                self.accdata[j][k][self.globalctreadings] = self.driver.accreadings[j][k]
+                                self.gyrodata[j][k][self.globalctreadings] = self.driver.gyroreadings[j][k]
                 self.dacoutdata[0][self.globalctreadings] = self.driver.dacout[0]
                 self.dacoutdata[1][self.globalctreadings] = self.driver.dacout[1]
                 self.dacoutdata[2][self.globalctreadings] = self.driver.dacout[2]
@@ -180,19 +176,25 @@ class dataman:
             df.to_feather(filename)
         else:
             limf = self.globalctreadings
-            df = pd.DataFrame({
-                "Tempo (s)": self.timereads[0:limf],
-                "Acc X": self.accdata[0][0][0:limf],
-                "Acc Y": self.accdata[0][1][0:limf],
-                "Acc Z": self.accdata[0][2][0:limf],
-                "Gyro X": self.gyrodata[0][0][0:limf],
-                "Gyro Y": self.gyrodata[0][1][0:limf],
-                "Gyro Z": self.gyrodata[0][2][0:limf],
+            thedict = {
+                "Tempo (s)": self.timereads[0:limf],                
                 "DAC 1": self.dacoutdata[0][0:limf],
                 "DAC 2": self.dacoutdata[1][0:limf],
                 "DAC 3": self.dacoutdata[2][0:limf],
                 "DAC 4": self.dacoutdata[3][0:limf],
                 "ADC in": self.adcdata[0:limf]
-            })
+            }
+            for k in range(3):
+                if self.driver.IMUEnableFlags[k]:
+                    thedict[f"IMU{k+1}AccX"] = self.accdata[k][0][0:limf]
+                    thedict[f"IMU{k+1}AccY"] = self.accdata[k][1][0:limf]
+                    thedict[f"IMU{k+1}AccZ"] = self.accdata[k][2][0:limf]
+                    thedict[f"IMU{k+1}GyroX"] = self.gyrodata[k][0][0:limf]
+                    thedict[f"IMU{k+1}GyroY"] = self.gyrodata[k][1][0:limf]
+                    thedict[f"IMU{k+1}GyroZ"] = self.gyrodata[k][2][0:limf]
+                    
+            df = pd.DataFrame(thedict)            
             df.to_feather(filename)
+            # df.to_csv(filename)
+
         self.flagsaved = setsaved
