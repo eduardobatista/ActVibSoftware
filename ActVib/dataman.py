@@ -62,31 +62,21 @@ class dataman:
             ctrlmode = self.driver.controlMode
             self.flagrodando = True
             self.driver.openSerial()
-            self.driver.handshake()
-            if ctrlmode:
-                self.driver.writeSensorChoice(0)
-                self.driver.initHardware()
-                self.driver.writeMPUScales()
-                self.driver.writeMPUFilter()
-                self.driver.writeSensorChoice(1)
-                self.driver.initHardware()
-                self.driver.writeMPUScales()
-                self.driver.writeMPUFilter()
+            self.driver.handshake()            
+            for k in range(3):
+                self.driver.setIMUConfig(k,self.mwindow.imupanel[k].getIMUConfig())
+                self.driver.writeIMUConfig(k)
+                if self.driver.IMUEnableFlags[k]:
+                    self.driver.initHardware(k)
+            self.driver.writeADCConfig()
+            for k in range(4):
+                self.driver.writeGeneratorConfig(id=k)
+                time.sleep(0.1)
+            if ctrlmode:                
                 self.driver.writeControlConfig()
                 self.driver.setAlgOn(False, 0, forcewrite=True)
-                self.driver.writeAlgOn()
-                self.driver.writeGeneratorConfig(id=0)
-                self.driver.writeGeneratorConfig(id=1)
                 self.driver.startControl()
-            else:
-                for k in range(3):
-                    self.driver.setIMUConfig(k,self.mwindow.imupanel[k].getIMUConfig())
-                    self.driver.writeIMUConfig(k)
-                    if self.driver.IMUEnableFlags[k]:
-                        self.driver.initHardware(k)
-                self.driver.writeADCConfig()
-                for k in range(4):
-                    self.driver.writeGeneratorConfig(id=k)
+            else:             
                 self.driver.startReadings()
             self.flagsaved = False
             self.ctreadings = 0
@@ -145,8 +135,9 @@ class dataman:
     def updateFigs(self):
         self.mwindow.ui.elapsedTime.setText(f'{int(self.readtime)} s / {self.maxtime} s')
         self.mwindow.ui.controlTime.setText(f'{self.realtime:.3f} s')
+        self.mwindow.ui.sampleTime.setText(f'{self.driver.calctime:.0f} us')
         if self.driver.controlMode:
-            self.ctrlfig.updateFig([self.driver.refid, self.driver.erroid])
+            self.ctrlfig.updateFig()
         else:
             self.mfig.updateFig()
         self.ofig.updateFig()
@@ -161,6 +152,8 @@ class dataman:
         self.ctrlfig.updateFig()
         self.mwindow.ui.elapsedTime.setText('0 s')
         self.mwindow.ui.controlTime.setText('0 s')
+        self.mwindow.ui.sampleTime.setText('0 us')
+        
 
     def salvaArquivo(self, filename, setsaved):
         if self.driver.controlMode:

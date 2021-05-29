@@ -1,7 +1,8 @@
-from PyQt5 import (QtCore, QtWidgets)
+from PyQt5 import (QtCore, QtWidgets, QtGui)
 from IMUPanel import Ui_IMUPanel
 from GeneratorPanel import Ui_GeneratorPanel
 from PlotCfgPanel import Ui_PlotCfgForm
+from ControlPanel import Ui_ControlForm
 
 
 class StateSaver:
@@ -66,6 +67,86 @@ class StateSaver:
                 ww.setEnabled(settings.value(f'EN{keyval}') == 'True')
 
 
+class ControlPanel(QtWidgets.QWidget,StateSaver):
+
+    def __init__(self):
+        super().__init__()
+        self.id = id
+        self.ui = Ui_ControlForm()
+        self.ui.setupUi(self)
+        self.saveprefix = 'CTRL'
+        self.ui.checkControle.toggled.connect(self.controlChanged)
+        self.ui.checkAlgOn.setChecked(False)
+        # self.ui.checkAlgOn.setEnabled(False)
+        self.ui.checkAlgOn.toggled.connect(self.controlChanged)
+        self.ui.passoCtrl.setValidator(QtGui.QDoubleValidator(0.0, 1000.0, 2, self))
+        self.ui.passoCtrl.editingFinished.connect(self.validateStep)
+        self.ui.normCtrl.setValidator(QtGui.QDoubleValidator(0.0, 1000.0, 2, self))
+        self.ui.normCtrl.editingFinished.connect(self.validateRegularization)
+        self.controlChangeFunc = None
+        self.oldctrlmu = float(self.ui.passoCtrl.text())
+        self.oldctrlpsi = float(self.ui.normCtrl.text())
+        self.ui.comboControlChannel.activated.connect(self.controlChannelChanged)
+        self.ui.comboPerturbChannel.activated.connect(self.perturbChannelChanged)
+    
+    def controlChannelChanged(self):
+        if self.ui.comboControlChannel.currentIndex() == self.ui.comboPerturbChannel.currentIndex():
+            self.ui.comboPerturbChannel.setCurrentIndex( (self.ui.comboControlChannel.currentIndex() + 1) % 4 )
+    
+    def perturbChannelChanged(self):
+        if self.ui.comboControlChannel.currentIndex() == self.ui.comboPerturbChannel.currentIndex():
+            self.ui.comboControlChannel.setCurrentIndex( (self.ui.comboPerturbChannel.currentIndex() + 1) % 4 )
+    
+    def connectControlChanged(self,controlchangefunc):
+        self.controlChangeFunc = controlchangefunc
+    
+    def isControlOn(self):
+        return self.ui.checkControle.isChecked()
+    
+    def isAlgOn(self):
+        self.ui.checkAlgOn.isChecked()
+    
+    def setEnabled(self,en):
+        cmps = [self.ui.checkControle,self.ui.comboRef,
+                self.ui.comboErro,self.ui.comboAlgoritmo,self.ui.spinMemCtrl]
+        for cc in cmps:
+            cc.setEnabled(en)
+
+    def controlChanged(self):
+        if self.controlChangeFunc is not None:
+            self.controlChangeFunc()
+
+    def validateStep(self):
+        try:
+            self.oldctrlmu = float(self.ui.passoCtrl.text())
+        except Exception as exc:
+            self.ui.passoCtrl.setText(str(self.oldctrlmu))
+
+    def validateRegularization(self):
+        try:
+            self.oldctrlpsi = float(self.ui.normCtrl.text())
+        except Exception as exc:
+            self.ui.normCtrl.setText(str(self.oldctrlpsi))
+
+    def getControlChannel(self):
+        return self.ui.comboControlChannel.currentIndex()
+    
+    def getPerturbChannel(self):
+        return self.ui.comboPerturbChannel.currentIndex()
+
+    def getControlConfiguration(self):
+        data = {
+            "alg": self.ui.comboAlgoritmo.currentIndex(),
+            "mem": int(self.ui.spinMemCtrl.value()),
+            "mu": float(self.ui.passoCtrl.text()),
+            "fi": float(self.ui.normCtrl.text()),
+            "refimuid": self.ui.comboIMURef.currentIndex(),
+            "errimuid": self.ui.comboIMUError.currentIndex(),
+            "refid": self.ui.comboRef.currentIndex(), # from 0 to 5, from AccX to GyroZ
+            "erroid": self.ui.comboErro.currentIndex()
+        }
+        return data
+
 
 
 class GeneratorPanel(QtWidgets.QWidget,StateSaver):
@@ -76,6 +157,10 @@ class GeneratorPanel(QtWidgets.QWidget,StateSaver):
         self.ui = Ui_GeneratorPanel()
         self.ui.setupUi(self)
         self.saveprefix = f'GEN{id}'
+        if id < 2:
+            self.ui.spinDCLevel.setMaximum(2048)
+        else:
+            self.ui.spinDCLevel.setMaximum(128)
         self.ui.comboType.activated.connect(self.typechanged)
     
     def isGeneratorOn(self):
@@ -106,12 +191,14 @@ class GeneratorPanel(QtWidgets.QWidget,StateSaver):
         self.ui.comboType.setEnabled(en)
         self.ui.spinAmpl.setEnabled(en)
         self.ui.spinFreq.setEnabled(en)
+        self.ui.spinDCLevel.setEnabled(en)
     
     def getGeneratorConfig(self):
         if self.ui.checkEnable.isChecked():
             generatorconfig = {'tipo': self.ui.comboType.currentIndex(),
                                 'amp': self.ui.spinAmpl.value(),
-                                'freq': self.ui.spinFreq.value()}
+                                'freq': self.ui.spinFreq.value(),
+                                'dclevel': self.ui.spinDCLevel.value()}
             if self.ui.comboType.currentIndex() == 2:  # Chirp
                 generatorconfig['chirpconf'] = [self.ui.chirpTinicio.value(),
                                                 self.ui.chirpDeltaI.value(),
@@ -120,10 +207,7 @@ class GeneratorPanel(QtWidgets.QWidget,StateSaver):
                                                 self.ui.chirpA2.value()]
             return generatorconfig
         else:
-            return {'tipo': 0, 'amp': 0, 'freq': 0}
-    
-    def getFreqValue(self):
-        return self.ui.spinFreq.value()
+            return {'tipo': 0, 'amp': 0, 'freq': 0, 'dclevel': self.ui.spinDCLevel.value()}
 
 
 class PlotCfgPanel(QtWidgets.QWidget,StateSaver):
@@ -153,6 +237,7 @@ class IMUPanel(QtWidgets.QWidget,StateSaver):
         self.ui.setupUi(self)
         self.ui.comboType.activated.connect(self.typechanged)
         self.ui.comboAddress.highlighted.connect(self.addresshighlight)
+        self.ui.comboBus.activated.connect(self.addresshighlight)
         self.saveprefix = f'IMU{id}'
 
     '''
@@ -173,7 +258,12 @@ class IMUPanel(QtWidgets.QWidget,StateSaver):
         # Byte 0:
         configbytes.append( (self.ui.comboBus.currentIndex()<<2) + (int(self.ui.comboType.currentIndex() == 2) << 1) +  int(self.ui.comboType.currentIndex() > 0)  )
         # Byte 1:
-        configbytes.append( int(str(self.ui.comboAddress.currentText())[2:],16) )
+        if self.ui.comboBus.currentIndex() < 2:
+            configbytes.append( int(str(self.ui.comboAddress.currentText())[2:],16) )
+        else: 
+            if self.ui.comboAddress.currentIndex() < 4:
+                self.ui.comboAddress.setCurrentIndex(4)
+            configbytes.append( int(str(self.ui.comboAddress.currentText())[2:],10) )
         # Byte 2:
         configbytes.append( (self.getMPUFilter()<<5) + (self.getGyroRange()<<2) + self.getAccRange() )
         return configbytes
@@ -220,7 +310,10 @@ class IMUPanel(QtWidgets.QWidget,StateSaver):
             self.ui.comboAddress.model().item(1).setEnabled(True)
             self.ui.comboAddress.model().item(2).setEnabled(False)
             self.ui.comboAddress.model().item(3).setEnabled(False)
+            self.ui.comboAddress.model().item(4).setEnabled(False)
+            self.ui.comboAddress.model().item(5).setEnabled(False)
             self.ui.comboGyroRange.model().item(0).setEnabled(False)
+            self.ui.comboBus.model().item(2).setEnabled(False)
             if self.ui.comboGyroRange.currentIndex() == 0:
                 self.ui.comboGyroRange.setCurrentIndex(1)
             if self.ui.comboAddress.currentIndex() > 1:
@@ -230,9 +323,22 @@ class IMUPanel(QtWidgets.QWidget,StateSaver):
         elif self.ui.comboType.currentIndex() == 2:
             self.ui.comboAddress.model().item(0).setEnabled(False)
             self.ui.comboAddress.model().item(1).setEnabled(False)
-            self.ui.comboAddress.model().item(2).setEnabled(True)
-            self.ui.comboAddress.model().item(3).setEnabled(True)
+            if self.ui.comboBus.currentIndex() == 2:
+                self.ui.comboAddress.model().item(2).setEnabled(False)
+                self.ui.comboAddress.model().item(3).setEnabled(False)
+                self.ui.comboAddress.model().item(4).setEnabled(True)
+                self.ui.comboAddress.model().item(5).setEnabled(True)
+                if self.ui.comboAddress.currentIndex() < 4:
+                    self.ui.comboAddress.setCurrentIndex(4)
+            else:
+                self.ui.comboAddress.model().item(2).setEnabled(True)
+                self.ui.comboAddress.model().item(3).setEnabled(True)
+                self.ui.comboAddress.model().item(4).setEnabled(False)
+                self.ui.comboAddress.model().item(5).setEnabled(False)
+                if (self.ui.comboAddress.currentIndex() < 2) or (self.ui.comboAddress.currentIndex() > 3):
+                    self.ui.comboAddress.setCurrentIndex(2)
             self.ui.comboGyroRange.model().item(0).setEnabled(True)
+            self.ui.comboBus.model().item(2).setEnabled(True)
             if self.ui.comboAddress.currentIndex() < 2:
                 self.ui.comboAddress.setCurrentIndex(2)
             self.ui.comboFilter.setEnabled(False)

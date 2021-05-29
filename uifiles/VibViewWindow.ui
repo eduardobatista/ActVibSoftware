@@ -73,7 +73,7 @@
           </font>
          </property>
          <property name="text">
-          <string>Tempo no Controlador:</string>
+          <string>Elapsed Time:</string>
          </property>
         </widget>
        </item>
@@ -134,7 +134,7 @@
           </font>
          </property>
          <property name="text">
-          <string>Erro de Tempo:</string>
+          <string>Time Delay:</string>
          </property>
         </widget>
        </item>
@@ -172,6 +172,64 @@
        </item>
        <item>
         <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_6">
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Sample Time:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="sampleTime">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>200</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="text">
+          <string>0 us</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_4">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
@@ -384,21 +442,19 @@
            </widget>
           </item>
           <item>
-           <widget class="QComboBox" name="comboCanaisControle">
-            <item>
-             <property name="text">
-              <string>C1 - Perturbação, C2 - Controle</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>C1 - Controle, C2 - Perturbação</string>
-             </property>
-            </item>
-           </widget>
-          </item>
-          <item>
-           <widget class="QFrame" name="Controle">
+           <widget class="QFrame" name="controlFrame">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>20</height>
+             </size>
+            </property>
             <property name="autoFillBackground">
              <bool>false</bool>
             </property>
@@ -413,420 +469,20 @@
             </property>
             <layout class="QHBoxLayout" name="horizontalLayout_5">
              <property name="spacing">
-              <number>3</number>
+              <number>0</number>
              </property>
              <property name="leftMargin">
-              <number>5</number>
+              <number>0</number>
              </property>
              <property name="topMargin">
-              <number>5</number>
+              <number>0</number>
              </property>
              <property name="rightMargin">
               <number>0</number>
              </property>
              <property name="bottomMargin">
-              <number>5</number>
+              <number>0</number>
              </property>
-             <item>
-              <widget class="QCheckBox" name="checkControle">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="text">
-                <string>Ativar</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="Line" name="line_4">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QFrame" name="frame_7">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>0</width>
-                 <height>150</height>
-                </size>
-               </property>
-               <property name="frameShape">
-                <enum>QFrame::StyledPanel</enum>
-               </property>
-               <property name="frameShadow">
-                <enum>QFrame::Raised</enum>
-               </property>
-               <layout class="QGridLayout" name="gridLayout_2">
-                <property name="topMargin">
-                 <number>3</number>
-                </property>
-                <property name="bottomMargin">
-                 <number>3</number>
-                </property>
-                <property name="verticalSpacing">
-                 <number>3</number>
-                </property>
-                <item row="0" column="4" colspan="5">
-                 <widget class="QComboBox" name="comboCanalPerturb">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <item>
-                   <property name="text">
-                    <string>Canal 1</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>Canal 2</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>Canal 3</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>Canal 4</string>
-                   </property>
-                  </item>
-                 </widget>
-                </item>
-                <item row="0" column="3">
-                 <widget class="QLabel" name="label_24">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="text">
-                   <string>Perturbação:</string>
-                  </property>
-                  <property name="alignment">
-                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="3">
-                 <widget class="QLabel" name="label_48">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="text">
-                   <string>Controle:</string>
-                  </property>
-                  <property name="alignment">
-                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                  </property>
-                 </widget>
-                </item>
-                <item row="2" column="4" colspan="5">
-                 <widget class="QComboBox" name="comboRef">
-                  <item>
-                   <property name="text">
-                    <string>0x68 - Acelerômetro X</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>0x68 - Acelerômetro Y</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>0x68 - Acelerômetro Z</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>0x68 - Giroscópio X</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>0x68 - Giroscópio Y</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>0x68 - Giroscópio Z</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>0x69 - Acelerômetro X</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>0x69 - Acelerômetro Y</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>0x69 - Acelerômetro Z</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>0x69 - Giroscópio X</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>0x69 - Giroscópio Y</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>0x69 - Giroscópio Z</string>
-                   </property>
-                  </item>
-                 </widget>
-                </item>
-                <item row="4" column="3">
-                 <widget class="QLabel" name="label_8">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="text">
-                   <string>Algoritmo:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="5" column="4" rowspan="3">
-                 <widget class="Line" name="line_3">
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
-                  </property>
-                 </widget>
-                </item>
-                <item row="2" column="3">
-                 <widget class="QLabel" name="label_16">
-                  <property name="text">
-                   <string>Sensor Ref:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="3" column="4" colspan="5">
-                 <widget class="QComboBox" name="comboErro">
-                  <item>
-                   <property name="text">
-                    <string>0x68 - Acelerômetro X</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>0x68 - Acelerômetro Y</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>0x68 - Acelerômetro Z</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>0x68 - Giroscópio X</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>0x68 - Giroscópio Y</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>0x68 - Giroscópio Z</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>0x69 - Acelerômetro X</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>0x69 - Acelerômetro Y</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>0x69 - Acelerômetro Z</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>0x69 - Giroscópio X</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>0x69 - Giroscópio Y</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>0x69 - Giroscópio z</string>
-                   </property>
-                  </item>
-                 </widget>
-                </item>
-                <item row="4" column="8">
-                 <widget class="QComboBox" name="comboAlgoritmo">
-                  <item>
-                   <property name="text">
-                    <string>FxNLMS</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>FxLMS</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>FxNLMS Modificado Proposto</string>
-                   </property>
-                  </item>
-                 </widget>
-                </item>
-                <item row="6" column="3">
-                 <widget class="QLabel" name="label_10">
-                  <property name="text">
-                   <string>Parâmetros:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="3" column="3">
-                 <widget class="QLabel" name="label_17">
-                  <property name="text">
-                   <string>Sensor Erro:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="4" colspan="5">
-                 <widget class="QComboBox" name="comboCanalControle">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="currentText">
-                   <string>Canal 1</string>
-                  </property>
-                  <item>
-                   <property name="text">
-                    <string>Canal 1</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>Canal 2</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>Canal 3</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>Canal 4</string>
-                   </property>
-                  </item>
-                 </widget>
-                </item>
-                <item row="7" column="8">
-                 <widget class="QLineEdit" name="normCtrl">
-                  <property name="text">
-                   <string>1e-4</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="6" column="8">
-                 <widget class="QLineEdit" name="passoCtrl">
-                  <property name="text">
-                   <string>0.01</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="5" column="8">
-                 <widget class="QSpinBox" name="spinMemCtrl">
-                  <property name="minimum">
-                   <number>1</number>
-                  </property>
-                  <property name="maximum">
-                   <number>3000</number>
-                  </property>
-                  <property name="value">
-                   <number>100</number>
-                  </property>
-                 </widget>
-                </item>
-                <item row="5" column="5" colspan="3">
-                 <widget class="QLabel" name="label_12">
-                  <property name="text">
-                   <string>Tam. Memória:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="7" column="5" colspan="3">
-                 <widget class="QLabel" name="label_11">
-                  <property name="text">
-                   <string>Penalização:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="6" column="5" colspan="3">
-                 <widget class="QLabel" name="label_9">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="text">
-                   <string>Passo:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="4" column="4" colspan="2">
-                 <widget class="QCheckBox" name="checkAlgOn">
-                  <property name="text">
-                   <string>On ≥</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="4" column="6" colspan="2">
-                 <widget class="QSpinBox" name="spinTAlgOn"/>
-                </item>
-               </layout>
-              </widget>
-             </item>
             </layout>
            </widget>
           </item>

@@ -102,6 +102,16 @@
           <string>0x6B</string>
          </property>
         </item>
+        <item>
+         <property name="text">
+          <string>CS5</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>CS33</string>
+         </property>
+        </item>
        </widget>
       </item>
       <item row="3" column="0">
@@ -356,6 +366,11 @@
           <string>I2C-2</string>
          </property>
         </item>
+        <item>
+         <property name="text">
+          <string>VSPI</string>
+         </property>
+        </item>
        </widget>
       </item>
       <item row="1" column="3">
@@ -370,6 +385,15 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>comboType</tabstop>
+  <tabstop>comboAddress</tabstop>
+  <tabstop>comboBus</tabstop>
+  <tabstop>comboAccRange</tabstop>
+  <tabstop>comboGyroRange</tabstop>
+  <tabstop>comboFilter</tabstop>
+  <tabstop>comboFilter2</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

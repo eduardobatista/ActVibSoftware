@@ -7,13 +7,28 @@
     <x>0</x>
     <y>0</y>
     <width>548</width>
-    <height>79</height>
+    <height>55</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>3</number>
+   </property>
+   <property name="leftMargin">
+    <number>1</number>
+   </property>
+   <property name="topMargin">
+    <number>1</number>
+   </property>
+   <property name="rightMargin">
+    <number>1</number>
+   </property>
+   <property name="bottomMargin">
+    <number>1</number>
+   </property>
    <item>
     <widget class="QFrame" name="frame_4">
      <property name="sizePolicy">
@@ -163,6 +178,29 @@
         </property>
         <property name="value">
          <double>10.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>DCLevel:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="spinDCLevel">
+        <property name="toolTip">
+         <string>Use to avoid overfitting. Regular values are 2048 for outputs 1 and 2 and 128 for outputs 3 and 4.</string>
+        </property>
+        <property name="locale">
+         <locale language="English" country="UnitedStates"/>
+        </property>
+        <property name="maximum">
+         <number>2048</number>
+        </property>
+        <property name="value">
+         <number>1668</number>
         </property>
        </widget>
       </item>

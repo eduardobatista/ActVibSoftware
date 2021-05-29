@@ -45,6 +45,8 @@ class Ui_IMUPanel(object):
         self.comboAddress.addItem("")
         self.comboAddress.addItem("")
         self.comboAddress.addItem("")
+        self.comboAddress.addItem("")
+        self.comboAddress.addItem("")
         self.gridLayout.addWidget(self.comboAddress, 3, 1, 1, 1)
         self.label = QtWidgets.QLabel(self.imuframe)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Preferred)
@@ -154,6 +156,7 @@ class Ui_IMUPanel(object):
         self.comboBus.setObjectName("comboBus")
         self.comboBus.addItem("")
         self.comboBus.addItem("")
+        self.comboBus.addItem("")
         self.gridLayout.addWidget(self.comboBus, 1, 4, 1, 1)
         self.label_2 = QtWidgets.QLabel(self.imuframe)
         self.label_2.setObjectName("label_2")
@@ -162,6 +165,12 @@ class Ui_IMUPanel(object):
 
         self.retranslateUi(IMUPanel)
         QtCore.QMetaObject.connectSlotsByName(IMUPanel)
+        IMUPanel.setTabOrder(self.comboType, self.comboAddress)
+        IMUPanel.setTabOrder(self.comboAddress, self.comboBus)
+        IMUPanel.setTabOrder(self.comboBus, self.comboAccRange)
+        IMUPanel.setTabOrder(self.comboAccRange, self.comboGyroRange)
+        IMUPanel.setTabOrder(self.comboGyroRange, self.comboFilter)
+        IMUPanel.setTabOrder(self.comboFilter, self.comboFilter2)
 
     def retranslateUi(self, IMUPanel):
         _translate = QtCore.QCoreApplication.translate
@@ -170,6 +179,8 @@ class Ui_IMUPanel(object):
         self.comboAddress.setItemText(1, _translate("IMUPanel", "0x69"))
         self.comboAddress.setItemText(2, _translate("IMUPanel", "0x6A"))
         self.comboAddress.setItemText(3, _translate("IMUPanel", "0x6B"))
+        self.comboAddress.setItemText(4, _translate("IMUPanel", "CS5"))
+        self.comboAddress.setItemText(5, _translate("IMUPanel", "CS33"))
         self.label.setText(_translate("IMUPanel", "Addr:"))
         self.label_14.setText(_translate("IMUPanel", "GyroR:"))
         self.comboType.setItemText(0, _translate("IMUPanel", "Disabled"))
@@ -199,4 +210,5 @@ class Ui_IMUPanel(object):
         self.comboFilter2.setItemText(3, _translate("IMUPanel", "50Hz"))
         self.comboBus.setItemText(0, _translate("IMUPanel", "I2C-1"))
         self.comboBus.setItemText(1, _translate("IMUPanel", "I2C-2"))
+        self.comboBus.setItemText(2, _translate("IMUPanel", "VSPI"))
         self.label_2.setText(_translate("IMUPanel", "Bus:"))

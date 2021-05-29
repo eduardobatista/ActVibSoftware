@@ -180,7 +180,7 @@ class CtrlFigQtGraph(BaseFigQtGraph):
             self.pitens[k].setXRange(-self.janelax[k], 0, padding=0.01)
             self.pitens[k].setYRange(self.miny[k], self.maxy[k], padding=0.01)
 
-    def updateFig(self, sensorids=[0, 6]):
+    def updateFig(self):
         limi = [0, 0]
         limf = [0, 0]
         npontos = [0, 0]

@@ -11,7 +11,7 @@ from VibViewWindow import Ui_MainWindow
 
 from others import (MyFigQtGraph, CtrlFigQtGraph, FigOutputQtGraph, WorkdirManager, MyUploadDialog)
 
-from panels import (IMUPanel,GeneratorPanel,PlotCfgPanel)
+from panels import (IMUPanel,GeneratorPanel,PlotCfgPanel,ControlPanel)
 
 class mainwindow(QtWidgets.QMainWindow):
 
@@ -26,8 +26,10 @@ class mainwindow(QtWidgets.QMainWindow):
         self.saveconfigtypes = [QtWidgets.QCheckBox, QtWidgets.QComboBox,
                                 QtWidgets.QDoubleSpinBox, QtWidgets.QSpinBox, QtWidgets.QLineEdit]
         self.imupanel = [IMUPanel(idd) for idd in range(3)]
-        self.genpanel = [GeneratorPanel(1),GeneratorPanel(2),GeneratorPanel(3),GeneratorPanel(4)]
+        self.genpanel = [GeneratorPanel(idd) for idd in range(4)]
+
         self.plotcfgpanel = PlotCfgPanel()
+        self.ctrlpanel = ControlPanel()
         self.readConfig()
         self.mapper = QtCore.QSignalMapper(self)
         self.ui.bInit.clicked.connect(self.bInit)
@@ -75,16 +77,17 @@ class mainwindow(QtWidgets.QMainWindow):
         self.plotcfgpanel.ui.comboPlot2.activated.connect(lambda: self.dataman.mfig.setPlotChoice(None,self.plotcfgpanel.ui.comboPlot2.currentIndex()))
         for cc in self.plotcfgpanel.findChildren(QCheckBox):
             cc.toggled.connect(self.plotConfig)
+        
+        # ControlPanel:
+        self.ui.controlFrame.layout().addWidget(self.ctrlpanel)  
+        self.ctrlpanel.connectControlChanged(self.configControl)      
+        # self.ui.comboCanaisControle.activated.connect(self.configControl)
+        self.ctrlpanel.ui.checkAlgOn.toggled.connect(self.configAlgOn)
+        # self.ui.passoCtrl.setValidator(QtGui.QDoubleValidator(0.0, 1000.0, 2, self))
+        # self.ui.passoCtrl.editingFinished.connect(self.validateStep)
+        # self.ui.normCtrl.setValidator(QtGui.QDoubleValidator(0.0, 1000.0, 2, self))
+        # self.ui.normCtrl.editingFinished.connect(self.validateRegularization)
 
-        self.ui.checkAlgOn.setChecked(False)
-        self.ui.checkAlgOn.setEnabled(False)
-        self.ui.checkControle.toggled.connect(self.configControl)
-        self.ui.comboCanaisControle.activated.connect(self.configControl)
-        self.ui.checkAlgOn.toggled.connect(self.configAlgOn)
-        self.ui.passoCtrl.setValidator(QtGui.QDoubleValidator(0.0, 1000.0, 2, self))
-        self.ui.passoCtrl.editingFinished.connect(self.validateStep)
-        self.ui.normCtrl.setValidator(QtGui.QDoubleValidator(0.0, 1000.0, 2, self))
-        self.ui.normCtrl.editingFinished.connect(self.validateRegularization)
         self.dataman = None
         self.driver = None
         self.mfig = None
@@ -248,71 +251,34 @@ class mainwindow(QtWidgets.QMainWindow):
         self.changeADCConfig()
         self.configControl()
 
-    def validateStep(self):
-        try:
-            passonovo = float(self.ui.passoCtrl.text())
-        except Exception as exc:
-            if self.driver is not None:
-                self.ui.passoCtrl.setText(str(self.driver.ctrlmu))
-            else:
-                self.ui.passoCtrl.setText('0')
-
-    def validateRegularization(self):
-        try:
-            regnovo = float(self.ui.normCtrl.text())
-        except Exception as exc:
-            if self.driver is not None:
-                self.ui.normCtrl.setText(str(self.driver.ctrlmu))
-            else:
-                self.ui.normCtrl.setText('0')
-
     def configAlgOn(self):
-        algon = self.ui.checkAlgOn.isChecked()
-        algontime = float(self.ui.spinTAlgOn.value())
+        # print("ConfigAlgOn!")
+        algon = self.ctrlpanel.ui.checkAlgOn.isChecked()
+        algontime = float(self.ctrlpanel.ui.spinTAlgOn.value())
         if algon:
-            self.driver.ctrlmu = float(self.ui.passoCtrl.text())
-            self.driver.ctrlfi = float(self.ui.normCtrl.text())
+            self.driver.ctrlmu = float(self.ctrlpanel.ui.passoCtrl.text())
+            self.driver.ctrlfi = float(self.ctrlpanel.ui.normCtrl.text())
         self.driver.setAlgOn(algon, algontime)
-        self.ui.normCtrl.setEnabled(not algon)
-        self.ui.passoCtrl.setEnabled(not algon)
-        self.ui.spinTAlgOn.setEnabled(not algon)
+        self.ctrlpanel.ui.normCtrl.setEnabled(not algon)
+        self.ctrlpanel.ui.passoCtrl.setEnabled(not algon)
+        self.ctrlpanel.ui.spinTAlgOn.setEnabled(not algon)
 
-    def configControl(self):
-        self.driver.controlMode = self.ui.checkControle.isChecked()
+    def configControl(self):        
+        self.driver.controlMode = self.ctrlpanel.isControlOn()
         if self.driver.controlMode:
-            state1 = (self.ui.comboCanaisControle.currentIndex() == 0)
-            if state1:
-                self.driver.canalControle = 1
-            else:
-                self.driver.canalControle = 0
-            
-            self.genpanel[1].setEnabled(not state1)
-            
-            self.genpanel[0].setEnabled(state1)
-            
-            if state1:
-                generatorconfig1 = self.genpanel[0].getGeneratorConfig()                
-                self.driver.setGeneratorConfig(0, **generatorconfig1)
-                self.driver.setGeneratorConfig(1, 0, 0, self.genpanel[1].getFreqValue())
-            else:
-                self.driver.setGeneratorConfig(0, 0, 0, self.genpanel[0].getFreqValue())
-                generatorconfig2 = self.genpanel[1].getGeneratorConfig()
-                self.driver.setGeneratorConfig(1, **generatorconfig2)
-            self.driver.setControlConfig(
-                self.ui.comboAlgoritmo.currentIndex(),
-                int(self.ui.spinMemCtrl.value()),
-                float(self.ui.passoCtrl.text()),
-                float(self.ui.normCtrl.text()),
-                self.ui.comboRef.currentIndex(),
-                self.ui.comboErro.currentIndex()
-            )
+            self.driver.controlChannel = self.ctrlpanel.getControlChannel()
+            self.driver.perturbChannel = self.ctrlpanel.getPerturbChannel()
+            for gg in self.genpanel:
+                gg.setEnabled(True)
+            self.genpanel[self.driver.controlChannel].setEnabled(False)
+            self.driver.setControlConfig( **self.ctrlpanel.getControlConfiguration() )
             if (self.mfig is not None):
                 self.ctrlfig.show()
                 self.mfig.hide()
 
         else:
-            self.genpanel[1].setEnabled(True)
-            self.genpanel[0].setEnabled(True)
+            for gg in self.genpanel:
+                gg.setEnabled(True)
             self.changeGeneratorConfig()
             if (self.ctrlfig is not None):
                 self.mfig.show()
@@ -324,7 +290,7 @@ class mainwindow(QtWidgets.QMainWindow):
     def plotConfig(self):
         self.mfig.accEnable = self.plotcfgpanel.getAccEnableList()
         self.mfig.gyroEnable = self.plotcfgpanel.getGyroEnableList()
-        self.ctrlfig.plotSetup([self.ui.comboRef.currentIndex(), self.ui.comboErro.currentIndex()])
+        self.ctrlfig.plotSetup([self.ctrlpanel.ui.comboRef.currentIndex(), self.ctrlpanel.ui.comboErro.currentIndex()])
 
     def changeGeneratorConfig(self):
         for k in range(4):
@@ -350,7 +316,7 @@ class mainwindow(QtWidgets.QMainWindow):
         self.ctrlfig = ctrlfig
         self.ui.plotOutLayout.addWidget(self.mfig)
         self.ui.plotOutLayout.addWidget(self.ctrlfig)
-        if self.ui.checkControle.isChecked():
+        if self.ctrlpanel.isControlOn():
             self.mfig.hide()
         else:
             self.ctrlfig.hide()
@@ -383,19 +349,20 @@ class mainwindow(QtWidgets.QMainWindow):
             self.plotConfig()
             self.plotOutConfig()
 
-            self.disabledwhenrunning = self.imupanel + [self.ui.checkControle,self.ui.comboCanaisControle,
-                                   self.ui.comboRef,self.ui.comboErro,self.ui.comboAlgoritmo,self.ui.spinMemCtrl,
-                                   self.ui.checkADCOn,self.ui.comboADCChannel,self.ui.comboRangeADC,self.ui.comboADCRate]
+            self.disabledwhenrunning = self.imupanel + [self.ctrlpanel,self.ui.checkADCOn,self.ui.comboADCChannel,
+                                                        self.ui.comboRangeADC,self.ui.comboADCRate]
             for cc in self.disabledwhenrunning: 
                 cc.setEnabled(False)
 
-            if self.ui.checkControle.isChecked():
-                self.ui.checkAlgOn.setEnabled(True)
+            if self.ctrlpanel.isControlOn():
+                self.ctrlpanel.ui.checkAlgOn.setEnabled(True)
 
             if self.driver.adcconfig[0] == 0:
                 self.mfig.removeADCPlot()
             else:
                 self.mfig.addADCPlot()
+
+            self.dataman.mfig.setPlotChoice(self.plotcfgpanel.ui.comboPlot1.currentIndex(),self.plotcfgpanel.ui.comboPlot2.currentIndex())
 
             self.dataman.IniciaLeituras()
 
@@ -405,8 +372,8 @@ class mainwindow(QtWidgets.QMainWindow):
     def readingsStopped(self):
         for cc in self.disabledwhenrunning:
             cc.setEnabled(True)
-        self.ui.checkAlgOn.setEnabled(False)
-        self.ui.checkAlgOn.setChecked(False)
+        self.ctrlpanel.ui.checkAlgOn.setEnabled(False)
+        self.ctrlpanel.ui.checkAlgOn.setChecked(False)
 
     def bReset(self):
         if self.dataman.flagrodando:

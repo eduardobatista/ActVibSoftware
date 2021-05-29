@@ -7,9 +7,7 @@ import struct
 
 class driverhardware:
 
-    def __init__(self, mwindow):
-        self.DCLEVEL = [1668,1668,104,104]
-        self.iampscaler = [1/float(self.DCLEVEL[0]),1/float(self.DCLEVEL[1]),1/float(self.DCLEVEL[2]),1/float(self.DCLEVEL[3])]
+    def __init__(self, mwindow):        
         self.mwindow = mwindow
         self.accscaler = [9.80665 * 2.0 / (2**15)] * 3
         self.gyroscaler = [250.0 / (2**15)] * 3
@@ -24,6 +22,8 @@ class driverhardware:
         self.gentipo = [0, 0, 0, 0]
         self.genamp = [0.0, 0.0, 0.0, 0.0]
         self.genfreq = [0.0, 0.0, 0.0, 0.0]
+        self.dclevel = [1668,1668,104,104]
+        self.iampscaler = [1/float(self.dclevel[0]),1/float(self.dclevel[1]),1/float(self.dclevel[2]),1/float(self.dclevel[3])]
         self.chirpconf = [[0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]]
         self.imuconfigdata = [[0, 0, 0, 0],[0, 0, 0, 0],[0, 0, 0, 0]]
         self.IMUEnableFlags = [False,False,False]
@@ -46,7 +46,8 @@ class driverhardware:
         if self.serial.isOpen():
             self.serial.close()
         self.controlMode = False
-        self.canalControle = 0
+        self.controlChannel = 0
+        self.perturbChannel = 0
         self.ctrlalg = 0
         self.algon = False
         self.ctrlmem = 100
@@ -54,6 +55,8 @@ class driverhardware:
         self.ctrlfi = 1e-4
         self.refid = 0
         self.erroid = 0
+        self.refimuid = 0
+        self.errimuid = 1
         self.packetsize = 17
         self.xref = 0
         self.xerro = 0
@@ -65,9 +68,9 @@ class driverhardware:
         self.serial.port = self.mwindow.porta
         self.serial.open()
 
-    def setGeneratorConfig(self, id=0, tipo=0, amp=0.0, freq=10.0, chirpconf=[0, 0, 0, 0, 0]):
+    def setGeneratorConfig(self, id=0, tipo=0, amp=0.0, freq=10.0, dclevel=128, chirpconf=[0, 0, 0, 0, 0]):
         if tipo != 2:
-            if (self.gentipo[id] != tipo) or (self.genamp[id] != amp) or (self.genfreq[id] != freq):
+            if (self.gentipo[id] != tipo) or (self.genamp[id] != amp) or (self.genfreq[id] != freq) or (self.dclevel[id] != dclevel):
                 self.genConfigWritten[id] = False
         else:
             if chirpconf[4] > 1.0:
@@ -81,17 +84,13 @@ class driverhardware:
         self.gentipo[id] = tipo
         self.genamp[id] = amp
         self.genfreq[id] = freq
+        self.dclevel[id] = dclevel
+        self.iampscaler[id] = 0 if (dclevel == 0) else 1/float(self.dclevel[id])
 
     def setADCConfig(self, adcconfigs=[0, 0, 0, 0]):
         self.adcconfig = adcconfigs
         multipliers = [6.144, 4.096, 2.048, 1.024, 0.512, 0.256]
         self.adcmultiplier = multipliers[adcconfigs[2]] / 2**15
-
-    def setMPUFilter(self, nrange):
-        self.filter = nrange
-
-    def setMPUAddress(self, nrange):
-        self.mpuaddress = nrange
 
     """ Seta range do acelerômetro:
         0 = -2 a +2 g
@@ -112,23 +111,15 @@ class driverhardware:
         self.gyrorangeselection[id] = nrange
         self.gyroscaler[id] = 125.0 * (2.0**nrange) / (2**15)
 
-    def writeMPUScales(self):
-        aux = 'c' + str(self.accrangeselection) + str(self.gyrorangeselection)
-        self.serial.write(aux.encode())
-        if self.serial.read(2) != b'ok':
-            raise Exception('Config. de escalas sem resposta.')
-
     def initHardware(self,id=0):
         aux = bytearray([ord('i')] + [id])
         self.serial.write(aux)
-        if self.serial.read(3) != b'ok!':
+        aux = self.serial.read(3)
+        if aux != b'ok!':
+            print(aux)
+            axxx = self.serial.read(2000)
+            print(str(axxx.decode("ISO-8859-1")))
             raise Exception(f'Fail initializing the IMU with id={id}.')
-
-    def writeMPUFilter(self):
-        aux = 'g' + str(self.filter)
-        self.serial.write(aux.encode())
-        if self.serial.read(2) != b'ok':
-            raise Exception('Config. de gerador sem resposta.')
 
     def setIMUConfig(self,id: int, imucfgdata: list):
         self.imuconfigdata[id] = imucfgdata
@@ -143,76 +134,87 @@ class driverhardware:
         self.readsize += 8+2
         
     def writeIMUConfig(self,id: int):
+        # print("writeIMU")
         aux = bytearray([ord('I')] + [id] + self.imuconfigdata[id])
         self.serial.write(aux)
-        if self.serial.read(2) != b'ok':
-            raise Exception('Error writing IMU Config.')
+        aux = self.serial.read(2)
+        if aux != b'ok':
+            print(aux)
+            raise Exception(f'Error writing IMU{id+1} Config.')
         
 
     def writeGeneratorConfig(self, id=0):
         freqaux = [int(self.genfreq[id]), int(round((self.genfreq[id] - int(self.genfreq[id])) * 100))]
         if id < 2:  # Saída de 12 bits, MCP4725
             ampaux = int(round(self.genamp[id] * 2047))
-            dclevel = self.DCLEVEL[0]  # Para não saturar. TODO: Expor isso como configuração para o programa.
+            dcl = self.dclevel[id]  # Para não saturar. TODO: Expor isso como configuração para o programa.
         else:  # Saída direta do ESP32, com 8 bits.
             ampaux = int(round(self.genamp[id] * 127))
-            dclevel = self.DCLEVEL[2]  # Para não saturar. TODO: Expor isso como configuração para o programa.
+            dcl = self.dclevel[id]  # Para não saturar. TODO: Expor isso como configuração para o programa.
         aux = 'G'
-        aux = aux.encode() + bytes([id, self.gentipo[id], (ampaux >> 8) & 0xFF, ampaux & 0xFF] + freqaux + [dclevel >> 8, dclevel & 0xFF])
+        aux = aux.encode() + bytes([id, self.gentipo[id], (ampaux >> 8) & 0xFF, ampaux & 0xFF] + freqaux + [dcl >> 8, dcl & 0xFF])
         if self.gentipo[id] == 2:  # Chirp, manda mais 4 bytes [tinicio,deltai,tfim,deltaf]
             aux = aux + bytes(self.chirpconf[id])
         self.serial.write(aux)
         self.genConfigWritten[id] = True
-        # if self.serial.read(3) != b'Oks':
-        # raise Exception('Config. de filtro sem resposta.')
-
-    def writeSensorChoice(self, id=-1):
-        if (id == -1):
-            aux = 'C'.encode() + bytes([self.mpuaddress])
-        else:
-            aux = 'C'.encode() + bytes([id])
-        self.serial.write(aux)
-        if self.serial.read(2) != b'ok':
-            raise Exception('Erro na escolha do sensor.')
+        # aux = self.serial.read(2);
+        # if aux != b'ok':
+        #     print(aux)
+        #     raise Exception('Config. de Gerador sem resposta.')
 
     def writeADCConfig(self):
         aux = 'd'.encode() + bytes(self.adcconfig)
         self.serial.write(aux)
-        if self.serial.read(2) != b'ok':
+        aux = self.serial.read(2);
+        if aux != b'ok':
+            print(aux)
             raise Exception('Erro na configuração do ADC.')
 
     def handshake(self):
+        self.serial.reset_output_buffer()
+        self.serial.reset_input_buffer()
         for k in range(5):
             self.serial.write(b'h')
             if self.serial.read(1) == b'k':
+                # time.sleep(0.1)
                 return True
             self.serial.reset_output_buffer()
             self.serial.reset_input_buffer()
             time.sleep(0.1)
         raise Exception("Handshake com dispositivo falhou.")
 
-    def setControlConfig(self, alg=0, mem=0, mu=0, fi=0, refid=0, erroid=0):
+    def setControlConfig(self, alg=0, mem=0, mu=0, fi=0, refimuid=0, errimuid=0, refid=0, erroid=0):
         self.ctrlalg = alg
         self.ctrlmem = mem
         self.ctrlmu = mu
         self.ctrlfi = fi
+        self.refimuid = refimuid
         self.refid = refid
+        self.errimuid = errimuid
         self.erroid = erroid
 
     def writeControlConfig(self):
+        # Data to send: 
+        #   Byte 0: 4 bits for perturbation channel (MSBs) and 4 bits for control channel (LSBs)
+        #   Byte 1: 4 bits for REF imu id (MSBs) and 4 bits for sensor choice (AccX = 0 to GyroZ = 5)
+        #   Byte 2: 4 bits for ERROR imu id (MSBs) and 4 bits for sensor choice (AccX = 0 to GyroZ = 5)
+        #   Byte 3: Algorithm choice
+        #   Bytes 4 and 5: Memory size (from 0 to 65535)
+        #   Bytes 6 to 9: Step size value (float encoded in 4 bytes)
+        #   Bytes 10 to 13: Regularization factor (float enconded in 4 bytes) 
         self.serial.write(b'!')
-        self.buf = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        self.buf[0] = self.canalControle
-        self.buf[1] = ((self.refid // 6) << 4) + (self.refid % 6)
-        self.buf[2] = ((self.erroid // 6) << 4) + (self.erroid % 6)
-        self.buf[3] = self.ctrlalg
-        self.buf[4] = (self.ctrlmem >> 8) & 0xFF
-        self.buf[5] = self.ctrlmem & 0xFF
-        self.serial.write(bytearray(self.buf[0:6]))
+        buf = [0] * 6
+        buf[0] = (self.perturbChannel << 4) + self.controlChannel
+        buf[1] = (self.refimuid << 4) + self.refid
+        buf[2] = (self.errimuid << 4) + self.erroid
+        buf[3] = self.ctrlalg
+        buf[4] = (self.ctrlmem >> 8) & 0xFF
+        buf[5] = self.ctrlmem & 0xFF
+        self.serial.write(bytearray(buf[0:6]))
         self.serial.write(bytearray(struct.pack("f", self.ctrlmu)))
         self.serial.write(bytearray(struct.pack("f", self.ctrlfi)))
         if self.serial.read(3) != b'ok!':
-            raise Exception("Sem resposta gravando configurações de controle.")
+            raise Exception("Fail recording control configurations.")
 
     def setAlgOn(self, status=False, algontime=0.0, forcewrite=False):
         if (status != self.algon) or forcewrite:
@@ -280,7 +282,6 @@ class driverhardware:
                 pbar.setValue(pbar.value() + (bb[0] << 8) + bb[1])
     
 
-
     def getReading(self):
         ctaux = 0
         val = 0
@@ -294,12 +295,12 @@ class driverhardware:
         if ctaux == 64:
             raise Exception('Falha na leitura de pacote: cabeçalho não encontrado.')
         if self.controlMode:
-            self.buf[0:13] = self.serial.read(13)[0:13]
-            self.dacout[0] = self.buf[0]
-            self.dacout[1] = self.buf[1]
-            self.xref = struct.unpack("f", bytearray(self.buf[2:6]))[0]
-            self.xerro = struct.unpack("f", bytearray(self.buf[6:10]))[0]
-            self.calctime = (((self.buf[11] << 8) + self.buf[12]) << 4) / 240
+            buf = self.serial.read(15)
+            self.dacout[0] = float(struct.unpack_from(">H",buf,0)[0]) * self.iampscaler[self.perturbChannel] - 1.0
+            self.dacout[1] = float(struct.unpack_from(">H",buf,2)[0]) * self.iampscaler[self.controlChannel] - 1.0
+            self.xref = struct.unpack_from("f",buf,4)[0]
+            self.xerro = struct.unpack_from("f",buf,8)[0]
+            self.calctime = (struct.unpack_from(">H",buf,13)[0] << 4) / 240 # (((self.buf[13] << 8) + self.buf[14]) << 4) / 240
         else:
             buf = self.serial.read(self.readsize)
             for j in range(3):
@@ -322,3 +323,4 @@ class driverhardware:
             self.dacout[3] = float(buf[ptr+5]) * self.iampscaler[3] - 1.0
             self.adcin = float( struct.unpack_from(">h",buf,ptr+6)[0] ) * self.adcmultiplier
             # print(struct.unpack_from(">H",buf,ptr+8))
+            self.calctime = (struct.unpack_from(">H",buf,ptr+8)[0] << 4) / 240
