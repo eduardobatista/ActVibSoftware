@@ -13,7 +13,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(996, 732)
+        MainWindow.resize(1090, 732)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -373,7 +373,7 @@ class Ui_MainWindow(object):
         self.verticalLayout.addWidget(self.bLimpar)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 996, 26))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1090, 26))
         self.menubar.setObjectName("menubar")
         self.menuArquivo = QtWidgets.QMenu(self.menubar)
         self.menuArquivo.setLocale(QtCore.QLocale(QtCore.QLocale.English, QtCore.QLocale.UnitedStates))
@@ -488,8 +488,8 @@ class Ui_MainWindow(object):
         self.comboADCRate.setItemText(6, _translate("MainWindow", "475 SPS"))
         self.comboADCRate.setItemText(7, _translate("MainWindow", "860 SPS"))
         self.tabSensors.setTabText(self.tabSensors.indexOf(self.adc), _translate("MainWindow", "ADC"))
-        self.bInit.setText(_translate("MainWindow", "Iniciar/Parar"))
-        self.bLimpar.setText(_translate("MainWindow", "Limpar Dados"))
+        self.bInit.setText(_translate("MainWindow", "Start/Stop"))
+        self.bLimpar.setText(_translate("MainWindow", "Reset Data"))
         self.menuArquivo.setTitle(_translate("MainWindow", "File"))
         self.menuSelecionar_Porta.setTitle(_translate("MainWindow", "Choose Port"))
         self.actionSalvar_dados.setText(_translate("MainWindow", "Save..."))

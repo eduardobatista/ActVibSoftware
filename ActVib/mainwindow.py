@@ -302,7 +302,7 @@ class mainwindow(QtWidgets.QMainWindow):
             for id in range(3):
                 self.driver.setIMUConfig(id,self.imupanel[id].getIMUConfig())
 
-    def changeADCConfig(self):
+    def changeADCConfig(self):        
         if self.driver is not None:
             adcconfig = [1 if self.ui.checkADCOn.isChecked() else 0,
                          self.ui.comboADCChannel.currentIndex(),

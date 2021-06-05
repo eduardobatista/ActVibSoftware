@@ -153,6 +153,16 @@ class dataman:
         self.mwindow.ui.elapsedTime.setText('0 s')
         self.mwindow.ui.controlTime.setText('0 s')
         self.mwindow.ui.sampleTime.setText('0 us')
+        self.accdata = [[np.zeros(self.wsize), np.zeros(self.wsize), np.zeros(self.wsize)],
+                        [np.zeros(self.wsize), np.zeros(self.wsize), np.zeros(self.wsize)],
+                        [np.zeros(self.wsize), np.zeros(self.wsize), np.zeros(self.wsize)]]
+        self.gyrodata = [[np.zeros(self.wsize), np.zeros(self.wsize), np.zeros(self.wsize)],
+                        [np.zeros(self.wsize), np.zeros(self.wsize), np.zeros(self.wsize)],
+                        [np.zeros(self.wsize), np.zeros(self.wsize), np.zeros(self.wsize)]]
+        self.dacoutdata = [np.zeros(self.wsize), np.zeros(self.wsize), np.zeros(self.wsize), np.zeros(self.wsize)]
+        self.adcdata = np.zeros(self.wsize)
+        self.xrefdata = np.zeros(self.wsize)
+        self.xerrodata = np.zeros(self.wsize)
         
 
     def salvaArquivo(self, filename, setsaved):

@@ -113,12 +113,14 @@ class driverhardware:
 
     def initHardware(self,id=0):
         aux = bytearray([ord('i')] + [id])
+        # print(aux)
         self.serial.write(aux)
+        # print(self.serial.read())
         aux = self.serial.read(3)
         if aux != b'ok!':
             print(aux)
-            axxx = self.serial.read(2000)
-            print(str(axxx.decode("ISO-8859-1")))
+            # axxx = self.serial.read(2000)
+            # print(str(axxx.decode("ISO-8859-1")))
             raise Exception(f'Fail initializing the IMU with id={id}.')
 
     def setIMUConfig(self,id: int, imucfgdata: list):
@@ -169,6 +171,7 @@ class driverhardware:
         if aux != b'ok':
             print(aux)
             raise Exception('Erro na configuração do ADC.')
+        
 
     def handshake(self):
         self.serial.reset_output_buffer()

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>996</width>
+    <width>1090</width>
     <height>732</height>
    </rect>
   </property>
@@ -870,7 +870,7 @@
        </sizepolicy>
       </property>
       <property name="text">
-       <string>Iniciar/Parar</string>
+       <string>Start/Stop</string>
       </property>
      </widget>
     </item>
@@ -883,7 +883,7 @@
        </sizepolicy>
       </property>
       <property name="text">
-       <string>Limpar Dados</string>
+       <string>Reset Data</string>
       </property>
      </widget>
     </item>
@@ -894,7 +894,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>996</width>
+     <width>1090</width>
      <height>26</height>
     </rect>
    </property>
