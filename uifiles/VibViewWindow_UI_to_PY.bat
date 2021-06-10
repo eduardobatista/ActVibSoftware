@@ -6,3 +6,4 @@ pyuic5 --output=..\ActVib\IMUPanel.py IMUPanel.ui
 pyuic5 --output=..\ActVib\GeneratorPanel.py GeneratorPanel.ui
 pyuic5 --output=..\ActVib\PlotCfgPanel.py PlotCfgPanel.ui
 pyuic5 --output=..\ActVib\ControlPanel.py ControlPanel.ui
+pyuic5 --output=..\ActVib\ADCPanel.py ADCPanel.ui

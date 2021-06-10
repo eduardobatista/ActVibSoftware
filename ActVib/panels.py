@@ -3,6 +3,7 @@ from IMUPanel import Ui_IMUPanel
 from GeneratorPanel import Ui_GeneratorPanel
 from PlotCfgPanel import Ui_PlotCfgForm
 from ControlPanel import Ui_ControlForm
+from ADCPanel import Ui_ADCForm
 
 
 class StateSaver:
@@ -185,6 +186,11 @@ class GeneratorPanel(QtWidgets.QWidget,StateSaver):
                 aa.setEnabled(False)
             for aa in [self.ui.chirpTinicio,self.ui.chirpTfim,self.ui.spinAmpl]:
                 aa.setEnabled(True)
+        elif idx == 4: # Square
+            for aa in [self.ui.chirpDeltaI,self.ui.chirpTfim,self.ui.chirpDeltaF,self.ui.chirpA2,self.ui.chirpTinicio]:
+                aa.setEnabled(False)
+            self.ui.spinAmpl.setEnabled(True)
+            self.ui.spinFreq.setEnabled(True)
     
     def setEnabled(self,en):
         self.ui.checkEnable.setEnabled(en)
@@ -355,5 +361,27 @@ class IMUPanel(QtWidgets.QWidget,StateSaver):
         self.addresshighlight()
         
         
+class ADCPanel(QtWidgets.QWidget,StateSaver):
 
+    def __init__(self):
+        super().__init__()
+        self.ui = Ui_ADCForm()
+        self.ui.setupUi(self)
+        self.saveprefix = f'ADC'
+
+    def getADCConfig(self):
+        flagon = (1 if self.ui.checkADC1.isChecked() else 0) + \
+                 (2 if self.ui.checkADC2.isChecked() else 0) + \
+                 (4 if self.ui.checkADC3.isChecked() else 0) + \
+                 (8 if self.ui.checkADC4.isChecked() else 0)
+        adcconfig = [flagon,
+                     self.ui.comboADCRange.currentIndex(),
+                     self.ui.comboADCRate.currentIndex()]
+        return adcconfig
+
+    def setEnabled(self,en):
+        for cc in [self.ui.checkADC1,self.ui.checkADC2,
+                   self.ui.checkADC3,self.ui.checkADC4,
+                   self.ui.comboADCModel,self.ui.comboADCRange,self.ui.comboADCRate]:
+            cc.setEnabled(en)
 

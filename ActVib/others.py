@@ -207,13 +207,15 @@ class MyFigQtGraph(BaseFigQtGraph):
         self.app = app
         super().__init__(3, self.dman.samplingperiod)
         self.wsize = 60
-        pens = [pg.mkPen('r', width=1), pg.mkPen('b', width=1), pg.mkPen('g', width=1)]
+        pens = [pg.mkPen('r', width=2), pg.mkPen('b', width=2), pg.mkPen('g', width=2), pg.mkPen('y', width=2)]
         self.lineacc = []
         self.linegyr = []        
         for k in range(3):
             self.lineacc.append(self.pitens[0].plot(np.array([]), np.array([]), pen=pens[k]))
             self.linegyr.append(self.pitens[1].plot(np.array([]), np.array([]), pen=pens[k]))
-        self.lineadc = self.pitens[2].plot(np.array([]), np.array([]), pen=pens[0])
+        self.lineadc = []
+        for k in range(4):
+            self.lineadc.append(self.pitens[2].plot(np.array([]), np.array([]), pen=pens[k]))
         for k, pitem in enumerate(self.pitens):
             pitem.disableAutoRange()
             pitem.setXRange(-self.janelax[k], 0, padding=0.01)
@@ -224,7 +226,7 @@ class MyFigQtGraph(BaseFigQtGraph):
         self.pitens[2].setLabel('left', 'ADC (Volts)')
         self.accEnable = [True, True, True]
         self.gyroEnable = [True, True, True]
-        self.adcEnable = True
+        self.adcEnableMap = [False, False, False, False]
         self.plotchoice = [0, 0]
 
     def setPlotChoice(self, idx1, idx2):
@@ -262,10 +264,12 @@ class MyFigQtGraph(BaseFigQtGraph):
                 self.linegyr[k].setData(self.vetoreixox[1][-npontos[1]:], self.dman.gyrodata[self.plotchoice[1]][k][limi[1]:limf[1]])
             else:
                 self.linegyr[k].setData([], [])
-        if self.adcEnable and (npontos[2] > 0):
-            self.lineadc.setData(self.vetoreixox[2][-npontos[2]:],self.dman.adcdata[limi[2]:limf[2]])
-        else:
-            self.lineadc.setData([], [])
+        for k in range(4):
+            if self.adcEnableMap[k] and (npontos[2] > 0):
+                self.lineadc[k].setData(self.vetoreixox[2][-npontos[2]:],self.dman.adcdata[k][limi[2]:limf[2]])
+            else:
+                self.lineadc[k].setData([], [])
+            
 
 
 class FigOutputQtGraph(BaseFigQtGraph):

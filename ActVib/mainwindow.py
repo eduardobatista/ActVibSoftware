@@ -11,7 +11,7 @@ from VibViewWindow import Ui_MainWindow
 
 from others import (MyFigQtGraph, CtrlFigQtGraph, FigOutputQtGraph, WorkdirManager, MyUploadDialog)
 
-from panels import (IMUPanel,GeneratorPanel,PlotCfgPanel,ControlPanel)
+from panels import (IMUPanel,GeneratorPanel,PlotCfgPanel,ControlPanel,ADCPanel)
 
 class mainwindow(QtWidgets.QMainWindow):
 
@@ -27,6 +27,7 @@ class mainwindow(QtWidgets.QMainWindow):
                                 QtWidgets.QDoubleSpinBox, QtWidgets.QSpinBox, QtWidgets.QLineEdit]
         self.imupanel = [IMUPanel(idd) for idd in range(3)]
         self.genpanel = [GeneratorPanel(idd) for idd in range(4)]
+        self.adcpanel = ADCPanel()
 
         self.plotcfgpanel = PlotCfgPanel()
         self.ctrlpanel = ControlPanel()
@@ -53,10 +54,11 @@ class mainwindow(QtWidgets.QMainWindow):
                 cc.activated.connect(self.changeMPUConfig)
 
         # ADC Connections
-        self.ui.checkADCOn.toggled.connect(self.changeADCConfig)
-        adcpanel = self.ui.adcframe.findChildren(QComboBox)
-        for cc in adcpanel:
-            cc.activated.connect(self.changeADCConfig)
+        self.ui.adctab.layout().addWidget(self.adcpanel)
+        # self.ui.checkADCOn.toggled.connect(self.changeADCConfig)
+        # adcpanel = self.ui.adcframe.findChildren(QComboBox)
+        # for cc in adcpanel:
+        #     cc.activated.connect(self.changeADCConfig)
 
         # Signal Generator Connections:
         self.ui.canal1.layout().addWidget(self.genpanel[0])
@@ -304,11 +306,9 @@ class mainwindow(QtWidgets.QMainWindow):
 
     def changeADCConfig(self):        
         if self.driver is not None:
-            adcconfig = [1 if self.ui.checkADCOn.isChecked() else 0,
-                         self.ui.comboADCChannel.currentIndex(),
-                         self.ui.comboRangeADC.currentIndex(),
-                         self.ui.comboADCRate.currentIndex()]
-            self.driver.setADCConfig(adcconfig)
+            self.driver.setADCConfig(self.adcpanel.getADCConfig())
+        if self.mfig is not None:
+            self.mfig.adcEnableMap = self.driver.adcenablemap
 
     def addPlots(self, mfig, ctrlfig):
         settings = QtCore.QSettings("VibSoftware", "VibView")
@@ -349,8 +349,7 @@ class mainwindow(QtWidgets.QMainWindow):
             self.plotConfig()
             self.plotOutConfig()
 
-            self.disabledwhenrunning = self.imupanel + [self.ctrlpanel,self.ui.checkADCOn,self.ui.comboADCChannel,
-                                                        self.ui.comboRangeADC,self.ui.comboADCRate]
+            self.disabledwhenrunning = self.imupanel + [self.ctrlpanel,self.adcpanel]
             for cc in self.disabledwhenrunning: 
                 cc.setEnabled(False)
 

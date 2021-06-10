@@ -12,6 +12,7 @@ class dataman:
     def __init__(self, driver, mwindow):
         self.plotupdatesec = 1
         self.samplingperiod = 4e-3  # 2.5e-3 #4e-3
+        # self.samplingperiod = 2e-3
         self.wsize = 200000
         self.driver = driver
         self.timereads = np.zeros(self.wsize)
@@ -31,7 +32,7 @@ class dataman:
                         [np.zeros(self.wsize), np.zeros(self.wsize), np.zeros(self.wsize)],
                         [np.zeros(self.wsize), np.zeros(self.wsize), np.zeros(self.wsize)]]
         self.dacoutdata = [np.zeros(self.wsize), np.zeros(self.wsize), np.zeros(self.wsize), np.zeros(self.wsize)]
-        self.adcdata = np.zeros(self.wsize)
+        self.adcdata = [np.zeros(self.wsize), np.zeros(self.wsize), np.zeros(self.wsize), np.zeros(self.wsize)]
         self.xrefdata = np.zeros(self.wsize)
         self.xerrodata = np.zeros(self.wsize)
         self.maxtime = int(self.wsize * self.samplingperiod)
@@ -68,6 +69,8 @@ class dataman:
                 self.driver.writeIMUConfig(k)
                 if self.driver.IMUEnableFlags[k]:
                     self.driver.initHardware(k)
+            # TODO: merge the following 2 calls?
+            self.mwindow.changeADCConfig()
             self.driver.writeADCConfig()
             for k in range(4):
                 self.driver.writeGeneratorConfig(id=k)
@@ -102,7 +105,9 @@ class dataman:
                 self.dacoutdata[1][self.globalctreadings] = self.driver.dacout[1]
                 self.dacoutdata[2][self.globalctreadings] = self.driver.dacout[2]
                 self.dacoutdata[3][self.globalctreadings] = self.driver.dacout[3]
-                self.adcdata[self.globalctreadings] = self.driver.adcin
+                for k in range(4):
+                    if self.driver.adcenablemap[k] != 0:
+                        self.adcdata[k][self.globalctreadings] = self.driver.adcin[k]
                 self.ctreadings += 1
                 self.globalctreadings += 1
                 if (self.readtime - lastfigrefresh) >= self.plotupdatesec:
@@ -146,10 +151,7 @@ class dataman:
     def ResetaDados(self):
         self.maxv = 1000
         self.flagsaved = True
-        self.globalctreadings = 0
-        self.mfig.updateFig(self.driver.controlMode, [self.driver.refid, self.driver.erroid])
-        self.ofig.updateFig()
-        self.ctrlfig.updateFig()
+        self.globalctreadings = 0        
         self.mwindow.ui.elapsedTime.setText('0 s')
         self.mwindow.ui.controlTime.setText('0 s')
         self.mwindow.ui.sampleTime.setText('0 us')
@@ -160,9 +162,12 @@ class dataman:
                         [np.zeros(self.wsize), np.zeros(self.wsize), np.zeros(self.wsize)],
                         [np.zeros(self.wsize), np.zeros(self.wsize), np.zeros(self.wsize)]]
         self.dacoutdata = [np.zeros(self.wsize), np.zeros(self.wsize), np.zeros(self.wsize), np.zeros(self.wsize)]
-        self.adcdata = np.zeros(self.wsize)
+        self.adcdata = [np.zeros(self.wsize), np.zeros(self.wsize), np.zeros(self.wsize), np.zeros(self.wsize)]
         self.xrefdata = np.zeros(self.wsize)
         self.xerrodata = np.zeros(self.wsize)
+        self.mfig.updateFig(self.driver.controlMode, [self.driver.refid, self.driver.erroid])
+        self.ofig.updateFig()
+        self.ctrlfig.updateFig()
         
 
     def salvaArquivo(self, filename, setsaved):
@@ -185,7 +190,10 @@ class dataman:
                 "DAC 2": self.dacoutdata[1][0:limf],
                 "DAC 3": self.dacoutdata[2][0:limf],
                 "DAC 4": self.dacoutdata[3][0:limf],
-                "ADC in": self.adcdata[0:limf]
+                "ADC 1": self.adcdata[0][0:limf],
+                "ADC 2": self.adcdata[1][0:limf],
+                "ADC 3": self.adcdata[2][0:limf],
+                "ADC 4": self.adcdata[3][0:limf]
             }
             for k in range(3):
                 if self.driver.IMUEnableFlags[k]:

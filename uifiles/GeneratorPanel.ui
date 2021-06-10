@@ -112,6 +112,11 @@
           <string>Step</string>
          </property>
         </item>
+        <item>
+         <property name="text">
+          <string>Square</string>
+         </property>
+        </item>
        </widget>
       </item>
       <item>

@@ -29,8 +29,9 @@ class driverhardware:
         self.IMUEnableFlags = [False,False,False]
         self.IMUTypes = [False,False,False]
         self.genConfigWritten = [False, False, False, False]
-        self.adcconfig = [0, 0, 0, 0]
-        self.adcin = 0.0
+        self.adcconfig = [0, 0, 0]
+        self.adcenablemap = [False, False, False, False]
+        self.adcin = [0.0,0.0,0.0,0.0]
         self.adcmultiplier = 0
         self.setGeneratorConfig(id=0)
         self.setGeneratorConfig(id=1)
@@ -38,7 +39,8 @@ class driverhardware:
         self.setGeneratorConfig(id=3)
         self.serial = serial.Serial(port=None,
                                     # baudrate=115200,
-                                    baudrate = 230400,
+                                    #baudrate = 230400,
+                                    baudrate = 500000,
                                     parity=serial.PARITY_NONE,
                                     stopbits=serial.STOPBITS_ONE,
                                     bytesize=serial.EIGHTBITS,
@@ -87,10 +89,14 @@ class driverhardware:
         self.dclevel[id] = dclevel
         self.iampscaler[id] = 0 if (dclevel == 0) else 1/float(self.dclevel[id])
 
-    def setADCConfig(self, adcconfigs=[0, 0, 0, 0]):
+    def setADCConfig(self, adcconfigs=[0, 0, 0]):
         self.adcconfig = adcconfigs
         multipliers = [6.144, 4.096, 2.048, 1.024, 0.512, 0.256]
-        self.adcmultiplier = multipliers[adcconfigs[2]] / 2**15
+        self.adcmultiplier = multipliers[adcconfigs[1]] / 2**15
+        self.adcenablemap = [ (self.adcconfig[0] & 0x01) == 1, 
+                              ((self.adcconfig[0] >> 1) & 0x01) == 1,
+                              ((self.adcconfig[0] >> 2) & 0x01) == 1,
+                              ((self.adcconfig[0] >> 3) & 0x01) == 1]
 
     """ Seta range do acelerômetro:
         0 = -2 a +2 g
@@ -129,11 +135,11 @@ class driverhardware:
         self.setGyroRange(id, (imucfgdata[2]>>2) & 0x07)
         self.IMUEnableFlags[id] = ((imucfgdata[0] & 0x01) == 1)
         self.IMUTypes[id] = (imucfgdata[0]>>1) & 0x01 
-        self.readsize = 0
-        for k in range(3):
-            if self.IMUEnableFlags[k]:
-                self.readsize += 14 if (self.IMUTypes[k] == 0) else 12 
-        self.readsize += 8+2
+        # self.readsize = 0
+        # for k in range(3):
+        #     if self.IMUEnableFlags[k]:
+        #         self.readsize += 14 if (self.IMUTypes[k] == 0) else 12 
+        # self.readsize += 6+2+2
         
     def writeIMUConfig(self,id: int):
         # print("writeIMU")
@@ -236,11 +242,16 @@ class driverhardware:
         self.algonchanged = False
 
     def startReadings(self):
-        self.packetsize = 21
+        self.readsize = 0
+        for k in range(3):
+            if self.IMUEnableFlags[k]:
+                self.readsize += 14 if (self.IMUTypes[k] == 0) else 12 
+        nADCs = ((self.adcconfig[0] >> 3) & 0x01) + ((self.adcconfig[0] >> 2) & 0x01) + ((self.adcconfig[0] >> 1) & 0x01) + (self.adcconfig[0] & 0x01)
+        self.readsize += 6 + 2*nADCs + 2
         self.serial.write(b's')
         if (len(self.serial.read(10)) < 10):
             raise Exception('Sem resposta nas leituras.')
-        self.buf = [0] * self.packetsize
+        self.buf = [0] * self.readsize
 
     def startControl(self):
         self.packetsize = 14
@@ -324,6 +335,12 @@ class driverhardware:
             self.dacout[1] = float(struct.unpack_from(">H",buf,ptr+2)[0]) * self.iampscaler[1] - 1.0
             self.dacout[2] = float(buf[ptr+4]) * self.iampscaler[2] - 1.0
             self.dacout[3] = float(buf[ptr+5]) * self.iampscaler[3] - 1.0
-            self.adcin = float( struct.unpack_from(">h",buf,ptr+6)[0] ) * self.adcmultiplier
+            ptr += 6
+            if self.adcconfig[0] >= 0:
+                for k in range(4):
+                    if self.adcenablemap[k]:
+                        self.adcin[k] = float( struct.unpack_from(">h",buf,ptr)[0] ) * self.adcmultiplier
+                        ptr += 2
             # print(struct.unpack_from(">H",buf,ptr+8))
-            self.calctime = (struct.unpack_from(">H",buf,ptr+8)[0] << 4) / 240
+            # print(self.adcin)
+            self.calctime = (struct.unpack_from(">H",buf,ptr)[0] << 4) / 240
