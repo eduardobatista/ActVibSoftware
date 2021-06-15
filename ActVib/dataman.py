@@ -71,7 +71,7 @@ class dataman:
                     self.driver.initHardware(k)
             # TODO: merge the following 2 calls?
             self.mwindow.changeADCConfig()
-            self.driver.writeADCConfig()
+            self.driver.writeADCConfig()            
             for k in range(4):
                 self.driver.writeGeneratorConfig(id=k)
                 time.sleep(0.1)
@@ -106,8 +106,8 @@ class dataman:
                 self.dacoutdata[2][self.globalctreadings] = self.driver.dacout[2]
                 self.dacoutdata[3][self.globalctreadings] = self.driver.dacout[3]
                 for k in range(4):
-                    if self.driver.adcenablemap[k] != 0:
-                        self.adcdata[k][self.globalctreadings] = self.driver.adcin[k]
+                    # if self.driver.adcenablemap[k] != 0:
+                    self.adcdata[k][self.globalctreadings] = self.driver.adcin[k]
                 self.ctreadings += 1
                 self.globalctreadings += 1
                 if (self.readtime - lastfigrefresh) >= self.plotupdatesec:
@@ -189,12 +189,11 @@ class dataman:
                 "DAC 1": self.dacoutdata[0][0:limf],
                 "DAC 2": self.dacoutdata[1][0:limf],
                 "DAC 3": self.dacoutdata[2][0:limf],
-                "DAC 4": self.dacoutdata[3][0:limf],
-                "ADC 1": self.adcdata[0][0:limf],
-                "ADC 2": self.adcdata[1][0:limf],
-                "ADC 3": self.adcdata[2][0:limf],
-                "ADC 4": self.adcdata[3][0:limf]
+                "DAC 4": self.dacoutdata[3][0:limf]                
             }
+            if self.driver.adcconfig[0] > 0:
+                for k in range(4):
+                    thedict[f"ADC {k+1}.{self.driver.adcseq[k]+1}"] = self.adcdata[k][0:limf]
             for k in range(3):
                 if self.driver.IMUEnableFlags[k]:
                     thedict[f"IMU{k+1}AccX"] = self.accdata[k][0][0:limf]
@@ -205,7 +204,7 @@ class dataman:
                     thedict[f"IMU{k+1}GyroZ"] = self.gyrodata[k][2][0:limf]
                     
             df = pd.DataFrame(thedict)            
-            df.to_feather(filename)
-            # df.to_csv(filename)
+            # df.to_feather(filename)
+            df.to_csv(filename)
 
         self.flagsaved = setsaved

@@ -33,6 +33,8 @@ class driverhardware:
         self.adcenablemap = [False, False, False, False]
         self.adcin = [0.0,0.0,0.0,0.0]
         self.adcmultiplier = 0
+        self.adcseq = [0,0,0,0]
+        self.adcturbo = 4
         self.setGeneratorConfig(id=0)
         self.setGeneratorConfig(id=1)
         self.setGeneratorConfig(id=2)
@@ -177,6 +179,10 @@ class driverhardware:
         if aux != b'ok':
             print(aux)
             raise Exception('Erro na configuração do ADC.')
+        else:
+            self.adcseq = [aa[0] for aa in struct.iter_unpack("b",self.serial.read(4))] 
+            if (self.adcconfig[0] == 0):
+                self.adcseq = [0,0,0,0]
         
 
     def handshake(self):
@@ -247,7 +253,11 @@ class driverhardware:
             if self.IMUEnableFlags[k]:
                 self.readsize += 14 if (self.IMUTypes[k] == 0) else 12 
         nADCs = ((self.adcconfig[0] >> 3) & 0x01) + ((self.adcconfig[0] >> 2) & 0x01) + ((self.adcconfig[0] >> 1) & 0x01) + (self.adcconfig[0] & 0x01)
-        self.readsize += 6 + 2*nADCs + 2
+        # self.readsize += 6 + 2*nADCs + 2
+        if nADCs == 0:
+            self.readsize += 6 + 0 + 2
+        else:
+            self.readsize += 6 + 2*4 + 2
         self.serial.write(b's')
         if (len(self.serial.read(10)) < 10):
             raise Exception('Sem resposta nas leituras.')
@@ -336,11 +346,9 @@ class driverhardware:
             self.dacout[2] = float(buf[ptr+4]) * self.iampscaler[2] - 1.0
             self.dacout[3] = float(buf[ptr+5]) * self.iampscaler[3] - 1.0
             ptr += 6
-            if self.adcconfig[0] >= 0:
+            if self.adcconfig[0] > 0:
                 for k in range(4):
-                    if self.adcenablemap[k]:
-                        self.adcin[k] = float( struct.unpack_from(">h",buf,ptr)[0] ) * self.adcmultiplier
-                        ptr += 2
-            # print(struct.unpack_from(">H",buf,ptr+8))
-            # print(self.adcin)
+                    self.adcin[k] = float( struct.unpack_from(">h",buf,ptr)[0] ) * self.adcmultiplier
+                    ptr += 2
             self.calctime = (struct.unpack_from(">H",buf,ptr)[0] << 4) / 240
+            # print(self.calctime)

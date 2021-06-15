@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>598</width>
+    <width>609</width>
     <height>85</height>
    </rect>
   </property>
@@ -103,6 +103,19 @@
         </item>
        </widget>
       </item>
+      <item row="0" column="2">
+       <widget class="QCheckBox" name="checkADC1">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Channel 1</string>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="6">
        <widget class="QComboBox" name="comboADCRange">
         <property name="sizePolicy">
@@ -143,39 +156,6 @@
         </item>
        </widget>
       </item>
-      <item row="0" column="3">
-       <widget class="QCheckBox" name="checkADC3">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>Channel 3</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="2">
-       <widget class="QCheckBox" name="checkADC1">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>Channel 1</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>Model:</string>
-        </property>
-       </widget>
-      </item>
       <item row="1" column="3">
        <widget class="QCheckBox" name="checkADC4">
         <property name="sizePolicy">
@@ -189,6 +169,33 @@
         </property>
        </widget>
       </item>
+      <item row="0" column="3">
+       <widget class="QCheckBox" name="checkADC3">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Channel 3</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Model:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="4" rowspan="2">
+       <widget class="Line" name="line_2">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+       </widget>
+      </item>
       <item row="1" column="2">
        <widget class="QCheckBox" name="checkADC2">
         <property name="sizePolicy">
@@ -199,33 +206,6 @@
         </property>
         <property name="text">
          <string>Channel 2</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QComboBox" name="comboADCModel">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <item>
-         <property name="text">
-          <string>ADS1115</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>ADS1015</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-      <item row="0" column="1" rowspan="2">
-       <widget class="Line" name="line">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
         </property>
        </widget>
       </item>
@@ -248,6 +228,13 @@
         </property>
        </widget>
       </item>
+      <item row="0" column="1" rowspan="2">
+       <widget class="Line" name="line">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+       </widget>
+      </item>
       <item row="1" column="5">
        <widget class="QLabel" name="label_33">
         <property name="sizePolicy">
@@ -264,11 +251,24 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="4" rowspan="2">
-       <widget class="Line" name="line_2">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
+      <item row="1" column="0">
+       <widget class="QComboBox" name="comboADCModel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
+        <item>
+         <property name="text">
+          <string>ADS1115</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>ADS1015</string>
+         </property>
+        </item>
        </widget>
       </item>
      </layout>
