@@ -140,7 +140,7 @@ class dataman:
     def updateFigs(self):
         self.mwindow.ui.elapsedTime.setText(f'{int(self.readtime)} s / {self.maxtime} s')
         self.mwindow.ui.controlTime.setText(f'{self.realtime:.3f} s')
-        self.mwindow.ui.sampleTime.setText(f'{self.driver.calctime:.0f} us')
+        self.mwindow.ui.sampleTime.setText(f'{self.driver.calctime[0]:.0f}/{self.driver.calctime[1]:.0f} us')
         if self.driver.controlMode:
             self.ctrlfig.updateFig()
         else:
@@ -191,7 +191,7 @@ class dataman:
                 "DAC 3": self.dacoutdata[2][0:limf],
                 "DAC 4": self.dacoutdata[3][0:limf]                
             }
-            if self.driver.adcconfig[0] > 0:
+            if (self.driver.adcconfig[0] & 0x0F) > 0:
                 for k in range(4):
                     thedict[f"ADC {k+1}.{self.driver.adcseq[k]+1}"] = self.adcdata[k][0:limf]
             for k in range(3):
@@ -204,7 +204,7 @@ class dataman:
                     thedict[f"IMU{k+1}GyroZ"] = self.gyrodata[k][2][0:limf]
                     
             df = pd.DataFrame(thedict)            
-            # df.to_feather(filename)
-            df.to_csv(filename)
+            df.to_feather(filename)
+            # df.to_csv(filename)
 
         self.flagsaved = setsaved

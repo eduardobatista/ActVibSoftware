@@ -356,7 +356,7 @@ class mainwindow(QtWidgets.QMainWindow):
             if self.ctrlpanel.isControlOn():
                 self.ctrlpanel.ui.checkAlgOn.setEnabled(True)
 
-            if self.driver.adcconfig[0] == 0:
+            if (self.driver.adcconfig[0] & 0x0F) == 0:
                 self.mfig.removeADCPlot()
             else:
                 self.mfig.addADCPlot()

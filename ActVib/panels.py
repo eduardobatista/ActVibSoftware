@@ -368,20 +368,34 @@ class ADCPanel(QtWidgets.QWidget,StateSaver):
         self.ui = Ui_ADCForm()
         self.ui.setupUi(self)
         self.saveprefix = f'ADC'
+        self.ui.comboADCModel.activated.connect(self.modelChanged)
 
+    #
+    # adcconfig[0]: less significant bits = channel enablers
+    # adcconfig[1]: ranges
+    # adcconfig[2]: rates
+    #
     def getADCConfig(self):
-        flagon = (1 if self.ui.checkADC1.isChecked() else 0) + \
+        isADC1115 = (self.ui.comboADCModel.currentIndex() == 0)
+        flagon = (0 if isADC1115 else 16) + \
+                 (1 if self.ui.checkADC1.isChecked() else 0) + \
                  (2 if self.ui.checkADC2.isChecked() else 0) + \
                  (4 if self.ui.checkADC3.isChecked() else 0) + \
                  (8 if self.ui.checkADC4.isChecked() else 0)
         adcconfig = [flagon,
                      self.ui.comboADCRange.currentIndex(),
-                     self.ui.comboADCRate.currentIndex()]
+                     self.ui.comboRate1115.currentIndex() if isADC1115 else self.ui.comboRate1015.currentIndex()]
         return adcconfig
 
     def setEnabled(self,en):
         for cc in [self.ui.checkADC1,self.ui.checkADC2,
                    self.ui.checkADC3,self.ui.checkADC4,
-                   self.ui.comboADCModel,self.ui.comboADCRange,self.ui.comboADCRate]:
+                   self.ui.comboADCModel,self.ui.comboADCRange,self.ui.comboRate1115,self.ui.comboRate1015]:
             cc.setEnabled(en)
+    
+    def modelChanged(self):
+        isADC1115 = (self.ui.comboADCModel.currentIndex() == 0)
+        self.ui.comboRate1115.setEnabled(isADC1115)
+        self.ui.comboRate1015.setEnabled(not isADC1115)
+
 
