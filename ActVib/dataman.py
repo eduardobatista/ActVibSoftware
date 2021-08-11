@@ -140,7 +140,7 @@ class dataman:
     def updateFigs(self):
         self.mwindow.ui.elapsedTime.setText(f'{int(self.readtime)} s / {self.maxtime} s')
         self.mwindow.ui.controlTime.setText(f'{self.realtime:.3f} s')
-        self.mwindow.ui.sampleTime.setText(f'{self.driver.calctime[0]:.0f}/{self.driver.calctime[1]:.0f} us')
+        self.mwindow.ui.sampleTime.setText(f'{self.driver.calctime[0]:.0f}/{self.driver.calctime[1]:.0f}/{self.driver.calctime[2]:.0f} us')
         if self.driver.controlMode:
             self.ctrlfig.updateFig()
         else:

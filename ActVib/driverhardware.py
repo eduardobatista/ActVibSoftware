@@ -65,7 +65,7 @@ class driverhardware:
         self.xref = 0
         self.xerro = 0
         self.algonchanged = False
-        self.calctime = [0,0]
+        self.calctime = [0,0,0]
         self.algontime = 0.0 
 
     def openSerial(self):
@@ -252,9 +252,9 @@ class driverhardware:
         nADCs = ((self.adcconfig[0] >> 3) & 0x01) + ((self.adcconfig[0] >> 2) & 0x01) + ((self.adcconfig[0] >> 1) & 0x01) + (self.adcconfig[0] & 0x01)
         # self.readsize += 6 + 2*nADCs + 2
         if nADCs == 0:
-            self.readsize += 6 + 0 + 2 + 2 + 1
+            self.readsize += 6 + 0 + 2 + 2 + 2 + 1
         else:
-            self.readsize += 6 + 2*4 + 2 + 2 + 1
+            self.readsize += 6 + 2*4 + 2 + 2 + 2 + 1
         self.serial.write(b's')
         if (len(self.serial.read(10)) < 10):
             raise Exception('Sem resposta nas leituras.')
@@ -316,14 +316,15 @@ class driverhardware:
         if ctaux == 64:
             raise Exception('Falha na leitura de pacote: cabeçalho não encontrado.')
         if self.controlMode:
-            buf = self.serial.read(18)
+            buf = self.serial.read(20)
             self.dacout[0] = float(struct.unpack_from(">H",buf,0)[0]) * self.iampscaler[self.perturbChannel] - 1.0
             self.dacout[1] = float(struct.unpack_from(">H",buf,2)[0]) * self.iampscaler[self.controlChannel] - 1.0
             self.xref = struct.unpack_from("f",buf,4)[0]
             self.xerro = struct.unpack_from("f",buf,8)[0]
             self.calctime[0] = (struct.unpack_from(">H",buf,13)[0] << 4) / 240 # (((self.buf[13] << 8) + self.buf[14]) << 4) / 240
             self.calctime[1] = (struct.unpack_from(">H",buf,15)[0] << 4) / 240
-            self.errorflag = struct.unpack_from("B",buf,17)[0]
+            self.calctime[2] = (struct.unpack_from(">H",buf,17)[0] << 4) / 240
+            self.errorflag = struct.unpack_from("B",buf,19)[0]
             if self.errorflag != 0:
                 print(self.errorflag)
         else:
@@ -353,7 +354,8 @@ class driverhardware:
                     ptr += 2
             self.calctime[0] = (struct.unpack_from(">H",buf,ptr)[0] << 4) / 240
             self.calctime[1] = (struct.unpack_from(">H",buf,ptr+2)[0] << 4) / 240
-            self.errorflag = struct.unpack_from("B",buf,ptr+4)[0]
+            self.calctime[2] = (struct.unpack_from(">H",buf,ptr+4)[0] << 4) / 240
+            self.errorflag = struct.unpack_from("B",buf,ptr+6)[0]
             if self.errorflag != 0:
                 print(self.errorflag)
             # print(self.calctime)
