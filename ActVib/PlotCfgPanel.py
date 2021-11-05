@@ -1,155 +1,169 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'PlotCfgPanel.ui'
-#
-# Created by: PyQt5 UI code generator 5.14.1
-#
-# WARNING! All changes made in this file will be lost!
+################################################################################
+## Form generated from reading UI file 'PlotCfgPanel.ui'
+##
+## Created by: Qt User Interface Compiler version 5.15.2
+##
+## WARNING! All changes made in this file will be lost when recompiling UI file!
+################################################################################
 
-
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PySide2.QtCore import *
+from PySide2.QtGui import *
+from PySide2.QtWidgets import *
 
 
 class Ui_PlotCfgForm(object):
     def setupUi(self, PlotCfgForm):
-        PlotCfgForm.setObjectName("PlotCfgForm")
+        if not PlotCfgForm.objectName():
+            PlotCfgForm.setObjectName(u"PlotCfgForm")
         PlotCfgForm.resize(426, 52)
-        self.verticalLayout_2 = QtWidgets.QVBoxLayout(PlotCfgForm)
-        self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayout_2 = QVBoxLayout(PlotCfgForm)
         self.verticalLayout_2.setSpacing(2)
-        self.verticalLayout_2.setObjectName("verticalLayout_2")
-        self.plotcfgframe = QtWidgets.QFrame(PlotCfgForm)
-        self.plotcfgframe.setFrameShape(QtWidgets.QFrame.NoFrame)
-        self.plotcfgframe.setFrameShadow(QtWidgets.QFrame.Plain)
+        self.verticalLayout_2.setObjectName(u"verticalLayout_2")
+        self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
+        self.plotcfgframe = QFrame(PlotCfgForm)
+        self.plotcfgframe.setObjectName(u"plotcfgframe")
+        self.plotcfgframe.setFrameShape(QFrame.NoFrame)
+        self.plotcfgframe.setFrameShadow(QFrame.Plain)
         self.plotcfgframe.setLineWidth(0)
-        self.plotcfgframe.setObjectName("plotcfgframe")
-        self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.plotcfgframe)
-        self.horizontalLayout_2.setContentsMargins(0, 2, 0, 2)
+        self.horizontalLayout_2 = QHBoxLayout(self.plotcfgframe)
         self.horizontalLayout_2.setSpacing(5)
-        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
-        self.label_31 = QtWidgets.QLabel(self.plotcfgframe)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Preferred)
+        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
+        self.horizontalLayout_2.setContentsMargins(0, 2, 0, 2)
+        self.label_31 = QLabel(self.plotcfgframe)
+        self.label_31.setObjectName(u"label_31")
+        sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.label_31.sizePolicy().hasHeightForWidth())
         self.label_31.setSizePolicy(sizePolicy)
-        self.label_31.setObjectName("label_31")
+
         self.horizontalLayout_2.addWidget(self.label_31)
-        self.comboPlot1 = QtWidgets.QComboBox(self.plotcfgframe)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.comboPlot1.sizePolicy().hasHeightForWidth())
-        self.comboPlot1.setSizePolicy(sizePolicy)
-        self.comboPlot1.setObjectName("comboPlot1")
+
+        self.comboPlot1 = QComboBox(self.plotcfgframe)
         self.comboPlot1.addItem("")
         self.comboPlot1.addItem("")
         self.comboPlot1.addItem("")
+        self.comboPlot1.setObjectName(u"comboPlot1")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.comboPlot1.sizePolicy().hasHeightForWidth())
+        self.comboPlot1.setSizePolicy(sizePolicy1)
+
         self.horizontalLayout_2.addWidget(self.comboPlot1)
-        self.label_32 = QtWidgets.QLabel(self.plotcfgframe)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Preferred)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
+
+        self.label_32 = QLabel(self.plotcfgframe)
+        self.label_32.setObjectName(u"label_32")
         sizePolicy.setHeightForWidth(self.label_32.sizePolicy().hasHeightForWidth())
         self.label_32.setSizePolicy(sizePolicy)
-        self.label_32.setObjectName("label_32")
+
         self.horizontalLayout_2.addWidget(self.label_32)
-        self.comboPlot2 = QtWidgets.QComboBox(self.plotcfgframe)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.comboPlot2.sizePolicy().hasHeightForWidth())
-        self.comboPlot2.setSizePolicy(sizePolicy)
-        self.comboPlot2.setObjectName("comboPlot2")
+
+        self.comboPlot2 = QComboBox(self.plotcfgframe)
         self.comboPlot2.addItem("")
         self.comboPlot2.addItem("")
         self.comboPlot2.addItem("")
+        self.comboPlot2.setObjectName(u"comboPlot2")
+        sizePolicy1.setHeightForWidth(self.comboPlot2.sizePolicy().hasHeightForWidth())
+        self.comboPlot2.setSizePolicy(sizePolicy1)
+
         self.horizontalLayout_2.addWidget(self.comboPlot2)
+
+
         self.verticalLayout_2.addWidget(self.plotcfgframe)
-        self.frame = QtWidgets.QFrame(PlotCfgForm)
-        self.frame.setFrameShape(QtWidgets.QFrame.NoFrame)
-        self.frame.setFrameShadow(QtWidgets.QFrame.Plain)
+
+        self.frame = QFrame(PlotCfgForm)
+        self.frame.setObjectName(u"frame")
+        self.frame.setFrameShape(QFrame.NoFrame)
+        self.frame.setFrameShadow(QFrame.Plain)
         self.frame.setLineWidth(0)
-        self.frame.setObjectName("frame")
-        self.horizontalLayout = QtWidgets.QHBoxLayout(self.frame)
-        self.horizontalLayout.setContentsMargins(0, 2, 0, 2)
+        self.horizontalLayout = QHBoxLayout(self.frame)
         self.horizontalLayout.setSpacing(5)
-        self.horizontalLayout.setObjectName("horizontalLayout")
-        self.checkAccX = QtWidgets.QCheckBox(self.frame)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.checkAccX.sizePolicy().hasHeightForWidth())
-        self.checkAccX.setSizePolicy(sizePolicy)
+        self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.horizontalLayout.setContentsMargins(0, 2, 0, 2)
+        self.checkAccX = QCheckBox(self.frame)
+        self.checkAccX.setObjectName(u"checkAccX")
+        sizePolicy2 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.checkAccX.sizePolicy().hasHeightForWidth())
+        self.checkAccX.setSizePolicy(sizePolicy2)
         self.checkAccX.setChecked(True)
-        self.checkAccX.setObjectName("checkAccX")
+
         self.horizontalLayout.addWidget(self.checkAccX)
-        self.checkAccY = QtWidgets.QCheckBox(self.frame)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.checkAccY.sizePolicy().hasHeightForWidth())
-        self.checkAccY.setSizePolicy(sizePolicy)
+
+        self.checkAccY = QCheckBox(self.frame)
+        self.checkAccY.setObjectName(u"checkAccY")
+        sizePolicy2.setHeightForWidth(self.checkAccY.sizePolicy().hasHeightForWidth())
+        self.checkAccY.setSizePolicy(sizePolicy2)
         self.checkAccY.setChecked(True)
-        self.checkAccY.setObjectName("checkAccY")
+
         self.horizontalLayout.addWidget(self.checkAccY)
-        self.checkAccZ = QtWidgets.QCheckBox(self.frame)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.checkAccZ.sizePolicy().hasHeightForWidth())
-        self.checkAccZ.setSizePolicy(sizePolicy)
+
+        self.checkAccZ = QCheckBox(self.frame)
+        self.checkAccZ.setObjectName(u"checkAccZ")
+        sizePolicy2.setHeightForWidth(self.checkAccZ.sizePolicy().hasHeightForWidth())
+        self.checkAccZ.setSizePolicy(sizePolicy2)
         self.checkAccZ.setChecked(True)
-        self.checkAccZ.setObjectName("checkAccZ")
+
         self.horizontalLayout.addWidget(self.checkAccZ)
-        self.checkGyroX = QtWidgets.QCheckBox(self.frame)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.checkGyroX.sizePolicy().hasHeightForWidth())
-        self.checkGyroX.setSizePolicy(sizePolicy)
+
+        self.checkGyroX = QCheckBox(self.frame)
+        self.checkGyroX.setObjectName(u"checkGyroX")
+        sizePolicy2.setHeightForWidth(self.checkGyroX.sizePolicy().hasHeightForWidth())
+        self.checkGyroX.setSizePolicy(sizePolicy2)
         self.checkGyroX.setChecked(True)
-        self.checkGyroX.setObjectName("checkGyroX")
+
         self.horizontalLayout.addWidget(self.checkGyroX)
-        self.checkGyroY = QtWidgets.QCheckBox(self.frame)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.checkGyroY.sizePolicy().hasHeightForWidth())
-        self.checkGyroY.setSizePolicy(sizePolicy)
+
+        self.checkGyroY = QCheckBox(self.frame)
+        self.checkGyroY.setObjectName(u"checkGyroY")
+        sizePolicy2.setHeightForWidth(self.checkGyroY.sizePolicy().hasHeightForWidth())
+        self.checkGyroY.setSizePolicy(sizePolicy2)
         self.checkGyroY.setChecked(True)
-        self.checkGyroY.setObjectName("checkGyroY")
+
         self.horizontalLayout.addWidget(self.checkGyroY)
-        self.checkGyroZ = QtWidgets.QCheckBox(self.frame)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.checkGyroZ.sizePolicy().hasHeightForWidth())
-        self.checkGyroZ.setSizePolicy(sizePolicy)
+
+        self.checkGyroZ = QCheckBox(self.frame)
+        self.checkGyroZ.setObjectName(u"checkGyroZ")
+        sizePolicy2.setHeightForWidth(self.checkGyroZ.sizePolicy().hasHeightForWidth())
+        self.checkGyroZ.setSizePolicy(sizePolicy2)
         self.checkGyroZ.setChecked(True)
-        self.checkGyroZ.setObjectName("checkGyroZ")
+
         self.horizontalLayout.addWidget(self.checkGyroZ)
+
+
         self.verticalLayout_2.addWidget(self.frame)
 
+
         self.retranslateUi(PlotCfgForm)
+
         self.comboPlot2.setCurrentIndex(0)
-        QtCore.QMetaObject.connectSlotsByName(PlotCfgForm)
+
+
+        QMetaObject.connectSlotsByName(PlotCfgForm)
+    # setupUi
 
     def retranslateUi(self, PlotCfgForm):
-        _translate = QtCore.QCoreApplication.translate
-        PlotCfgForm.setWindowTitle(_translate("PlotCfgForm", "Form"))
-        self.label_31.setText(_translate("PlotCfgForm", "Plot 1:"))
-        self.comboPlot1.setItemText(0, _translate("PlotCfgForm", "IMU 1: Acceleration"))
-        self.comboPlot1.setItemText(1, _translate("PlotCfgForm", "IMU 2: Acceleration"))
-        self.comboPlot1.setItemText(2, _translate("PlotCfgForm", "IMU 3: Acceleration"))
-        self.label_32.setText(_translate("PlotCfgForm", "Plot 2:"))
-        self.comboPlot2.setCurrentText(_translate("PlotCfgForm", "IMU 1: Gyro"))
-        self.comboPlot2.setItemText(0, _translate("PlotCfgForm", "IMU 1: Gyro"))
-        self.comboPlot2.setItemText(1, _translate("PlotCfgForm", "IMU 2: Gyro"))
-        self.comboPlot2.setItemText(2, _translate("PlotCfgForm", "IMU 3: Gyro"))
-        self.checkAccX.setText(_translate("PlotCfgForm", "AccX"))
-        self.checkAccY.setText(_translate("PlotCfgForm", "AccY"))
-        self.checkAccZ.setText(_translate("PlotCfgForm", "AccZ"))
-        self.checkGyroX.setText(_translate("PlotCfgForm", "GyroX"))
-        self.checkGyroY.setText(_translate("PlotCfgForm", "GyroY"))
-        self.checkGyroZ.setText(_translate("PlotCfgForm", "GyroZ"))
+        PlotCfgForm.setWindowTitle(QCoreApplication.translate("PlotCfgForm", u"Form", None))
+        self.label_31.setText(QCoreApplication.translate("PlotCfgForm", u"Plot 1:", None))
+        self.comboPlot1.setItemText(0, QCoreApplication.translate("PlotCfgForm", u"IMU 1: Acceleration", None))
+        self.comboPlot1.setItemText(1, QCoreApplication.translate("PlotCfgForm", u"IMU 2: Acceleration", None))
+        self.comboPlot1.setItemText(2, QCoreApplication.translate("PlotCfgForm", u"IMU 3: Acceleration", None))
+
+        self.label_32.setText(QCoreApplication.translate("PlotCfgForm", u"Plot 2:", None))
+        self.comboPlot2.setItemText(0, QCoreApplication.translate("PlotCfgForm", u"IMU 1: Gyro", None))
+        self.comboPlot2.setItemText(1, QCoreApplication.translate("PlotCfgForm", u"IMU 2: Gyro", None))
+        self.comboPlot2.setItemText(2, QCoreApplication.translate("PlotCfgForm", u"IMU 3: Gyro", None))
+
+        self.comboPlot2.setCurrentText(QCoreApplication.translate("PlotCfgForm", u"IMU 1: Gyro", None))
+        self.checkAccX.setText(QCoreApplication.translate("PlotCfgForm", u"AccX", None))
+        self.checkAccY.setText(QCoreApplication.translate("PlotCfgForm", u"AccY", None))
+        self.checkAccZ.setText(QCoreApplication.translate("PlotCfgForm", u"AccZ", None))
+        self.checkGyroX.setText(QCoreApplication.translate("PlotCfgForm", u"GyroX", None))
+        self.checkGyroY.setText(QCoreApplication.translate("PlotCfgForm", u"GyroY", None))
+        self.checkGyroZ.setText(QCoreApplication.translate("PlotCfgForm", u"GyroZ", None))
+    # retranslateUi
+

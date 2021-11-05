@@ -1,4 +1,4 @@
-from PyQt5 import (QtCore, QtWidgets, QtGui)
+from PySide2 import (QtCore, QtWidgets, QtGui)
 from .IMUPanel import Ui_IMUPanel
 from .GeneratorPanel import Ui_GeneratorPanel
 from .PlotCfgPanel import Ui_PlotCfgForm

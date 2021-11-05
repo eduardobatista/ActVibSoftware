@@ -4,8 +4,8 @@ import time
 
 import pandas as pd
 
-from PyQt5 import QtWidgets, QtGui, QtCore
-from PyQt5.QtWidgets import QMessageBox, QFileDialog, QCheckBox, QComboBox, QDoubleSpinBox, QSpinBox
+from PySide2 import QtWidgets, QtGui, QtCore
+from PySide2.QtWidgets import QMessageBox, QFileDialog, QCheckBox, QComboBox, QDoubleSpinBox, QSpinBox
 
 from .VibViewWindow import Ui_MainWindow
 

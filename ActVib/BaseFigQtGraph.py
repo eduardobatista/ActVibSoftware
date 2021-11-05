@@ -1,8 +1,8 @@
 import json
 import numpy as np
 
-from PyQt5 import QtWidgets, uic, QtGui, QtCore
-from PyQt5.QtWidgets import QMessageBox, QFileDialog, QDialog, QVBoxLayout
+from PySide2 import QtWidgets, QtGui, QtCore
+from PySide2.QtWidgets import QMessageBox, QFileDialog, QDialog, QVBoxLayout
 
 import pyqtgraph as pg
 from pyqtgraph import PlotWidget, PlotItem, GraphicsWidget, GraphicsLayout, GraphicsLayoutWidget

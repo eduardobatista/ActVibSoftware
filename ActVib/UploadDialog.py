@@ -1,82 +1,108 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'UploadDialog.ui'
-#
-# Created by: PyQt5 UI code generator 5.14.1
-#
-# WARNING! All changes made in this file will be lost!
+################################################################################
+## Form generated from reading UI file 'UploadDialog.ui'
+##
+## Created by: Qt User Interface Compiler version 5.15.2
+##
+## WARNING! All changes made in this file will be lost when recompiling UI file!
+################################################################################
 
-
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PySide2.QtCore import *
+from PySide2.QtGui import *
+from PySide2.QtWidgets import *
 
 
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
-        Dialog.setObjectName("Dialog")
+        if not Dialog.objectName():
+            Dialog.setObjectName(u"Dialog")
         Dialog.resize(450, 207)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(Dialog.sizePolicy().hasHeightForWidth())
         Dialog.setSizePolicy(sizePolicy)
-        Dialog.setMinimumSize(QtCore.QSize(300, 0))
-        self.gridLayout = QtWidgets.QGridLayout(Dialog)
-        self.gridLayout.setObjectName("gridLayout")
-        self.status = QtWidgets.QLabel(Dialog)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.status.sizePolicy().hasHeightForWidth())
-        self.status.setSizePolicy(sizePolicy)
-        self.status.setMinimumSize(QtCore.QSize(0, 20))
-        self.status.setFrameShape(QtWidgets.QFrame.StyledPanel)
-        self.status.setText("")
-        self.status.setObjectName("status")
+        Dialog.setMinimumSize(QSize(300, 0))
+        self.gridLayout = QGridLayout(Dialog)
+        self.gridLayout.setObjectName(u"gridLayout")
+        self.status = QLabel(Dialog)
+        self.status.setObjectName(u"status")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.status.sizePolicy().hasHeightForWidth())
+        self.status.setSizePolicy(sizePolicy1)
+        self.status.setMinimumSize(QSize(0, 20))
+        self.status.setFrameShape(QFrame.StyledPanel)
+
         self.gridLayout.addWidget(self.status, 6, 0, 1, 3)
-        self.bAbre = QtWidgets.QPushButton(Dialog)
-        self.bAbre.setObjectName("bAbre")
+
+        self.bAbre = QPushButton(Dialog)
+        self.bAbre.setObjectName(u"bAbre")
+
         self.gridLayout.addWidget(self.bAbre, 1, 2, 1, 1)
-        self.buttonBox = QtWidgets.QDialogButtonBox(Dialog)
-        self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Close)
-        self.buttonBox.setObjectName("buttonBox")
+
+        self.buttonBox = QDialogButtonBox(Dialog)
+        self.buttonBox.setObjectName(u"buttonBox")
+        self.buttonBox.setOrientation(Qt.Horizontal)
+        self.buttonBox.setStandardButtons(QDialogButtonBox.Close)
+
         self.gridLayout.addWidget(self.buttonBox, 7, 0, 1, 3)
-        self.bGravar = QtWidgets.QPushButton(Dialog)
-        self.bGravar.setObjectName("bGravar")
+
+        self.bGravar = QPushButton(Dialog)
+        self.bGravar.setObjectName(u"bGravar")
+
         self.gridLayout.addWidget(self.bGravar, 4, 0, 1, 3)
-        self.label = QtWidgets.QLabel(Dialog)
-        self.label.setObjectName("label")
+
+        self.label = QLabel(Dialog)
+        self.label.setObjectName(u"label")
+
         self.gridLayout.addWidget(self.label, 1, 0, 1, 1)
-        self.progressBar = QtWidgets.QProgressBar(Dialog)
-        self.progressBar.setProperty("value", 24)
-        self.progressBar.setAlignment(QtCore.Qt.AlignCenter)
-        self.progressBar.setObjectName("progressBar")
+
+        self.progressBar = QProgressBar(Dialog)
+        self.progressBar.setObjectName(u"progressBar")
+        self.progressBar.setValue(24)
+        self.progressBar.setAlignment(Qt.AlignCenter)
+
         self.gridLayout.addWidget(self.progressBar, 3, 0, 1, 3)
-        self.caminhoArquivo = QtWidgets.QLineEdit(Dialog)
-        self.caminhoArquivo.setObjectName("caminhoArquivo")
+
+        self.caminhoArquivo = QLineEdit(Dialog)
+        self.caminhoArquivo.setObjectName(u"caminhoArquivo")
+
         self.gridLayout.addWidget(self.caminhoArquivo, 1, 1, 1, 1)
-        self.comboTipo = QtWidgets.QComboBox(Dialog)
-        self.comboTipo.setObjectName("comboTipo")
+
+        self.comboTipo = QComboBox(Dialog)
         self.comboTipo.addItem("")
         self.comboTipo.addItem("")
         self.comboTipo.addItem("")
+        self.comboTipo.setObjectName(u"comboTipo")
+
         self.gridLayout.addWidget(self.comboTipo, 0, 0, 1, 3)
-        self.bGravaFlash = QtWidgets.QPushButton(Dialog)
-        self.bGravaFlash.setObjectName("bGravaFlash")
+
+        self.bGravaFlash = QPushButton(Dialog)
+        self.bGravaFlash.setObjectName(u"bGravaFlash")
+
         self.gridLayout.addWidget(self.bGravaFlash, 5, 0, 1, 3)
+
 
         self.retranslateUi(Dialog)
         self.buttonBox.accepted.connect(Dialog.accept)
         self.buttonBox.rejected.connect(Dialog.reject)
-        QtCore.QMetaObject.connectSlotsByName(Dialog)
+
+        QMetaObject.connectSlotsByName(Dialog)
+    # setupUi
 
     def retranslateUi(self, Dialog):
-        _translate = QtCore.QCoreApplication.translate
-        Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
-        self.bAbre.setText(_translate("Dialog", "..."))
-        self.bGravar.setText(_translate("Dialog", "Fazer Upload ..."))
-        self.label.setText(_translate("Dialog", "Escolhar o arquivo:"))
-        self.comboTipo.setItemText(0, _translate("Dialog", "Ambos"))
-        self.comboTipo.setItemText(1, _translate("Dialog", "Caminho Secundário"))
-        self.comboTipo.setItemText(2, _translate("Dialog", "Caminho de FeedBack"))
-        self.bGravaFlash.setText(_translate("Dialog", "Gravar em Definitivo na Flash"))
+        Dialog.setWindowTitle(QCoreApplication.translate("Dialog", u"Dialog", None))
+        self.status.setText("")
+        self.bAbre.setText(QCoreApplication.translate("Dialog", u"...", None))
+        self.bGravar.setText(QCoreApplication.translate("Dialog", u"Fazer Upload ...", None))
+        self.label.setText(QCoreApplication.translate("Dialog", u"Escolhar o arquivo:", None))
+        self.comboTipo.setItemText(0, QCoreApplication.translate("Dialog", u"Ambos", None))
+        self.comboTipo.setItemText(1, QCoreApplication.translate("Dialog", u"Caminho Secund\u00e1rio", None))
+        self.comboTipo.setItemText(2, QCoreApplication.translate("Dialog", u"Caminho de FeedBack", None))
+
+        self.bGravaFlash.setText(QCoreApplication.translate("Dialog", u"Gravar em Definitivo na Flash", None))
+    # retranslateUi
+

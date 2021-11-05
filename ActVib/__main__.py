@@ -1,7 +1,7 @@
 import os
 import sys
 
-from PyQt5 import QtWidgets
+from PySide2 import QtWidgets
 
 from .mainwindow import mainwindow
 from .driverhardware import driverhardware
@@ -18,4 +18,4 @@ mwindow.setDataMan(dman)
 
 mwindow.show()
 
-sys.exit(app.exec())
+sys.exit(app.exec_())
