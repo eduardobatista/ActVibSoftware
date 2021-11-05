@@ -11,9 +11,9 @@ import numpy as np
 import pandas as pd
 import pyqtgraph as pg
 
-from BaseFigQtGraph import BaseFigQtGraph
-from WorkdirDialog import Ui_Dialog as WorkdirDialog
-from UploadDialog import Ui_Dialog as UploadDialog
+from .BaseFigQtGraph import BaseFigQtGraph
+from .WorkdirDialog import Ui_Dialog as WorkdirDialog
+from .UploadDialog import Ui_Dialog as UploadDialog
 
 
 class WorkdirManager():

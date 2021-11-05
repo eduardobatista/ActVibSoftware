@@ -7,11 +7,11 @@ import pandas as pd
 from PyQt5 import QtWidgets, QtGui, QtCore
 from PyQt5.QtWidgets import QMessageBox, QFileDialog, QCheckBox, QComboBox, QDoubleSpinBox, QSpinBox
 
-from VibViewWindow import Ui_MainWindow
+from .VibViewWindow import Ui_MainWindow
 
-from others import (MyFigQtGraph, CtrlFigQtGraph, FigOutputQtGraph, WorkdirManager, MyUploadDialog)
+from .others import (MyFigQtGraph, CtrlFigQtGraph, FigOutputQtGraph, WorkdirManager, MyUploadDialog)
 
-from panels import (IMUPanel,GeneratorPanel,PlotCfgPanel,ControlPanel,ADCPanel)
+from .panels import (IMUPanel,GeneratorPanel,PlotCfgPanel,ControlPanel,ADCPanel)
 
 class mainwindow(QtWidgets.QMainWindow):
 
@@ -205,6 +205,7 @@ class mainwindow(QtWidgets.QMainWindow):
                     w.setText(settings.value(w.objectName()))
         if (settings.value("Porta") is not None):
             self.porta = settings.value("Porta")
+            self.setaPorta(self.porta)
         if (settings.value("WorkDir") is not None):
             self.workdir = settings.value("WorkDir")
         for imp in self.imupanel:
@@ -391,12 +392,19 @@ class mainwindow(QtWidgets.QMainWindow):
             self.ui.statusbar.clearMessage()
 
     def setaPorta(self, portasel):
+        if portasel.startswith(">"):
+            portasel = portasel[1:]
         self.porta = portasel
-        print(self.porta)
+        # print(self.porta)
         for acc in self.ui.menuSelecionar_Porta.actions():
-            actualFont = acc.font()
-            actualFont.setBold(acc.text() == self.porta)
-            acc.setFont(actualFont)
+            # actualFont = acc.font()
+            # actualFont.setBold(acc.text() == self.porta)
+            # acc.setFont(actualFont)
+            if acc.text().endswith(portasel):
+                acc.setText(f">{portasel}")
+            else:
+                if acc.text().startswith(">"):
+                    acc.setText(acc.text()[1:])
         self.ui.statusbar.clearMessage()
 
     def openWorkdirManager(self):

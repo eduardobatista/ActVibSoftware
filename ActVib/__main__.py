@@ -3,9 +3,9 @@ import sys
 
 from PyQt5 import QtWidgets
 
-from mainwindow import mainwindow
-from driverhardware import driverhardware
-from dataman import dataman
+from .mainwindow import mainwindow
+from .driverhardware import driverhardware
+from .dataman import dataman
 
 app = QtWidgets.QApplication([])
 app.setStyle('Fusion')
