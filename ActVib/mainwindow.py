@@ -15,7 +15,7 @@ from .panels import (IMUPanel,GeneratorPanel,PlotCfgPanel,ControlPanel,ADCPanel)
 
 class mainwindow(QtWidgets.QMainWindow):
 
-    def __init__(self, app):
+    def __init__(self, app, driver, dataman):
         super(mainwindow, self).__init__()
         self.app = app
         self.ui = Ui_MainWindow()
@@ -75,8 +75,8 @@ class mainwindow(QtWidgets.QMainWindow):
 
         # PlotCfg:
         self.ui.plotCfgFrame.layout().addWidget(self.plotcfgpanel)
-        self.plotcfgpanel.ui.comboPlot1.activated.connect(lambda: self.dataman.mfig.setPlotChoice(self.plotcfgpanel.ui.comboPlot1.currentIndex(),None))
-        self.plotcfgpanel.ui.comboPlot2.activated.connect(lambda: self.dataman.mfig.setPlotChoice(None,self.plotcfgpanel.ui.comboPlot2.currentIndex()))
+        self.plotcfgpanel.ui.comboPlot1.activated.connect(lambda: self.mfig.setPlotChoice(self.plotcfgpanel.ui.comboPlot1.currentIndex(),None))
+        self.plotcfgpanel.ui.comboPlot2.activated.connect(lambda: self.mfig.setPlotChoice(None,self.plotcfgpanel.ui.comboPlot2.currentIndex()))
         for cc in self.plotcfgpanel.findChildren(QCheckBox):
             cc.toggled.connect(self.plotConfig)
         
@@ -90,11 +90,23 @@ class mainwindow(QtWidgets.QMainWindow):
         # self.ui.normCtrl.setValidator(QtGui.QDoubleValidator(0.0, 1000.0, 2, self))
         # self.ui.normCtrl.editingFinished.connect(self.validateRegularization)
 
-        self.dataman = None
-        self.driver = None
-        self.mfig = None
-        self.ctrlfig = None
-        self.ofig = None
+        self.dataman = dataman
+        self.dataman.updateFigures.connect(self.updateFigs)
+        self.dataman.reset.connect(self.dataReset)
+        self.dataman.statusMessage.connect(self.statusMessage)
+        self.dataman.stopped.connect(self.readingsStopped)
+
+        self.mfig = MyFigQtGraph(self.dataman, self)
+        self.ctrlfig = CtrlFigQtGraph(self.dataman, self)        
+        self.ofig = FigOutputQtGraph(self.dataman, self)
+        self.addPlots()
+
+        self.driver = driver
+        self.changeGeneratorConfig()
+        self.changeMPUConfig()
+        self.changeADCConfig()
+        self.configControl()
+
         saveplussc = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+S"), self, self.saveDialog)
         saveplus2sc = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+Shift+S"), self, self.savePlus2)
         initstop = QtWidgets.QShortcut(QtGui.QKeySequence("Space"), self, self.kSpace)
@@ -102,11 +114,14 @@ class mainwindow(QtWidgets.QMainWindow):
         self.ui.actionSavePlus.triggered.connect(self.savePlus)
         self.ui.actionDefineWorkdir.triggered.connect(self.defWorkdir)
         self.flagsaveplus = False
+
         self.disabledwhenrunning = []
+
 
     def pFocus(self):
         self.ui.passoCtrl.selectAll()
         self.ui.passoCtrl.setFocus()
+
 
     def kSpace(self):
         if not self.dataman.flagrodando:
@@ -116,9 +131,11 @@ class mainwindow(QtWidgets.QMainWindow):
         else:
             self.bInit()
 
+
     def savePlus2(self):
         self.savePlus()
         self.bReset()
+
 
     def savePlus(self):
         try:
@@ -179,6 +196,7 @@ class mainwindow(QtWidgets.QMainWindow):
         except Exception as err:
             self.ui.statusbar.showMessage(str(err))
 
+
     def defWorkdir(self):
         fdg = QFileDialog(self, "Escolha Diretório de Trabalho (workdir)", getenv('HOME'))
         fdg.setFileMode(QFileDialog.DirectoryOnly)
@@ -188,10 +206,10 @@ class mainwindow(QtWidgets.QMainWindow):
                 if dirnames[0] != '':
                     self.workdir = dirnames[0]
 
+
     def readConfig(self):        
         settings = QtCore.QSettings("VibSoftware", "VibView")
         for w in self.app.allWidgets():
-            # print(w.objectName())
             if ((type(w) in self.saveconfigtypes) and (settings.value(w.objectName()) is not None)):
                 if (type(w) == QtWidgets.QCheckBox):
                     w.setChecked(settings.value(w.objectName()) == 'True')
@@ -237,25 +255,49 @@ class mainwindow(QtWidgets.QMainWindow):
         for gp in self.genpanel:
             gp.saveState(settings)
 
-    def setDataMan(self, dm):
-        self.dataman = dm
-        mfig = MyFigQtGraph(self.dataman, self)
-        ctrlfig = CtrlFigQtGraph(self.dataman, self)
-        self.addPlots(mfig, ctrlfig)
-        outfig = FigOutputQtGraph(self.dataman, self)
-        self.addPlotOut(outfig)
-        self.dataman.setaFigs(mfig, ctrlfig)
-        self.dataman.setaFigOut(outfig)
+    # def setDataMan(self, dm):
+    #     self.dataman = dm
+    #     self.mfig = MyFigQtGraph(self.dataman, self)
+    #     self.ctrlfig = CtrlFigQtGraph(self.dataman, self)        
+    #     self.ofig = FigOutputQtGraph(self.dataman, self)
+    #     self.addPlots()
+    #     self.dataman.updateFigures.connect(self.updateFigs)
+    #     self.dataman.reset.connect(self.dataReset)
+    #     self.dataman.statusMessage.connect(self.statusMessage)
+    #     self.dataman.stopped.connect(self.readingsStopped)
 
-    def setDriver(self, drv):
-        self.driver = drv
-        self.changeGeneratorConfig()
-        self.changeMPUConfig()
-        self.changeADCConfig()
-        self.configControl()
+    def statusMessage(self, msg):
+        if msg is None:
+            self.ui.statusbar.clearMessage()
+        else:
+            self.ui.statusbar.showMessage(msg)   
+
+    def updateFigs(self):
+        self.ui.elapsedTime.setText(f'{int(self.dataman.readtime)} s / {self.dataman.maxtime} s')
+        self.ui.controlTime.setText(f'{self.dataman.realtime:.3f} s')
+        self.ui.sampleTime.setText(f'{self.driver.calctime[0]:.0f}/{self.driver.calctime[1]:.0f}/{self.driver.calctime[2]:.0f} us')
+        if self.driver.controlMode:
+            self.ctrlfig.updateFig()
+        else:
+            self.mfig.updateFig()
+        self.ofig.updateFig()
+    
+    def dataReset(self):
+        self.ui.elapsedTime.setText('0 s')
+        self.ui.controlTime.setText('0 s')
+        self.ui.sampleTime.setText('0 us')
+        self.mfig.updateFig(self.driver.controlMode, [self.driver.refid, self.driver.erroid])
+        self.ofig.updateFig()
+        self.ctrlfig.updateFig()
+
+    # def setDriver(self, drv):
+    #     self.driver = drv
+    #     self.changeGeneratorConfig()
+    #     self.changeMPUConfig()
+    #     self.changeADCConfig()
+    #     self.configControl()
 
     def configAlgOn(self):
-        # print("ConfigAlgOn!")
         algon = self.ctrlpanel.ui.checkAlgOn.isChecked()
         algontime = float(self.ctrlpanel.ui.spinTAlgOn.value())
         if algon:
@@ -265,6 +307,7 @@ class mainwindow(QtWidgets.QMainWindow):
         self.ctrlpanel.ui.normCtrl.setEnabled(not algon)
         self.ctrlpanel.ui.passoCtrl.setEnabled(not algon)
         self.ctrlpanel.ui.spinTAlgOn.setEnabled(not algon)
+
 
     def configControl(self):        
         self.driver.controlMode = self.ctrlpanel.isControlOn()
@@ -278,7 +321,6 @@ class mainwindow(QtWidgets.QMainWindow):
             if (self.mfig is not None):
                 self.ctrlfig.show()
                 self.mfig.hide()
-
         else:
             for gg in self.genpanel:
                 gg.setEnabled(True)
@@ -287,23 +329,28 @@ class mainwindow(QtWidgets.QMainWindow):
                 self.mfig.show()
                 self.ctrlfig.hide()
 
+
     def plotOutConfig(self):
         self.ofig.dacenable = [aa.isGeneratorOn() for aa in self.genpanel]
+
 
     def plotConfig(self):
         self.mfig.accEnable = self.plotcfgpanel.getAccEnableList()
         self.mfig.gyroEnable = self.plotcfgpanel.getGyroEnableList()
         self.ctrlfig.plotSetup([self.ctrlpanel.ui.comboRef.currentIndex(), self.ctrlpanel.ui.comboErro.currentIndex()])
 
+
     def changeGeneratorConfig(self):
         for k in range(4):
             generatorconfig = self.genpanel[k].getGeneratorConfig()
             self.driver.setGeneratorConfig(k, **generatorconfig)
 
+
     def changeMPUConfig(self):
         if self.driver is not None:
             for id in range(3):
                 self.driver.setIMUConfig(id,self.imupanel[id].getIMUConfig())
+
 
     def changeADCConfig(self):        
         if self.driver is not None:
@@ -311,10 +358,8 @@ class mainwindow(QtWidgets.QMainWindow):
         if self.mfig is not None:
             self.mfig.adcEnableMap = self.driver.adcenablemap
 
-    def addPlots(self, mfig, ctrlfig):
+    def addPlots(self):
         settings = QtCore.QSettings("VibSoftware", "VibView")
-        self.mfig = mfig
-        self.ctrlfig = ctrlfig
         self.ui.plotOutLayout.addWidget(self.mfig)
         self.ui.plotOutLayout.addWidget(self.ctrlfig)
         if self.ctrlpanel.isControlOn():
@@ -329,14 +374,12 @@ class mainwindow(QtWidgets.QMainWindow):
             self.ctrlfig.parseConfigString(aux)
         self.plotConfig()
 
-    def addPlotOut(self, ofig):
-        self.ofig = ofig
         settings = QtCore.QSettings("VibSoftware", "VibView")
         aux = settings.value('OFig')
         if aux is not None:
             self.ofig.parseConfigString(aux)
         self.ui.plotLayout2.addWidget(self.ofig)
-        # self.ofig.draw()
+        
     
     def bInit(self):
         if self.dataman.flagrodando:
@@ -362,12 +405,15 @@ class mainwindow(QtWidgets.QMainWindow):
             else:
                 self.mfig.addADCPlot()
 
-            self.dataman.mfig.setPlotChoice(self.plotcfgpanel.ui.comboPlot1.currentIndex(),self.plotcfgpanel.ui.comboPlot2.currentIndex())
+            self.mfig.setPlotChoice(self.plotcfgpanel.ui.comboPlot1.currentIndex(),self.plotcfgpanel.ui.comboPlot2.currentIndex())
 
+            for k in range(3):
+                self.driver.setIMUConfig(k,self.imupanel[k].getIMUConfig())
+            self.changeADCConfig()
+
+            self.driver.setPort(self.porta)
             self.dataman.IniciaLeituras()
 
-    # def bPara(self):
-    #     self.dataman.ParaLeituras()
 
     def readingsStopped(self):
         for cc in self.disabledwhenrunning:
@@ -395,11 +441,7 @@ class mainwindow(QtWidgets.QMainWindow):
         if portasel.startswith(">"):
             portasel = portasel[1:]
         self.porta = portasel
-        # print(self.porta)
         for acc in self.ui.menuSelecionar_Porta.actions():
-            # actualFont = acc.font()
-            # actualFont.setBold(acc.text() == self.porta)
-            # acc.setFont(actualFont)
             if acc.text().endswith(portasel):
                 acc.setText(f">{portasel}")
             else:
@@ -414,6 +456,7 @@ class mainwindow(QtWidgets.QMainWindow):
 
     def openUploadDialog(self):
         if not self.dataman.flagrodando:
+            self.driver.setPort(self.porta)
             self.upd = MyUploadDialog(self.driver)
             self.upd.showUploadDialog()
 

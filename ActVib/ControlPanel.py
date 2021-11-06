@@ -17,7 +17,7 @@ class Ui_ControlForm(object):
     def setupUi(self, ControlForm):
         if not ControlForm.objectName():
             ControlForm.setObjectName(u"ControlForm")
-        ControlForm.resize(481, 190)
+        ControlForm.resize(481, 160)
         self.horizontalLayout = QHBoxLayout(ControlForm)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
@@ -242,13 +242,6 @@ class Ui_ControlForm(object):
 
 
         self.horizontalLayout_5.addWidget(self.frame_7)
-
-        self.line_4 = QFrame(self.Controle)
-        self.line_4.setObjectName(u"line_4")
-        self.line_4.setFrameShape(QFrame.VLine)
-        self.line_4.setFrameShadow(QFrame.Sunken)
-
-        self.horizontalLayout_5.addWidget(self.line_4)
 
 
         self.horizontalLayout.addWidget(self.Controle)

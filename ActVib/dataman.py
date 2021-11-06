@@ -6,21 +6,24 @@ import time
 import numpy as np
 import pandas as pd
 
+from PySide2.QtCore import Signal,QObject
 
-class dataman:
+class dataman (QObject):
 
-    def __init__(self, driver, mwindow):
+    updateFigures = Signal()
+    reset = Signal()
+    statusMessage = Signal(str)
+    stopped = Signal()
+
+    def __init__(self, driver):
+        super().__init__()
         self.plotupdatesec = 1
-        self.samplingperiod = 4e-3  # 2.5e-3 #4e-3
-        # self.samplingperiod = 2e-3
+        self.samplingperiod = 4e-3
         self.wsize = 200000
         self.driver = driver
         self.timereads = np.zeros(self.wsize)
         self.flagparar = True
         self.flagrodando = False
-        self.mfig = None
-        self.ctrlfig = None
-        self.ofig = None
         self.flagsaved = True
         self.ctreadings = 0
         self.globalctreadings = 0
@@ -37,40 +40,29 @@ class dataman:
         self.xerrodata = np.zeros(self.wsize)
         self.maxtime = int(self.wsize * self.samplingperiod)
         self.realtime = 0.0
-        self.mwindow = mwindow
-
-    def setaFigs(self, fig, cfig):
-        self.mfig = fig
-        self.ctrlfig = cfig
-
-    def setaFigOut(self, fig):
-        self.ofig = fig
 
     def ParaLeituras(self):
         self.flagparar = True
-        self.mwindow.ui.statusbar.clearMessage()
+        self.statusMessage.emit(None)
 
     def IniciaLeituras(self):
-        self.mwindow.ui.statusbar.clearMessage()        
+        self.statusMessage.emit(None)      
         self.flagparar = False
         self.mythread = Thread(target=self.LeDados)
         self.mythread.start()
 
     def LeDados(self):
         try:
-            trd = Thread(target=self.updateFigs)
-            trd.start()
+            # trd = Thread(target=self.updateFigs)
+            # trd.start()
             ctrlmode = self.driver.controlMode
             self.flagrodando = True
             self.driver.openSerial()
             self.driver.handshake()            
             for k in range(3):
-                self.driver.setIMUConfig(k,self.mwindow.imupanel[k].getIMUConfig())
                 self.driver.writeIMUConfig(k)
                 if self.driver.IMUEnableFlags[k]:
                     self.driver.initHardware(k)
-            # TODO: merge the following 2 calls?
-            self.mwindow.changeADCConfig()
             self.driver.writeADCConfig()            
             for k in range(4):
                 self.driver.writeGeneratorConfig(id=k)
@@ -120,13 +112,14 @@ class dataman:
                     for k in range(4):
                         if not self.driver.genConfigWritten[k]:
                             self.driver.writeGeneratorConfig(k)
-                    if not trd.isAlive():
-                        trd = Thread(target=self.updateFigs)
-                        trd.start()
+                    # if not trd.isAlive():
+                    #     trd = Thread(target=self.updateFigs)
+                    #     trd.start()
                     # print(f'{int(self.driver.calctime)} us')
+                    self.updateFigures.emit()
                 ctaux = 0
             self.driver.stopReadings()
-            self.mwindow.readingsStopped()
+            self.stopped.emit()
             self.flagrodando = False
             self.flagparar = False
             # app.save(srcdir,"backup" + str(time.time()) + ".txt")
@@ -134,27 +127,14 @@ class dataman:
             if self.driver.serial.isOpen():
                 self.driver.stopReadings()
             self.flagrodando = False
-            self.mwindow.ui.statusbar.showMessage("Erro: " + str(err))
-            self.mwindow.readingsStopped()
+            self.statusMessage.emit("Erro: " + str(err))
+            self.stopped.emit()
 
-    def updateFigs(self):
-        self.mwindow.ui.elapsedTime.setText(f'{int(self.readtime)} s / {self.maxtime} s')
-        self.mwindow.ui.controlTime.setText(f'{self.realtime:.3f} s')
-        self.mwindow.ui.sampleTime.setText(f'{self.driver.calctime[0]:.0f}/{self.driver.calctime[1]:.0f}/{self.driver.calctime[2]:.0f} us')
-        if self.driver.controlMode:
-            self.ctrlfig.updateFig()
-        else:
-            self.mfig.updateFig()
-        self.ofig.updateFig()
-        # application.ui.progressBar.setValue(self.globalctreadings // 2000)
 
     def ResetaDados(self):
         self.maxv = 1000
         self.flagsaved = True
-        self.globalctreadings = 0        
-        self.mwindow.ui.elapsedTime.setText('0 s')
-        self.mwindow.ui.controlTime.setText('0 s')
-        self.mwindow.ui.sampleTime.setText('0 us')
+        self.globalctreadings = 0
         self.accdata = [[np.zeros(self.wsize), np.zeros(self.wsize), np.zeros(self.wsize)],
                         [np.zeros(self.wsize), np.zeros(self.wsize), np.zeros(self.wsize)],
                         [np.zeros(self.wsize), np.zeros(self.wsize), np.zeros(self.wsize)]]
@@ -165,9 +145,7 @@ class dataman:
         self.adcdata = [np.zeros(self.wsize), np.zeros(self.wsize), np.zeros(self.wsize), np.zeros(self.wsize)]
         self.xrefdata = np.zeros(self.wsize)
         self.xerrodata = np.zeros(self.wsize)
-        self.mfig.updateFig(self.driver.controlMode, [self.driver.refid, self.driver.erroid])
-        self.ofig.updateFig()
-        self.ctrlfig.updateFig()
+        self.reset.emit()        
         
 
     def salvaArquivo(self, filename, setsaved):

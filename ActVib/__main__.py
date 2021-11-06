@@ -10,11 +10,10 @@ from .dataman import dataman
 app = QtWidgets.QApplication([])
 app.setStyle('Fusion')
 
-mwindow = mainwindow(app)
-driver = driverhardware(mwindow)
-dman = dataman(driver, mwindow)
-mwindow.setDriver(driver)
-mwindow.setDataMan(dman)
+drv = driverhardware()
+dman = dataman(drv)
+
+mwindow = mainwindow(app, drv, dman)
 
 mwindow.show()
 

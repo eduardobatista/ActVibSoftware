@@ -7,8 +7,7 @@ import struct
 
 class driverhardware:
 
-    def __init__(self, mwindow):        
-        self.mwindow = mwindow
+    def __init__(self):
         self.accscaler = [9.80665 * 2.0 / (2**15)] * 3
         self.gyroscaler = [250.0 / (2**15)] * 3
         self.accrangeselection = [0] * 3
@@ -68,9 +67,14 @@ class driverhardware:
         self.calctime = [0,0,0]
         self.algontime = 0.0 
 
+
+    def setPort(self,port):
+        self.serial.port = port
+
+
     def openSerial(self):
-        self.serial.port = self.mwindow.porta
         self.serial.open()
+
 
     def setGeneratorConfig(self, id=0, tipo=0, amp=0.0, freq=10.0, dclevel=128, chirpconf=[0, 0, 0, 0, 0]):
         if tipo != 2:
