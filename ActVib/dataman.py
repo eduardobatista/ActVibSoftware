@@ -58,12 +58,13 @@ class dataman (QObject):
             ctrlmode = self.driver.controlMode
             self.flagrodando = True
             self.driver.openSerial()
-            self.driver.handshake()            
+            self.driver.handshake()
+            self.driver.writeSampling(int(self.samplingperiod*1000))
             for k in range(3):
                 self.driver.writeIMUConfig(k)
                 if self.driver.IMUEnableFlags[k]:
                     self.driver.initHardware(k)
-            self.driver.writeADCConfig()            
+            self.driver.writeADCConfig()
             for k in range(4):
                 self.driver.writeGeneratorConfig(id=k)
                 time.sleep(0.1)
@@ -130,9 +131,12 @@ class dataman (QObject):
             self.statusMessage.emit("Erro: " + str(err))
             self.stopped.emit()
 
-
-    def ResetaDados(self):
-        self.maxv = 1000
+    """
+    """
+    def ResetaDados(self, samplingperiod=4e-3, maxtime=10):
+        self.samplingperiod = samplingperiod
+        self.maxtime = maxtime * 60
+        self.wsize = int(self.maxtime/self.samplingperiod)
         self.flagsaved = True
         self.globalctreadings = 0
         self.accdata = [[np.zeros(self.wsize), np.zeros(self.wsize), np.zeros(self.wsize)],

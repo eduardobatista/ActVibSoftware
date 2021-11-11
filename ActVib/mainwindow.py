@@ -22,7 +22,10 @@ class mainwindow(QtWidgets.QMainWindow):
         self.ui.setupUi(self)
         self.cw = self.ui.centralwidget
         self.porta = "COM3"
+        self.TSampling = 4   # 4 ms is the default
         self.workdir = "D://"
+        self.dataman = dataman
+        self.driver = driver
         self.saveconfigtypes = [QtWidgets.QCheckBox, QtWidgets.QComboBox,
                                 QtWidgets.QDoubleSpinBox, QtWidgets.QSpinBox, QtWidgets.QLineEdit]
         self.imupanel = [IMUPanel(idd) for idd in range(3)]
@@ -31,14 +34,22 @@ class mainwindow(QtWidgets.QMainWindow):
 
         self.plotcfgpanel = PlotCfgPanel()
         self.ctrlpanel = ControlPanel()
-        self.readConfig()
-        self.mapper = QtCore.QSignalMapper(self)
+        self.readConfig()        
         self.ui.bInit.clicked.connect(self.bInit)
         self.ui.bLimpar.clicked.connect(self.bReset)
+
+        self.mapper = QtCore.QSignalMapper(self)
         for acc in self.ui.menuSelecionar_Porta.actions():
             self.mapper.setMapping(acc, acc.text())
             acc.triggered.connect(self.mapper.map)
         self.mapper.mapped['QString'].connect(self.setaPorta)
+
+        self.mapper2 = QtCore.QSignalMapper(self)
+        for sra in self.ui.menuSampling_Rate.actions():
+            self.mapper2.setMapping(sra, sra.text())
+            sra.triggered.connect(self.mapper2.map)
+        self.mapper2.mapped['QString'].connect(self.setSampling)
+
         self.ui.actionSair.triggered.connect(self.closeEvent)
         self.ui.actionSalvar_dados.triggered.connect(self.saveDialog)
         self.ui.actionUpload.triggered.connect(self.openUploadDialog)
@@ -90,7 +101,7 @@ class mainwindow(QtWidgets.QMainWindow):
         # self.ui.normCtrl.setValidator(QtGui.QDoubleValidator(0.0, 1000.0, 2, self))
         # self.ui.normCtrl.editingFinished.connect(self.validateRegularization)
 
-        self.dataman = dataman
+        
         self.dataman.updateFigures.connect(self.updateFigs)
         self.dataman.reset.connect(self.dataReset)
         self.dataman.statusMessage.connect(self.statusMessage)
@@ -101,7 +112,6 @@ class mainwindow(QtWidgets.QMainWindow):
         self.ofig = FigOutputQtGraph(self.dataman, self)
         self.addPlots()
 
-        self.driver = driver
         self.changeGeneratorConfig()
         self.changeMPUConfig()
         self.changeADCConfig()
@@ -224,6 +234,8 @@ class mainwindow(QtWidgets.QMainWindow):
         if (settings.value("Porta") is not None):
             self.porta = settings.value("Porta")
             self.setaPorta(self.porta)
+        if (settings.value("TSampling") is not None):
+            self.setSampling(settings.value("TSampling"))            
         if (settings.value("WorkDir") is not None):
             self.workdir = settings.value("WorkDir")
         for imp in self.imupanel:
@@ -246,6 +258,7 @@ class mainwindow(QtWidgets.QMainWindow):
             elif (type(w) == QtWidgets.QLineEdit):
                 settings.setValue(w.objectName(), w.text())
         settings.setValue("Porta", self.porta)
+        settings.setValue("TSampling", str(self.TSampling) + " ms")
         settings.setValue("MFig", self.mfig.getConfigString())
         settings.setValue("OFig", self.ofig.getConfigString())
         settings.setValue("CtrlFig", self.ctrlfig.getConfigString())
@@ -255,22 +268,13 @@ class mainwindow(QtWidgets.QMainWindow):
         for gp in self.genpanel:
             gp.saveState(settings)
 
-    # def setDataMan(self, dm):
-    #     self.dataman = dm
-    #     self.mfig = MyFigQtGraph(self.dataman, self)
-    #     self.ctrlfig = CtrlFigQtGraph(self.dataman, self)        
-    #     self.ofig = FigOutputQtGraph(self.dataman, self)
-    #     self.addPlots()
-    #     self.dataman.updateFigures.connect(self.updateFigs)
-    #     self.dataman.reset.connect(self.dataReset)
-    #     self.dataman.statusMessage.connect(self.statusMessage)
-    #     self.dataman.stopped.connect(self.readingsStopped)
 
     def statusMessage(self, msg):
         if msg is None:
             self.ui.statusbar.clearMessage()
         else:
-            self.ui.statusbar.showMessage(msg)   
+            self.ui.statusbar.showMessage(msg) 
+
 
     def updateFigs(self):
         self.ui.elapsedTime.setText(f'{int(self.dataman.readtime)} s / {self.dataman.maxtime} s')
@@ -281,6 +285,7 @@ class mainwindow(QtWidgets.QMainWindow):
         else:
             self.mfig.updateFig()
         self.ofig.updateFig()
+
     
     def dataReset(self):
         self.ui.elapsedTime.setText('0 s')
@@ -290,12 +295,6 @@ class mainwindow(QtWidgets.QMainWindow):
         self.ofig.updateFig()
         self.ctrlfig.updateFig()
 
-    # def setDriver(self, drv):
-    #     self.driver = drv
-    #     self.changeGeneratorConfig()
-    #     self.changeMPUConfig()
-    #     self.changeADCConfig()
-    #     self.configControl()
 
     def configAlgOn(self):
         algon = self.ctrlpanel.ui.checkAlgOn.isChecked()
@@ -429,25 +428,45 @@ class mainwindow(QtWidgets.QMainWindow):
             buttonReply = QMessageBox.question(self, 'Atenção!', "Dados não salvos poderão ser apagados, confirma?",
                                                QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
             if buttonReply == QMessageBox.Yes:
-                self.dataman.ResetaDados()
+                self.dataman.ResetaDados(self.TSampling/1000)
                 self.ui.statusbar.clearMessage()
             else:
                 self.ui.statusbar.showMessage("Cancelado...")
         else:
-            self.dataman.ResetaDados()
+            self.dataman.ResetaDados(self.TSampling/1000)
             self.ui.statusbar.clearMessage()
 
+    def setSampling(self, selsampling):
+        if self.dataman.flagrodando or (not self.dataman.flagsaved):
+            self.ui.statusbar.setMessage("Not allowed when running or with unsaved data.")
+        else:
+            if selsampling.startswith(">"):
+                selsampling = selsampling[1:]
+            self.TSampling = int(selsampling[0])
+            for sra in self.ui.menuSampling_Rate.actions():
+                if sra.text().endswith(selsampling):
+                    sra.setText(f">{selsampling}")
+                else:
+                    if sra.text().startswith(">"):
+                        sra.setText(sra.text()[1:])
+            self.dataman.ResetaDados(self.TSampling/1000)
+            self.ui.statusbar.clearMessage()
+            
+        
     def setaPorta(self, portasel):
-        if portasel.startswith(">"):
-            portasel = portasel[1:]
-        self.porta = portasel
-        for acc in self.ui.menuSelecionar_Porta.actions():
-            if acc.text().endswith(portasel):
-                acc.setText(f">{portasel}")
-            else:
-                if acc.text().startswith(">"):
-                    acc.setText(acc.text()[1:])
-        self.ui.statusbar.clearMessage()
+        if not self.dataman.flagrodando:
+            if portasel.startswith(">"):
+                portasel = portasel[1:]
+            self.porta = portasel
+            for acc in self.ui.menuSelecionar_Porta.actions():
+                if acc.text().endswith(portasel):
+                    acc.setText(f">{portasel}")
+                else:
+                    if acc.text().startswith(">"):
+                        acc.setText(acc.text()[1:])
+            self.ui.statusbar.clearMessage()
+        else: 
+            self.ui.statusbar.setMessage("Not allowed when running.")
 
     def openWorkdirManager(self):
         if not self.dataman.flagrodando:

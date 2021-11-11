@@ -207,7 +207,7 @@ class MyFigQtGraph(BaseFigQtGraph):
         self.app = app
         super().__init__(3, self.dman.samplingperiod)
         self.wsize = 60
-        pens = [pg.mkPen('r', width=2), pg.mkPen('b', width=2), pg.mkPen('g', width=2), pg.mkPen('y', width=2)]
+        pens = [pg.mkPen('r', width=1), pg.mkPen('b', width=1), pg.mkPen('g', width=1), pg.mkPen('y', width=1)]
         self.lineacc = []
         self.linegyr = []        
         for k in range(3):
@@ -279,7 +279,7 @@ class FigOutputQtGraph(BaseFigQtGraph):
         self.app = app
         super().__init__(1, self.dman.samplingperiod)
         self.pitem = self.pitens[0]
-        pens = [pg.mkPen('r', width=2), pg.mkPen('b', width=2), pg.mkPen('g', width=2), pg.mkPen('y', width=2)]
+        pens = [pg.mkPen('r', width=1), pg.mkPen('b', width=1), pg.mkPen('g', width=1), pg.mkPen('y', width=1)]
         self.lines = []
         for k in range(4):
             self.lines.append(self.pitem.plot(np.array([]), np.array([]), pen=pens[k]))

@@ -115,6 +115,7 @@ class driverhardware:
         self.accrangeselection[id] = nrange
         self.accscaler[id] = 2.0**(nrange + 1) * 9.80665 / (2**15)
 
+
     """ Seta range do giroscópio:
         0 = -125 a +125 graus/s
         1 = -250 a +250 graus/s
@@ -124,6 +125,7 @@ class driverhardware:
     def setGyroRange(self, id, nrange):
         self.gyrorangeselection[id] = nrange
         self.gyroscaler[id] = 125.0 * (2.0**nrange) / (2**15)
+
 
     def initHardware(self,id=0):
         aux = bytearray([ord('i')] + [id])
@@ -137,6 +139,7 @@ class driverhardware:
             # print(str(axxx.decode("ISO-8859-1")))
             raise Exception(f'Fail initializing the IMU with id={id}.')
 
+
     def setIMUConfig(self,id: int, imucfgdata: list):
         self.imuconfigdata[id] = imucfgdata
         self.setAccRange(id, imucfgdata[2] & 0x03)
@@ -144,6 +147,7 @@ class driverhardware:
         self.IMUEnableFlags[id] = ((imucfgdata[0] & 0x01) == 1)
         self.IMUTypes[id] = (imucfgdata[0]>>1) & 0x01 
         
+
     def writeIMUConfig(self,id: int):
         # print("writeIMU")
         aux = bytearray([ord('I')] + [id] + self.imuconfigdata[id])
@@ -152,6 +156,16 @@ class driverhardware:
         if aux != b'ok':
             print(aux)
             raise Exception(f'Error writing IMU{id+1} Config.')
+
+    
+    def writeSampling(self,TSampling: int):
+        # print("writeIMU")
+        aux = bytearray([ord('f')] + [TSampling])
+        self.serial.write(aux)
+        aux = self.serial.read(2)
+        if aux[0] != ord('k'):
+            print(aux)
+            raise Exception(f'Error writing sampling rate.')
         
 
     def writeGeneratorConfig(self, id=0):

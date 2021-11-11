@@ -751,7 +751,7 @@
     </property>
     <widget class="QMenu" name="menuSelecionar_Porta">
      <property name="title">
-      <string>Choose Port</string>
+      <string>Port</string>
      </property>
      <addaction name="actionCOM1"/>
      <addaction name="actionCOM2"/>
@@ -766,9 +766,20 @@
      <addaction name="actionCOM11"/>
      <addaction name="actionCOM12"/>
     </widget>
+    <widget class="QMenu" name="menuSampling_Rate">
+     <property name="title">
+      <string>Sampling Rate</string>
+     </property>
+     <addaction name="action1_ms"/>
+     <addaction name="action2_ms"/>
+     <addaction name="action3_ms"/>
+     <addaction name="action4_ms"/>
+     <addaction name="action5_ms"/>
+    </widget>
     <addaction name="actionSalvar_dados"/>
     <addaction name="actionUpload"/>
     <addaction name="menuSelecionar_Porta"/>
+    <addaction name="menuSampling_Rate"/>
     <addaction name="separator"/>
     <addaction name="actionSavePlus"/>
     <addaction name="actionDefineWorkdir"/>
@@ -872,6 +883,31 @@
   <action name="actionTeste">
    <property name="text">
     <string>Teste</string>
+   </property>
+  </action>
+  <action name="action1_ms">
+   <property name="text">
+    <string>1 ms</string>
+   </property>
+  </action>
+  <action name="action2_ms">
+   <property name="text">
+    <string>2 ms</string>
+   </property>
+  </action>
+  <action name="action3_ms">
+   <property name="text">
+    <string>3 ms</string>
+   </property>
+  </action>
+  <action name="action4_ms">
+   <property name="text">
+    <string>4 ms</string>
+   </property>
+  </action>
+  <action name="action5_ms">
+   <property name="text">
+    <string>5 ms</string>
    </property>
   </action>
  </widget>
