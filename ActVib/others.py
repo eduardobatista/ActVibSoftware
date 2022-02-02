@@ -202,9 +202,9 @@ class CtrlFigQtGraph(BaseFigQtGraph):
 
 class MyFigQtGraph(BaseFigQtGraph):
 
-    def __init__(self, dman, app):
+    def __init__(self, dman): # , app):
         self.dman = dman
-        self.app = app
+        # self.app = app
         super().__init__(3, self.dman.samplingperiod)
         self.wsize = 60
         pens = [pg.mkPen('r', width=1), pg.mkPen('b', width=1), pg.mkPen('g', width=1), pg.mkPen('y', width=1)]

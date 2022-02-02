@@ -15,7 +15,7 @@ from .panels import (IMUPanel,GeneratorPanel,PlotCfgPanel,ControlPanel,ADCPanel)
 
 class mainwindow(QtWidgets.QMainWindow):
 
-    def __init__(self, app, driver, dataman):
+    def __init__(self, app, driver, dataman, mainfig):
         super(mainwindow, self).__init__()
         self.app = app
         self.ui = Ui_MainWindow()
@@ -107,7 +107,7 @@ class mainwindow(QtWidgets.QMainWindow):
         self.dataman.statusMessage.connect(self.statusMessage)
         self.dataman.stopped.connect(self.readingsStopped)
 
-        self.mfig = MyFigQtGraph(self.dataman, self)
+        self.mfig = mainfig #MyFigQtGraph(self.dataman, self)
         self.ctrlfig = CtrlFigQtGraph(self.dataman, self)        
         self.ofig = FigOutputQtGraph(self.dataman, self)
         self.addPlots()

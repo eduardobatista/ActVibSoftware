@@ -6,14 +6,16 @@ from PySide2 import QtWidgets
 from .mainwindow import mainwindow
 from .driverhardware import driverhardware
 from .dataman import dataman
+from .others import MyFigQtGraph
 
 app = QtWidgets.QApplication([])
 app.setStyle('Fusion')
 
 drv = driverhardware()
 dman = dataman(drv)
+mfig = MyFigQtGraph(dman)
 
-mwindow = mainwindow(app, drv, dman)
+mwindow = mainwindow(app, drv, dman, mfig)
 
 mwindow.show()
 
