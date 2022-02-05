@@ -106,6 +106,8 @@ class mainwindow(QtWidgets.QMainWindow):
         self.dataman.reset.connect(self.dataReset)
         self.dataman.statusMessage.connect(self.statusMessage)
         self.dataman.stopped.connect(self.readingsStopped)
+        self.dataman.logMessage.connect(self.processLogMsg)
+        self.loglist = []
 
         self.mfig = mainfig #MyFigQtGraph(self.dataman, self)
         self.ctrlfig = CtrlFigQtGraph(self.dataman, self)        
@@ -126,6 +128,26 @@ class mainwindow(QtWidgets.QMainWindow):
         self.flagsaveplus = False
 
         self.disabledwhenrunning = []
+
+
+    def processLogMsg(self,tstamp,msg):
+        if msg == "Init":
+            if (tstamp == 0):
+                self.loglist = []            
+            self.loglist.append(f"{tstamp}: Started.")
+            for imu in self.imupanel:
+                self.loglist.append(imu.getLogString())
+            self.loglist.append(self.adcpanel.getLogString())
+            for gen in self.genpanel:
+                self.loglist.append(gen.getLogString())   
+            # print( "\n".join(self.loglist) )         
+        elif msg == "Stop":
+            self.loglist.append(f"{tstamp}: Stopped.")
+            # print(self.loglist[-1])
+        elif msg.startswith("Gen"):
+            idx = int(msg[3:])
+            self.loglist.append(f"{tstamp}: Gen{idx+1}|{self.genpanel[idx].getLogString()}")
+            # print(self.loglist[-1])
 
 
     def pFocus(self):
@@ -384,6 +406,7 @@ class mainwindow(QtWidgets.QMainWindow):
         if self.dataman.flagrodando:
             self.dataman.ParaLeituras()
         else:
+            self.expLog = []
             self.flagsaveplus = False
             self.configControl()
             self.changeGeneratorConfig()                   
@@ -486,7 +509,7 @@ class mainwindow(QtWidgets.QMainWindow):
         filename = QFileDialog.getSaveFileName(self, "Salvar Arquivo", getenv('HOME'), 'feather (*.feather)')
         if (filename[0] != ''):
             try:
-                self.dataman.salvaArquivo(filename[0], True)
+                self.dataman.salvaArquivo(filename[0], True, loglist=self.loglist)
             except Exception as err:
                 QMessageBox.question(self.app, "Erro!", str(err), QMessageBox.Ok)
 

@@ -14,6 +14,7 @@ class dataman (QObject):
     reset = Signal()
     statusMessage = Signal(str)
     stopped = Signal()
+    logMessage = Signal((int,str))
 
     def __init__(self, driver):
         super().__init__()
@@ -81,6 +82,7 @@ class dataman (QObject):
             if self.globalctreadings == 0:
                 self.globalstarttime = self.starttime
             timedelta = self.starttime - self.globalstarttime
+            self.logMessage.emit(timedelta,"Init")
             while not self.flagparar:
                 self.driver.getReading()
                 self.readtime = self.ctreadings * self.samplingperiod + timedelta
@@ -113,6 +115,7 @@ class dataman (QObject):
                     for k in range(4):
                         if not self.driver.genConfigWritten[k]:
                             self.driver.writeGeneratorConfig(k)
+                            self.logMessage.emit(self.readtime,"Gen" + str(k))
                     # if not trd.isAlive():
                     #     trd = Thread(target=self.updateFigs)
                     #     trd.start()
@@ -121,6 +124,7 @@ class dataman (QObject):
                 ctaux = 0
             self.driver.stopReadings()
             self.stopped.emit()
+            self.logMessage.emit((time.time() - self.globalstarttime),"Stop")
             self.flagrodando = False
             self.flagparar = False
             # app.save(srcdir,"backup" + str(time.time()) + ".txt")
@@ -152,7 +156,7 @@ class dataman (QObject):
         self.reset.emit()        
         
 
-    def salvaArquivo(self, filename, setsaved):
+    def salvaArquivo(self, filename, setsaved, loglist=None):
         if self.driver.controlMode:
             limf = self.globalctreadings
             df = pd.DataFrame({
@@ -188,5 +192,9 @@ class dataman (QObject):
             df = pd.DataFrame(thedict)            
             df.to_feather(filename)
             # df.to_csv(filename)
+            if loglist:
+                with open(filename + ".log","w+") as ff:
+                    ff.write("\n".join(loglist))
+            
 
         self.flagsaved = setsaved

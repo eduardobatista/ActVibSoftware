@@ -214,6 +214,15 @@ class GeneratorPanel(QtWidgets.QWidget,StateSaver):
             return generatorconfig
         else:
             return {'tipo': 0, 'amp': 0, 'freq': 0, 'dclevel': self.ui.spinDCLevel.value()}
+    
+    def getLogString(self):
+        logstring = "Enabled" if self.ui.checkEnable.isChecked() else "Disabled"
+        if logstring == "Enabled":
+            info = [self.ui.comboType.currentText(),
+                    str(self.ui.spinAmpl.value()), str(self.ui.spinFreq.value()), str(self.ui.spinDCLevel.value()),
+                    f"{self.ui.chirpTinicio.value()},{self.ui.chirpDeltaI.value()},{self.ui.chirpTfim.value()},{self.ui.chirpDeltaF.value()},{self.ui.chirpA2.value()}"]
+            logstring = logstring + "|" + "|".join(info)
+        return logstring
 
 
 class PlotCfgPanel(QtWidgets.QWidget,StateSaver):
@@ -359,6 +368,15 @@ class IMUPanel(QtWidgets.QWidget,StateSaver):
         for cc in cmps:
             cc.setEnabled(enabled)
         self.addresshighlight()
+
+    def getLogString(self):
+        logstring = self.ui.comboType.currentText()
+        if logstring != "Disabled":
+            info = [self.ui.comboAddress.currentText(),self.ui.comboBus.currentText(),self.ui.comboAccRange.currentText(),
+                    self.ui.comboGyroRange.currentText(), 
+                    (self.ui.comboFilter.currentText() if (logstring == "MPU6050") else self.ui.comboFilter2.currentText()) ]
+            logstring = logstring + "|" + "|".join(info)
+        return logstring
         
         
 class ADCPanel(QtWidgets.QWidget,StateSaver):
@@ -397,5 +415,17 @@ class ADCPanel(QtWidgets.QWidget,StateSaver):
         isADC1115 = (self.ui.comboADCModel.currentIndex() == 0)
         self.ui.comboRate1115.setEnabled(isADC1115)
         self.ui.comboRate1015.setEnabled(not isADC1115)
+    
+    def getLogString(self):
+        logstring = self.ui.comboADCModel.currentText()
+        info = [ "1" if self.ui.checkADC1.isChecked() else "0",
+                 "1" if self.ui.checkADC2.isChecked() else "0",
+                 "1" if self.ui.checkADC3.isChecked() else "0",
+                 "1" if self.ui.checkADC4.isChecked() else "0",
+                 self.ui.comboADCRange.currentText(),
+                 self.ui.comboRate1015.currentText() if (logstring == "ADS1015") else self.ui.comboRate1115.currentText() ]
+        logstring = logstring + "|" + "|".join(info)
+        return logstring
+
 
 
