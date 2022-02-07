@@ -219,8 +219,9 @@ class GeneratorPanel(QtWidgets.QWidget,StateSaver):
         logstring = "Enabled" if self.ui.checkEnable.isChecked() else "Disabled"
         if logstring == "Enabled":
             info = [self.ui.comboType.currentText(),
-                    str(self.ui.spinAmpl.value()), str(self.ui.spinFreq.value()), str(self.ui.spinDCLevel.value()),
-                    f"{self.ui.chirpTinicio.value()},{self.ui.chirpDeltaI.value()},{self.ui.chirpTfim.value()},{self.ui.chirpDeltaF.value()},{self.ui.chirpA2.value()}"]
+                    str(self.ui.spinAmpl.value()), str(self.ui.spinFreq.value()), str(self.ui.spinDCLevel.value())]
+            if self.ui.comboType.currentText() == "Chirp":
+                info.append(f"{self.ui.chirpTinicio.value()},{self.ui.chirpDeltaI.value()},{self.ui.chirpTfim.value()},{self.ui.chirpDeltaF.value()},{self.ui.chirpA2.value()}")
             logstring = logstring + "|" + "|".join(info)
         return logstring
 

@@ -82,7 +82,7 @@ class dataman (QObject):
             if self.globalctreadings == 0:
                 self.globalstarttime = self.starttime
             timedelta = self.starttime - self.globalstarttime
-            self.logMessage.emit(timedelta,"Init")
+            self.logMessage.emit(timedelta,"Started")
             while not self.flagparar:
                 self.driver.getReading()
                 self.readtime = self.ctreadings * self.samplingperiod + timedelta
@@ -124,7 +124,7 @@ class dataman (QObject):
                 ctaux = 0
             self.driver.stopReadings()
             self.stopped.emit()
-            self.logMessage.emit((time.time() - self.globalstarttime),"Stop")
+            self.logMessage.emit((time.time() - self.globalstarttime),"Stopped")
             self.flagrodando = False
             self.flagparar = False
             # app.save(srcdir,"backup" + str(time.time()) + ".txt")
@@ -189,12 +189,39 @@ class dataman (QObject):
                     thedict[f"IMU{k+1}GyroY"] = self.gyrodata[k][1][0:limf]
                     thedict[f"IMU{k+1}GyroZ"] = self.gyrodata[k][2][0:limf]
                     
-            df = pd.DataFrame(thedict)            
-            df.to_feather(filename)
+            df = pd.DataFrame(thedict)   
+
+            df.to_feather(filename + "2")         
+            
             # df.to_csv(filename)
             if loglist:
-                with open(filename + ".log","w+") as ff:
-                    ff.write("\n".join(loglist))
+                print(loglist)
+                df = pd.concat([df,pd.DataFrame({"Log":[" "]})],axis=1)
+                tempo = df["Tempo (s)"].values
+                idx = 0
+                for item in loglist:
+                    while tempo[idx] < item[0]:
+                        idx += 1
+                        pass
+                    df.at[idx, "Log"] = item[1]
+                    idx += 1
+                # for item in loglist:
+                #     if item[0] == 0:
+                #         zeroitens.append(item[1])
+                #         idx += 1
+                #     else:
+                #         if not concatenated:
+                            
+                #             concatenated = True
+                #         pos = df["Tempo (s)"][data["Tempo (s)"] >= item[0]].index[0]
+                #         if item[1] == "Started":
+                            
+                #         df.loc[np.isclose(df["Tempo (s)"],item[0],atol=1e-3), "Log"] = item[1]
+                #         print(item[1])
+                #         # df["Log"][df["Tempo (s)"] == float(item[0])] = item[1]
+                # # lista = [f"{item[0]}: {item[1]}" for item in loglist]
+
+            df.to_feather(filename)
             
 
         self.flagsaved = setsaved

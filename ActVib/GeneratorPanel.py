@@ -98,7 +98,7 @@ class Ui_GeneratorPanel(object):
         self.spinFreq.setObjectName(u"spinFreq")
         sizePolicy4.setHeightForWidth(self.spinFreq.sizePolicy().hasHeightForWidth())
         self.spinFreq.setSizePolicy(sizePolicy4)
-        self.spinFreq.setMaximum(100.000000000000000)
+        self.spinFreq.setMaximum(125.000000000000000)
         self.spinFreq.setSingleStep(0.100000000000000)
         self.spinFreq.setValue(10.000000000000000)
 
