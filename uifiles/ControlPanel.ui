@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>481</width>
-    <height>160</height>
+    <width>469</width>
+    <height>107</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -43,7 +43,7 @@
      <property name="lineWidth">
       <number>0</number>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_5">
+     <layout class="QVBoxLayout" name="verticalLayout">
       <property name="spacing">
        <number>2</number>
       </property>
@@ -60,29 +60,9 @@
        <number>5</number>
       </property>
       <item>
-       <widget class="QCheckBox" name="checkControle">
+       <widget class="QFrame" name="frame">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>Enable</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="Line" name="line">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QFrame" name="frame_7">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -90,162 +70,42 @@
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>150</height>
+          <height>0</height>
          </size>
         </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
         <property name="frameShadow">
-         <enum>QFrame::Sunken</enum>
+         <enum>QFrame::Raised</enum>
         </property>
-        <property name="lineWidth">
-         <number>0</number>
-        </property>
-        <layout class="QGridLayout" name="gridLayout_2">
+        <layout class="QGridLayout" name="gridLayout">
          <property name="leftMargin">
           <number>3</number>
          </property>
          <property name="topMargin">
-          <number>1</number>
+          <number>0</number>
          </property>
          <property name="rightMargin">
           <number>5</number>
          </property>
          <property name="bottomMargin">
-          <number>1</number>
+          <number>0</number>
          </property>
-         <property name="verticalSpacing">
-          <number>2</number>
+         <property name="spacing">
+          <number>3</number>
          </property>
-         <item row="8" column="5" colspan="2">
-          <widget class="QLabel" name="label_11">
-           <property name="text">
-            <string>Penalization:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="4" colspan="2">
-          <widget class="QCheckBox" name="checkAlgOn">
-           <property name="text">
-            <string>On ≥</string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="6">
-          <widget class="QSpinBox" name="spinTAlgOn"/>
-         </item>
-         <item row="2" column="4" colspan="3">
-          <widget class="QComboBox" name="comboIMURef">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <item>
-            <property name="text">
-             <string>IMU 1</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>IMU 2</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>IMU 3</string>
-            </property>
-           </item>
-          </widget>
-         </item>
-         <item row="8" column="7">
-          <widget class="QLineEdit" name="normCtrl">
-           <property name="text">
-            <string>1e-4</string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="3">
-          <widget class="QLabel" name="label_17">
-           <property name="text">
-            <string>Error Sensor:</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="3">
-          <widget class="QLabel" name="label_8">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="locale">
-            <locale language="English" country="UnitedStates"/>
-           </property>
-           <property name="text">
-            <string>Algorithm:</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="3">
-          <widget class="QLabel" name="label_24">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>Perturbation:</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="3">
-          <widget class="QLabel" name="label_48">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>Control:</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="4" rowspan="4">
-          <widget class="Line" name="line_3">
+         <item row="0" column="6" rowspan="2">
+          <widget class="Line" name="line_2">
            <property name="orientation">
             <enum>Qt::Vertical</enum>
            </property>
           </widget>
          </item>
-         <item row="2" column="3">
-          <widget class="QLabel" name="label_16">
-           <property name="text">
-            <string>Ref. Sensor:</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="4" colspan="3">
-          <widget class="QComboBox" name="comboIMUError">
+         <item row="0" column="8">
+          <widget class="QComboBox" name="comboIMURef">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -267,36 +127,82 @@
            </item>
           </widget>
          </item>
-         <item row="6" column="7">
-          <widget class="QSpinBox" name="spinMemCtrl">
-           <property name="minimum">
-            <number>1</number>
-           </property>
-           <property name="maximum">
-            <number>3000</number>
-           </property>
-           <property name="value">
-            <number>100</number>
-           </property>
-          </widget>
-         </item>
-         <item row="7" column="5" colspan="2">
-          <widget class="QLabel" name="label_9">
+         <item row="1" column="7">
+          <widget class="QLabel" name="label_17">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
            <property name="text">
-            <string>Step size:</string>
+            <string>Error:</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
            </property>
           </widget>
          </item>
-         <item row="1" column="4" colspan="4">
+         <item row="0" column="7">
+          <widget class="QLabel" name="label_16">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Ref.:</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="9">
+          <widget class="QComboBox" name="comboRef">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <item>
+            <property name="text">
+             <string>X Accel</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Y Accel</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Z Accel</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>X Gyro</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Y Gyro</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Z Gyro</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="1" column="5">
           <widget class="QComboBox" name="comboControlChannel">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -326,133 +232,107 @@
            </item>
           </widget>
          </item>
-         <item row="2" column="7">
-          <widget class="QComboBox" name="comboRef">
+         <item row="1" column="8">
+          <widget class="QComboBox" name="comboIMUError">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
            <item>
             <property name="text">
-             <string>X-Axis Accelerometer</string>
+             <string>IMU 1</string>
             </property>
            </item>
            <item>
             <property name="text">
-             <string>Y-Axis Accelerometer</string>
+             <string>IMU 2</string>
             </property>
            </item>
            <item>
             <property name="text">
-             <string>Z-Axis Accelerometer</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>X-Axis Gyro</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Y-Axis Gyro</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Z-Axis Gyro</string>
+             <string>IMU 3</string>
             </property>
            </item>
           </widget>
          </item>
-         <item row="6" column="5" colspan="2">
-          <widget class="QLabel" name="label_12">
-           <property name="text">
-            <string>Memory size:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="7">
+         <item row="1" column="9">
           <widget class="QComboBox" name="comboErro">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
            <item>
             <property name="text">
-             <string>X-Axis Accelerometer</string>
+             <string>X Accel</string>
             </property>
            </item>
            <item>
             <property name="text">
-             <string>Y-Axis Accelerometer</string>
+             <string>Y Accel</string>
             </property>
            </item>
            <item>
             <property name="text">
-             <string>Z-Axis Accelerometer</string>
+             <string>Z Accel</string>
             </property>
            </item>
            <item>
             <property name="text">
-             <string>X-Axis Gyro</string>
+             <string>X Gyro</string>
             </property>
            </item>
            <item>
             <property name="text">
-             <string>Y-Axis Gyro</string>
+             <string>Y Gyro</string>
             </property>
            </item>
            <item>
             <property name="text">
-             <string>Z-Axis Gyro</string>
+             <string>Z Gyro</string>
             </property>
            </item>
           </widget>
          </item>
-         <item row="4" column="7">
-          <widget class="QComboBox" name="comboAlgoritmo">
-           <item>
-            <property name="text">
-             <string>FxNLMS</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>FxLMS</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>FxNLMS Modificado Proposto</string>
-            </property>
-           </item>
-          </widget>
-         </item>
-         <item row="7" column="7">
-          <widget class="QLineEdit" name="passoCtrl">
-           <property name="text">
-            <string>0.01</string>
+         <item row="1" column="4">
+          <widget class="QLabel" name="label_48">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
            </property>
-          </widget>
-         </item>
-         <item row="6" column="3" rowspan="3">
-          <widget class="QLabel" name="label_10">
            <property name="text">
-            <string>Parameters:</string>
+            <string>Control:</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
            </property>
           </widget>
          </item>
-         <item row="0" column="4" colspan="4">
+         <item row="0" column="4">
+          <widget class="QLabel" name="label_24">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Perturb.:</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="5">
           <widget class="QComboBox" name="comboPerturbChannel">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -479,6 +359,204 @@
            </item>
           </widget>
          </item>
+         <item row="0" column="3" rowspan="2">
+          <widget class="Line" name="line_4">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="2" rowspan="2">
+          <widget class="QCheckBox" name="checkControle">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Enable</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFrame" name="frame_7">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Sunken</enum>
+        </property>
+        <property name="lineWidth">
+         <number>0</number>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <property name="leftMargin">
+          <number>3</number>
+         </property>
+         <property name="topMargin">
+          <number>1</number>
+         </property>
+         <property name="rightMargin">
+          <number>5</number>
+         </property>
+         <property name="bottomMargin">
+          <number>1</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="label_8">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="locale">
+            <locale language="English" country="UnitedStates"/>
+           </property>
+           <property name="text">
+            <string>Algorithm:</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="checkAlgOn">
+           <property name="text">
+            <string>On ≥</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="spinTAlgOn">
+           <property name="minimumSize">
+            <size>
+             <width>50</width>
+             <height>0</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="comboAlgoritmo">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <item>
+            <property name="text">
+             <string>FxNLMS</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>FxLMS</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>FxNLMS Modificado Proposto</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFrame" name="frame_2">
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <property name="spacing">
+          <number>5</number>
+         </property>
+         <property name="leftMargin">
+          <number>3</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>5</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="label_12">
+           <property name="text">
+            <string>Memory size:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="spinMemCtrl">
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>3000</number>
+           </property>
+           <property name="value">
+            <number>100</number>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_9">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Step size:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="passoCtrl">
+           <property name="text">
+            <string>0.01</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_11">
+           <property name="text">
+            <string>Penalization:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="normCtrl">
+           <property name="text">
+            <string>1e-4</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </widget>
       </item>
@@ -488,19 +566,7 @@
   </layout>
  </widget>
  <tabstops>
-  <tabstop>checkControle</tabstop>
-  <tabstop>comboPerturbChannel</tabstop>
-  <tabstop>comboControlChannel</tabstop>
-  <tabstop>comboIMURef</tabstop>
-  <tabstop>comboRef</tabstop>
-  <tabstop>comboIMUError</tabstop>
-  <tabstop>comboErro</tabstop>
   <tabstop>checkAlgOn</tabstop>
-  <tabstop>spinTAlgOn</tabstop>
-  <tabstop>comboAlgoritmo</tabstop>
-  <tabstop>spinMemCtrl</tabstop>
-  <tabstop>passoCtrl</tabstop>
-  <tabstop>normCtrl</tabstop>
  </tabstops>
  <resources/>
  <connections/>

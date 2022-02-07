@@ -101,6 +101,8 @@ class mainwindow(QtWidgets.QMainWindow):
         # self.ui.normCtrl.setValidator(QtGui.QDoubleValidator(0.0, 1000.0, 2, self))
         # self.ui.normCtrl.editingFinished.connect(self.validateRegularization)
 
+        self.ui.notes.textChanged.connect(self.txtInputChanged)
+        self.maxNoteLength = 1000
         
         self.dataman.updateFigures.connect(self.updateFigs)
         self.dataman.reset.connect(self.dataReset)
@@ -148,6 +150,15 @@ class mainwindow(QtWidgets.QMainWindow):
             idx = int(msg[3:])
             self.loglist.append((tstamp,f"Gen{idx+1}|{self.genpanel[idx].getLogString()}"))
             # print(self.loglist[-1])
+
+    
+    def txtInputChanged(self):
+        txt = self.ui.notes.toPlainText()
+        if len(txt) > self.maxNoteLength:
+            self.ui.notes.setPlainText(txt[:self.maxNoteLength])
+            cursor = self.ui.notes.textCursor()
+            cursor.setPosition(self.maxNoteLength)
+            self.ui.notes.setTextCursor(cursor)
 
     def pFocus(self):
         self.ui.passoCtrl.selectAll()
@@ -508,6 +519,9 @@ class mainwindow(QtWidgets.QMainWindow):
         filename = QFileDialog.getSaveFileName(self, "Salvar Arquivo", getenv('HOME'), 'feather (*.feather)')
         if (filename[0] != ''):
             try:
+                notes = self.ui.notes.toPlainText()
+                if len(notes) > 0:
+                    self.loglist = [(0,notes)] + self.loglist
                 self.dataman.salvaArquivo(filename[0], True, loglist=self.loglist)
             except Exception as err:
                 QMessageBox.question(self.app, "Erro!", str(err), QMessageBox.Ok)

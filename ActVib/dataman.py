@@ -191,11 +191,11 @@ class dataman (QObject):
                     
             df = pd.DataFrame(thedict)   
 
-            df.to_feather(filename + "2")         
+            # df.to_feather(filename + "2")         
             
             # df.to_csv(filename)
             if loglist:
-                print(loglist)
+                # print(loglist)
                 df = pd.concat([df,pd.DataFrame({"Log":[" "]})],axis=1)
                 tempo = df["Tempo (s)"].values
                 idx = 0

@@ -260,6 +260,34 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_2.addWidget(self.controlFrame)
 
+        self.frame_4 = QFrame(self.frame11)
+        self.frame_4.setObjectName(u"frame_4")
+        self.frame_4.setFrameShape(QFrame.Box)
+        self.frame_4.setFrameShadow(QFrame.Sunken)
+        self.horizontalLayout_2 = QHBoxLayout(self.frame_4)
+        self.horizontalLayout_2.setSpacing(3)
+        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
+        self.horizontalLayout_2.setContentsMargins(3, 0, 0, 0)
+        self.label = QLabel(self.frame_4)
+        self.label.setObjectName(u"label")
+        self.label.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
+
+        self.horizontalLayout_2.addWidget(self.label)
+
+        self.notes = QTextEdit(self.frame_4)
+        self.notes.setObjectName(u"notes")
+        sizePolicy1.setHeightForWidth(self.notes.sizePolicy().hasHeightForWidth())
+        self.notes.setSizePolicy(sizePolicy1)
+        self.notes.setMinimumSize(QSize(0, 70))
+        self.notes.setMaximumSize(QSize(16777215, 70))
+        self.notes.setFrameShape(QFrame.NoFrame)
+        self.notes.setFrameShadow(QFrame.Plain)
+
+        self.horizontalLayout_2.addWidget(self.notes)
+
+
+        self.verticalLayout_2.addWidget(self.frame_4)
+
         self.frame_5 = QFrame(self.frame11)
         self.frame_5.setObjectName(u"frame_5")
         sizePolicy6 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
@@ -463,6 +491,7 @@ class Ui_MainWindow(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.canal2), QCoreApplication.translate("MainWindow", u"Output 2", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.canal3), QCoreApplication.translate("MainWindow", u"Output 3", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.canal4), QCoreApplication.translate("MainWindow", u"Output 4", None))
+        self.label.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p>Notes:</p></body></html>", None))
         self.tabSensors.setTabText(self.tabSensors.indexOf(self.imutab1), QCoreApplication.translate("MainWindow", u"IMU 1", None))
         self.tabSensors.setTabText(self.tabSensors.indexOf(self.imutab2), QCoreApplication.translate("MainWindow", u"IMU 2", None))
         self.tabSensors.setTabText(self.tabSensors.indexOf(self.imutab3), QCoreApplication.translate("MainWindow", u"IMU 3", None))
