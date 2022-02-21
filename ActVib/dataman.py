@@ -57,6 +57,7 @@ class dataman (QObject):
             # trd = Thread(target=self.updateFigs)
             # trd.start()
             ctrlmode = self.driver.controlMode
+            taskisctrl = self.driver.taskIsControl
             self.flagrodando = True
             self.driver.openSerial()
             self.driver.handshake()
@@ -69,11 +70,11 @@ class dataman (QObject):
             for k in range(4):
                 self.driver.writeGeneratorConfig(id=k)
                 time.sleep(0.1)
-            if ctrlmode:                
+            if ctrlmode and taskisctrl:  # If control on and control task is control (not path modelling)                
                 self.driver.writeControlConfig()
-                self.driver.setAlgOn(False, 0, forcewrite=True)
+                self.driver.setAlgOn(False, 0, forcewrite=True)                
                 self.driver.startControl()
-            else:             
+            else:
                 self.driver.startReadings()
             self.flagsaved = False
             self.ctreadings = 0
@@ -82,7 +83,7 @@ class dataman (QObject):
             if self.globalctreadings == 0:
                 self.globalstarttime = self.starttime
             timedelta = self.starttime - self.globalstarttime
-            self.logMessage.emit(timedelta,"Started")
+            self.logMessage.emit(timedelta,"Started")            
             while not self.flagparar:
                 self.driver.getReading()
                 self.readtime = self.ctreadings * self.samplingperiod + timedelta
@@ -111,6 +112,7 @@ class dataman (QObject):
                     lastfigrefresh = self.readtime
                     if self.driver.algonchanged and (self.readtime >= self.driver.algontime):
                         self.driver.writeAlgOn()
+                        self.logMessage.emit(self.readtime,"Alg")
                         # print("AlgOn!!!")
                     for k in range(4):
                         if not self.driver.genConfigWritten[k]:
@@ -166,8 +168,20 @@ class dataman (QObject):
                 'Referencia': self.xrefdata[0:limf],
                 'Erro': self.xerrodata[0:limf]
             })
-            # df.to_csv(filename,index=False)
+            
+            if loglist:
+                df = pd.concat([df,pd.DataFrame({"Log":[" "]})],axis=1)
+                tempo = df["Tempo (s)"].values
+                idx = 0
+                for item in loglist:
+                    while tempo[idx] < item[0]:
+                        idx += 1
+                        pass
+                    df.at[idx, "Log"] = item[1]
+                    idx += 1
+
             df.to_feather(filename)
+
         else:
             limf = self.globalctreadings
             thedict = {

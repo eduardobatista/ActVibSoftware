@@ -89,27 +89,45 @@ class ControlPanel(QtWidgets.QWidget,StateSaver):
         self.oldctrlpsi = float(self.ui.normCtrl.text())
         self.ui.comboControlChannel.activated.connect(self.controlChannelChanged)
         self.ui.comboPerturbChannel.activated.connect(self.perturbChannelChanged)
+        self.ui.comboCtrlTask.activated.connect(self.controlChanged)
     
     def controlChannelChanged(self):
         if self.ui.comboControlChannel.currentIndex() == self.ui.comboPerturbChannel.currentIndex():
             self.ui.comboPerturbChannel.setCurrentIndex( (self.ui.comboControlChannel.currentIndex() + 1) % 4 )
+        self.controlChanged()
     
     def perturbChannelChanged(self):
         if self.ui.comboControlChannel.currentIndex() == self.ui.comboPerturbChannel.currentIndex():
             self.ui.comboControlChannel.setCurrentIndex( (self.ui.comboPerturbChannel.currentIndex() + 1) % 4 )
+        self.controlChanged()
     
     def connectControlChanged(self,controlchangefunc):
         self.controlChangeFunc = controlchangefunc
     
     def isControlOn(self):
         return self.ui.checkControle.isChecked()
+
+    def isTaskControl(self):
+        return True if (self.ui.comboCtrlTask.currentIndex() == 0) else False
+
+    def getControlTask(self):
+        '''
+           Control Task: 0 = Active Control / 1 = Path Modelling 
+        '''
+        return self.ui.comboCtrlTask.currentIndex()
     
     def isAlgOn(self):
-        self.ui.checkAlgOn.isChecked()
+        return self.ui.checkAlgOn.isChecked()
     
-    def setEnabled(self,en):
-        cmps = [self.ui.checkControle,self.ui.comboRef,
-                self.ui.comboErro,self.ui.comboAlgoritmo,self.ui.spinMemCtrl]
+    def setEnabled(self,en,isreset=False):
+        cmps = [self.ui.comboRef,
+                self.ui.comboErro,self.ui.comboAlgoritmo,self.ui.spinMemCtrl,
+                self.ui.comboIMUError,self.ui.comboIMURef,
+                self.ui.comboPerturbChannel,self.ui.comboControlChannel]
+        if not self.isTaskControl():
+            cmps = cmps + [self.ui.checkAlgOn,self.ui.spinTAlgOn,self.ui.passoCtrl,self.ui.normCtrl]
+        if (not en) or (isreset and en):
+            cmps.append(self.ui.comboCtrlTask)
         for cc in cmps:
             cc.setEnabled(en)
 
@@ -148,6 +166,21 @@ class ControlPanel(QtWidgets.QWidget,StateSaver):
         }
         return data
 
+    def getLogString(self):
+        logstring = "Enabled" if self.ui.checkControle.isChecked() else "Disabled"
+        if logstring == "Enabled":
+            info = [self.ui.comboCtrlTask.currentText(), self.ui.comboPerturbChannel.currentText(), self.ui.comboControlChannel.currentText(),
+                    self.ui.comboIMURef.currentText(),self.ui.comboRef.currentText(),self.ui.comboIMUError.currentText(),self.ui.comboErro.currentText(),
+                    "AlgOn" if self.ui.checkAlgOn.isChecked() else "AlgOff",str(self.ui.spinTAlgOn.value()),self.ui.comboAlgoritmo.currentText(),
+                    str(self.ui.spinMemCtrl.value()),self.ui.passoCtrl.text(),self.ui.normCtrl.text()]
+            logstring = logstring + "|" + "|".join(info)
+        return logstring
+    
+    def getAlgOnLogString(self):
+        logstring = "AlgOn" if self.ui.checkAlgOn.isChecked() else "AlgOff"
+        if logstring == "AlgOn":
+            logstring = logstring + "|" + self.ui.passoCtrl.text() + "|" + self.ui.normCtrl.text() + "|" + self.ui.spinTAlgOn.text()
+        return logstring
 
 
 class GeneratorPanel(QtWidgets.QWidget,StateSaver):
@@ -165,7 +198,7 @@ class GeneratorPanel(QtWidgets.QWidget,StateSaver):
         self.ui.comboType.activated.connect(self.typechanged)
     
     def isGeneratorOn(self):
-        return self.ui.checkEnable.isEnabled()
+        return self.ui.checkEnable.isEnabled() and self.ui.checkEnable.isChecked()
 
     def typechanged(self):
         idx = self.ui.comboType.currentIndex()
@@ -200,7 +233,7 @@ class GeneratorPanel(QtWidgets.QWidget,StateSaver):
         self.ui.spinDCLevel.setEnabled(en)
     
     def getGeneratorConfig(self):
-        if self.ui.checkEnable.isChecked():
+        if self.isGeneratorOn():
             generatorconfig = {'tipo': self.ui.comboType.currentIndex(),
                                 'amp': self.ui.spinAmpl.value(),
                                 'freq': self.ui.spinFreq.value(),
@@ -216,7 +249,7 @@ class GeneratorPanel(QtWidgets.QWidget,StateSaver):
             return {'tipo': 0, 'amp': 0, 'freq': 0, 'dclevel': self.ui.spinDCLevel.value()}
     
     def getLogString(self):
-        logstring = "Enabled" if self.ui.checkEnable.isChecked() else "Disabled"
+        logstring = "Enabled" if self.isGeneratorOn() else "Disabled"
         if logstring == "Enabled":
             info = [self.ui.comboType.currentText(),
                     str(self.ui.spinAmpl.value()), str(self.ui.spinFreq.value()), str(self.ui.spinDCLevel.value())]

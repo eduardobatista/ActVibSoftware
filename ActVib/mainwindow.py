@@ -142,6 +142,7 @@ class mainwindow(QtWidgets.QMainWindow):
             self.loglist.append((tstamp,f"ADC|{self.adcpanel.getLogString()}"))
             for k,gen in enumerate(self.genpanel):                
                 self.loglist.append((tstamp,f"Gen{k+1}|{gen.getLogString()}"))   
+            self.loglist.append((tstamp,f"Ctrl|{self.ctrlpanel.getLogString()}"))
             # print( self.loglist )        
         elif msg == "Stopped":
             self.loglist.append((tstamp,msg))
@@ -149,6 +150,12 @@ class mainwindow(QtWidgets.QMainWindow):
         elif msg.startswith("Gen"):
             idx = int(msg[3:])
             self.loglist.append((tstamp,f"Gen{idx+1}|{self.genpanel[idx].getLogString()}"))
+            # print(self.loglist[-1])
+        elif msg == "Ctrl":
+            self.loglist.append((tstamp,f"Ctrl|{self.ctrlpanel.getLogString()}"))
+            # print(self.loglist[-1])
+        elif msg == "Alg":
+            self.loglist.append((tstamp,self.ctrlpanel.getAlgOnLogString()))
             # print(self.loglist[-1])
 
     
@@ -168,8 +175,8 @@ class mainwindow(QtWidgets.QMainWindow):
     def kSpace(self):
         if not self.dataman.flagrodando:
             self.bInit()
-        elif not self.ui.checkAlgOn.isChecked():
-            self.ui.checkAlgOn.setChecked(True)
+        elif not self.ctrlpanel.isAlgOn():
+            self.ctrlpanel.ui.checkAlgOn.setChecked(True)
         else:
             self.bInit()
 
@@ -340,20 +347,28 @@ class mainwindow(QtWidgets.QMainWindow):
         self.ctrlpanel.ui.spinTAlgOn.setEnabled(not algon)
 
 
-    def configControl(self):        
-        self.driver.controlMode = self.ctrlpanel.isControlOn()
+    def configControl(self):   
+        self.driver.setControlMode(self.ctrlpanel.isControlOn(),self.ctrlpanel.getControlTask())
         if self.driver.controlMode:
             self.driver.controlChannel = self.ctrlpanel.getControlChannel()
             self.driver.perturbChannel = self.ctrlpanel.getPerturbChannel()
-            for gg in self.genpanel:
-                gg.setEnabled(True)
-            self.genpanel[self.driver.controlChannel].setEnabled(False)
+            for k,gg in enumerate(self.genpanel):
+                if k == self.driver.controlChannel:
+                    gg.setEnabled(not self.driver.taskIsControl)
+                    self.ui.tabWidget.setTabText(k, f"Output {k+1} (Control)")
+                elif k == self.driver.perturbChannel:
+                    gg.setEnabled(self.driver.taskIsControl)
+                    self.ui.tabWidget.setTabText(k, f"Output {k+1} (Perturb.)")
+                else:
+                    gg.setEnabled(False)
+                    self.ui.tabWidget.setTabText(k, f"Output {k+1}")
             self.driver.setControlConfig( **self.ctrlpanel.getControlConfiguration() )
             if (self.mfig is not None):
                 self.ctrlfig.show()
                 self.mfig.hide()
         else:
-            for gg in self.genpanel:
+            for k,gg in enumerate(self.genpanel):
+                self.ui.tabWidget.setTabText(k,f"Output {k+1}")
                 gg.setEnabled(True)
             self.changeGeneratorConfig()
             if (self.ctrlfig is not None):
@@ -362,7 +377,11 @@ class mainwindow(QtWidgets.QMainWindow):
 
 
     def plotOutConfig(self):
-        self.ofig.dacenable = [aa.isGeneratorOn() for aa in self.genpanel]
+        if self.ctrlpanel.isControlOn() and self.ctrlpanel.isTaskControl():
+            self.ofig.dacenable = [True,True,False,False]
+        else: 
+            self.ofig.dacenable = [aa.isGeneratorOn() for aa in self.genpanel]
+        # print(self.ofig.dacenable)
 
 
     def plotConfig(self):
@@ -429,7 +448,7 @@ class mainwindow(QtWidgets.QMainWindow):
             for cc in self.disabledwhenrunning: 
                 cc.setEnabled(False)
 
-            if self.ctrlpanel.isControlOn():
+            if self.ctrlpanel.isControlOn() and self.ctrlpanel.isTaskControl():
                 self.ctrlpanel.ui.checkAlgOn.setEnabled(True)
 
             if (self.driver.adcconfig[0] & 0x0F) == 0:
@@ -468,6 +487,7 @@ class mainwindow(QtWidgets.QMainWindow):
         else:
             self.dataman.ResetaDados(self.TSampling/1000)
             self.ui.statusbar.clearMessage()
+        self.ctrlpanel.setEnabled(True,isreset=True)
 
     def setSampling(self, selsampling):
         if self.dataman.flagrodando or (not self.dataman.flagsaved):

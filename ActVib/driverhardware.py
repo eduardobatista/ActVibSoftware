@@ -49,6 +49,7 @@ class driverhardware:
         if self.serial.isOpen():
             self.serial.close()
         self.controlMode = False
+        self.taskIsControl = 0  # True for Control, False for Path Modelling
         self.controlChannel = 0
         self.perturbChannel = 0
         self.ctrlalg = 0
@@ -74,6 +75,17 @@ class driverhardware:
 
     def openSerial(self):
         self.serial.open()
+
+    
+    def setControlMode(self,mode=False,task=0):
+        self.controlMode = mode
+        if mode == False:  # if control is off
+            self.taskIsControl = True
+        else:
+            if task == 0:
+                self.taskIsControl = True
+            else:
+                self.taskIsControl = False
 
 
     def setGeneratorConfig(self, id=0, tipo=0, amp=0.0, freq=10.0, dclevel=128, chirpconf=[0, 0, 0, 0, 0]):
@@ -333,7 +345,7 @@ class driverhardware:
             ctaux = ctaux + 1
         if ctaux == 64:
             raise Exception('Falha na leitura de pacote: cabeçalho não encontrado.')
-        if self.controlMode:
+        if self.controlMode and self.taskIsControl:
             buf = self.serial.read(20)
             self.dacout[0] = float(struct.unpack_from(">H",buf,0)[0]) * self.iampscaler[self.perturbChannel] - 1.0
             self.dacout[1] = float(struct.unpack_from(">H",buf,2)[0]) * self.iampscaler[self.controlChannel] - 1.0
@@ -344,7 +356,7 @@ class driverhardware:
             self.calctime[2] = (struct.unpack_from(">H",buf,17)[0] << 4) / 240
             self.errorflag = struct.unpack_from("B",buf,19)[0]
             if self.errorflag != 0:
-                print(self.errorflag)
+                print(self.errorflag)  # TODO: generate error message in UI.
         else:
             buf = self.serial.read(self.readsize)
             for j in range(3):
@@ -360,7 +372,16 @@ class driverhardware:
                             self.gyroreadings[j][k] = float(struct.unpack_from("<h",buf,2*k+ptr)[0]) * self.gyroscaler[j]
                         for k in range(3): 
                             self.accreadings[j][k] = float(struct.unpack_from("<h",buf,2*k+6+ptr)[0]) * self.accscaler[j]
-                        ptr += 12    
+                        ptr += 12  
+            if (not self.taskIsControl):
+                if self.refid > 2:
+                    self.xref = self.gyroreadings[self.refimuid][self.refid-3]
+                else:
+                    self.xref = self.accreadings[self.refimuid][self.refid]
+                if self.erroid > 2:
+                    self.xerro = self.gyroreadings[self.errimuid][self.erroid-3]
+                else:
+                    self.xerro = self.accreadings[self.errimuid][self.erroid]
             self.dacout[0] = float(struct.unpack_from(">H",buf,ptr)[0]) * self.iampscaler[0] - 1.0
             self.dacout[1] = float(struct.unpack_from(">H",buf,ptr+2)[0]) * self.iampscaler[1] - 1.0
             self.dacout[2] = float(buf[ptr+4]) * self.iampscaler[2] - 1.0
@@ -375,5 +396,5 @@ class driverhardware:
             self.calctime[2] = (struct.unpack_from(">H",buf,ptr+4)[0] << 4) / 240
             self.errorflag = struct.unpack_from("B",buf,ptr+6)[0]
             if self.errorflag != 0:
-                print(self.errorflag)
+                print(self.errorflag)  # TODO: generate error message in UI.
             # print(self.calctime)

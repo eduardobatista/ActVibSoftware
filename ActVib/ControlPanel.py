@@ -166,6 +166,13 @@ class Ui_ControlForm(object):
 
         self.gridLayout.addWidget(self.line_4, 0, 3, 2, 1)
 
+        self.comboCtrlTask = QComboBox(self.frame)
+        self.comboCtrlTask.addItem("")
+        self.comboCtrlTask.addItem("")
+        self.comboCtrlTask.setObjectName(u"comboCtrlTask")
+
+        self.gridLayout.addWidget(self.comboCtrlTask, 1, 1, 1, 1)
+
         self.checkControle = QCheckBox(self.frame)
         self.checkControle.setObjectName(u"checkControle")
         sizePolicy3 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Minimum)
@@ -174,7 +181,7 @@ class Ui_ControlForm(object):
         sizePolicy3.setHeightForWidth(self.checkControle.sizePolicy().hasHeightForWidth())
         self.checkControle.setSizePolicy(sizePolicy3)
 
-        self.gridLayout.addWidget(self.checkControle, 0, 2, 2, 1)
+        self.gridLayout.addWidget(self.checkControle, 0, 1, 1, 1)
 
 
         self.verticalLayout.addWidget(self.frame)
@@ -324,6 +331,9 @@ class Ui_ControlForm(object):
         self.comboPerturbChannel.setItemText(1, QCoreApplication.translate("ControlForm", u"Output 2", None))
         self.comboPerturbChannel.setItemText(2, QCoreApplication.translate("ControlForm", u"Output 3", None))
         self.comboPerturbChannel.setItemText(3, QCoreApplication.translate("ControlForm", u"Output 4", None))
+
+        self.comboCtrlTask.setItemText(0, QCoreApplication.translate("ControlForm", u"Control", None))
+        self.comboCtrlTask.setItemText(1, QCoreApplication.translate("ControlForm", u"Path Modelling", None))
 
         self.checkControle.setText(QCoreApplication.translate("ControlForm", u"Enable", None))
         self.label_8.setText(QCoreApplication.translate("ControlForm", u"Algorithm:", None))
