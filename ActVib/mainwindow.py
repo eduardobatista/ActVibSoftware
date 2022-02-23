@@ -366,6 +366,7 @@ class mainwindow(QtWidgets.QMainWindow):
             if (self.mfig is not None):
                 self.ctrlfig.show()
                 self.mfig.hide()
+            self.plotcfgpanel.setEnabled(False)
         else:
             for k,gg in enumerate(self.genpanel):
                 self.ui.tabWidget.setTabText(k,f"Output {k+1}")
@@ -374,6 +375,7 @@ class mainwindow(QtWidgets.QMainWindow):
             if (self.ctrlfig is not None):
                 self.mfig.show()
                 self.ctrlfig.hide()
+            self.plotcfgpanel.setEnabled(True)
 
 
     def plotOutConfig(self):

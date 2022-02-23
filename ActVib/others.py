@@ -106,7 +106,7 @@ class MyUploadDialog():
             self.driver.openSerial()
             self.driver.handshake()
             self.driver.gravaFlash()
-            self.uploaddialog.ui.status.setText("Gravação na flash concluída!")
+            self.uploaddialog.ui.status.setText("Successfully written in flash!")
             self.driver.stopReadings()
         except Exception as err:
             if self.driver.serial.isOpen():
@@ -120,33 +120,33 @@ class MyUploadDialog():
             if self.uploaddialog.ui.comboTipo.currentIndex() == 0:
                 dataf = pd.read_feather(fname)
                 if (dataf.columns[0] != 'wsec') or (dataf.columns[1] != 'wfbk'):
-                    raise Exception("Dataframe inválida.")
+                    raise Exception("Invalid dataframe.")
                 datasize = dataf.wsec.values.shape[0]
                 if datasize > 3000:
-                    raise Exception("Caminho com mais de 3000 amostras.")
+                    raise Exception("Path having more than 3000 samples.")
                 self.driver.openSerial()
                 self.driver.handshake()
                 self.driver.gravaCaminho('s', dataf.wsec.values, self.uploaddialog.ui.progressBar)
                 self.driver.handshake()
                 self.driver.gravaCaminho('f', dataf.wfbk.values, self.uploaddialog.ui.progressBar)
-                self.uploaddialog.ui.status.setText("Gravação concluída!")
+                self.uploaddialog.ui.status.setText("Upload finished!")
                 self.driver.stopReadings()
             else:
                 dataf = pd.read_csv(fname)
                 datasize = dataf.values.shape[0]
                 if datasize > 3000:
-                    raise Exception("Caminho com mais de 3000 amostras.")
+                    raise Exception("Path having more than 3000 samples.")
                 datatitle = dataf.columns[0]
                 if (datatitle == 'wsec') and (self.uploaddialog.ui.comboTipo.currentIndex() == 1):
                     tipo = 's'
                 elif (datatitle == 'wfbk') and (self.uploaddialog.ui.comboTipo.currentIndex() == 2):
                     tipo = 'f'
                 else:
-                    raise Exception("Comb. título da coluna e dados incorreta.")
+                    raise Exception("Incorrect combination between column title and data.")
                 self.driver.openSerial()
                 self.driver.handshake()
                 self.driver.gravaCaminho(tipo, dataf.values.reshape((1, -1))[0], self.uploaddialog.ui.progressBar)
-                self.uploaddialog.ui.status.setText("Gravação concluída!")
+                self.uploaddialog.ui.status.setText("Upload finished!")
                 self.driver.stopReadings()
         except Exception as err:
             if self.driver.serial.isOpen():
@@ -168,13 +168,13 @@ class CtrlFigQtGraph(BaseFigQtGraph):
     def plotSetup(self, sensorids=[0, 6]):
         for k in range(2):
             self.pitens[k].disableAutoRange()
-            self.pitens[k].setLabel('bottom', 'Tempo (s)')
+            self.pitens[k].setLabel('bottom', 'Time (s)')
             if (sensorids[k] % 6) < 3:
-                self.pitens[k].setLabel('left', 'Aceleração (m/s²)')
+                self.pitens[k].setLabel('left', f'{"Reference" if k == 0 else "Error"}<br>Acceleration (m/s²)')
                 # self.miny[k] = -0.25
                 # self.maxy[k] = 0.25
             else:
-                self.pitens[k].setLabel('left', 'Gyro (degrees/s)')
+                self.pitens[k].setLabel('left', f'{"Reference" if k == 0 else "Error"}<br>Gyro (dg/s)')
                 # self.miny[k] = -10
                 # self.maxy[k] = 10
             self.pitens[k].setXRange(-self.janelax[k], 0, padding=0.01)
@@ -220,8 +220,8 @@ class MyFigQtGraph(BaseFigQtGraph):
             pitem.disableAutoRange()
             pitem.setXRange(-self.janelax[k], 0, padding=0.01)
             pitem.setYRange(self.miny[k], self.maxy[k], padding=0.01)
-            pitem.setLabel('bottom', 'Tempo (s)')
-        self.pitens[0].setLabel('left', 'Acceleration (m/s2)')
+            pitem.setLabel('bottom', 'Time (s)')
+        self.pitens[0].setLabel('left', 'Accel. (m/s²)')
         self.pitens[1].setLabel('left', 'Gyro (dg/s)')
         self.pitens[2].setLabel('left', 'ADC (Volts)')
         self.accEnable = [True, True, True]
@@ -287,8 +287,8 @@ class FigOutputQtGraph(BaseFigQtGraph):
         self.pitem.disableAutoRange()
         self.pitem.setXRange(-self.janelax[0], 0, padding=0.01)
         self.pitem.setYRange(self.miny[0], self.maxy[0], padding=0.01)
-        self.pitem.setLabel('bottom', 'Tempo (s)')
-        self.pitem.setLabel('left', 'Saída (normalizada)')
+        self.pitem.setLabel('bottom', 'Time (s)')
+        self.pitem.setLabel('left', 'Normalized output')
         self.oldctr = 0
         self.dacenable = [True, False, False, False]
 

@@ -17,7 +17,7 @@ class Ui_Dialog(object):
     def setupUi(self, Dialog):
         if not Dialog.objectName():
             Dialog.setObjectName(u"Dialog")
-        Dialog.resize(450, 207)
+        Dialog.resize(450, 216)
         sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -94,15 +94,15 @@ class Ui_Dialog(object):
     # setupUi
 
     def retranslateUi(self, Dialog):
-        Dialog.setWindowTitle(QCoreApplication.translate("Dialog", u"Dialog", None))
+        Dialog.setWindowTitle(QCoreApplication.translate("Dialog", u"Path Upload", None))
         self.status.setText("")
         self.bAbre.setText(QCoreApplication.translate("Dialog", u"...", None))
-        self.bGravar.setText(QCoreApplication.translate("Dialog", u"Fazer Upload ...", None))
-        self.label.setText(QCoreApplication.translate("Dialog", u"Escolhar o arquivo:", None))
-        self.comboTipo.setItemText(0, QCoreApplication.translate("Dialog", u"Ambos", None))
-        self.comboTipo.setItemText(1, QCoreApplication.translate("Dialog", u"Caminho Secund\u00e1rio", None))
-        self.comboTipo.setItemText(2, QCoreApplication.translate("Dialog", u"Caminho de FeedBack", None))
+        self.bGravar.setText(QCoreApplication.translate("Dialog", u"Upload data...", None))
+        self.label.setText(QCoreApplication.translate("Dialog", u"Choose file:", None))
+        self.comboTipo.setItemText(0, QCoreApplication.translate("Dialog", u"Both Secondary and Feedback Paths", None))
+        self.comboTipo.setItemText(1, QCoreApplication.translate("Dialog", u"Secondary Path", None))
+        self.comboTipo.setItemText(2, QCoreApplication.translate("Dialog", u"Feedback Path", None))
 
-        self.bGravaFlash.setText(QCoreApplication.translate("Dialog", u"Gravar em Definitivo na Flash", None))
+        self.bGravaFlash.setText(QCoreApplication.translate("Dialog", u"Record in Flash", None))
     # retranslateUi
 

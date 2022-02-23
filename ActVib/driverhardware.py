@@ -331,6 +331,7 @@ class driverhardware:
                     self.serial.write(bytearray(struct.pack("f", w)))
                 buf = self.serial.read(2)
                 pbar.setValue(pbar.value() + (bb[0] << 8) + bb[1])
+        pbar.setValue(dados.shape[0] - 2)
     
 
     def getReading(self):

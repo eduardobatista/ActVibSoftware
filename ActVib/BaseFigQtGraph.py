@@ -24,7 +24,7 @@ class BaseFigQtGraph(GraphicsLayoutWidget):
             pi.hideButtons()
             pi.setMouseEnabled(False, True)
             pi.setMenuEnabled(True, None)
-            pi.setClipToView(True)
+            pi.setClipToView(True)            
         self.samplingperiod = samplingperiod
         self.janelax, self.miny, self.maxy, self.autoy, self.vetoreixox, self.npontosjanela = [], [], [], [], [], []
         for k in range(len(self.pitens)):

@@ -277,6 +277,11 @@ class PlotCfgPanel(QtWidgets.QWidget,StateSaver):
         return [self.ui.checkGyroX.isChecked(),
                 self.ui.checkGyroY.isChecked(),
                 self.ui.checkGyroZ.isChecked()]
+    
+    def setEnabled(self, en):
+        comps = self.checks + [self.ui.comboPlot1,self.ui.comboPlot2]
+        for cc in comps:
+            cc.setEnabled(en)
 
 class IMUPanel(QtWidgets.QWidget,StateSaver):
 
