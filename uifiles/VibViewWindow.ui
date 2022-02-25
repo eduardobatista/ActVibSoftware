@@ -843,6 +843,7 @@
     </widget>
     <addaction name="actionSalvar_dados"/>
     <addaction name="actionUpload"/>
+    <addaction name="actionPathModeling"/>
     <addaction name="menuSelecionar_Porta"/>
     <addaction name="menuSampling_Rate"/>
     <addaction name="separator"/>
@@ -973,6 +974,11 @@
   <action name="action5_ms">
    <property name="text">
     <string>5 ms</string>
+   </property>
+  </action>
+  <action name="actionPathModeling">
+   <property name="text">
+    <string>Path modeling...</string>
    </property>
   </action>
  </widget>

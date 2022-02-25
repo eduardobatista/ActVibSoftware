@@ -9,7 +9,7 @@ from PySide2.QtWidgets import QMessageBox, QFileDialog, QCheckBox, QComboBox, QD
 
 from .VibViewWindow import Ui_MainWindow
 
-from .others import (MyFigQtGraph, CtrlFigQtGraph, FigOutputQtGraph, WorkdirManager, MyUploadDialog)
+from .others import (MyFigQtGraph, CtrlFigQtGraph, FigOutputQtGraph, WorkdirManager, MyUploadDialog, MyPathModelingDialog)
 
 from .panels import (IMUPanel,GeneratorPanel,PlotCfgPanel,ControlPanel,ADCPanel)
 
@@ -54,6 +54,7 @@ class mainwindow(QtWidgets.QMainWindow):
         self.ui.actionSalvar_dados.triggered.connect(self.saveDialog)
         self.ui.actionUpload.triggered.connect(self.openUploadDialog)
         self.ui.actionWorkdirManager.triggered.connect(self.openWorkdirManager)
+        self.ui.actionPathModeling.triggered.connect(self.openPathModelingDialog)
         
         # IMU Connections:        
         self.ui.imutab1.layout().addWidget(self.imupanel[0])
@@ -533,6 +534,11 @@ class mainwindow(QtWidgets.QMainWindow):
             self.driver.setPort(self.porta)
             self.upd = MyUploadDialog(self.driver)
             self.upd.showUploadDialog()
+
+    def openPathModelingDialog(self):
+        if not self.dataman.flagrodando:
+            self.pmd = MyPathModelingDialog(self.dataman)
+            self.pmd.showPathModelingdDialog()
 
     def saveDialog(self):
         if self.dataman.flagrodando:

@@ -91,16 +91,22 @@ class dataman (QObject):
                 if ctrlmode:
                     self.xrefdata[self.globalctreadings] = self.driver.xref
                     self.xerrodata[self.globalctreadings] = self.driver.xerro
+                    if taskisctrl:
+                        self.dacoutdata[0][self.globalctreadings] = self.driver.dacout[0]
+                        self.dacoutdata[1][self.globalctreadings] = self.driver.dacout[1]
+                    else:   
+                        self.dacoutdata[0][self.globalctreadings] = self.driver.dacout[self.driver.perturbChannel]
+                        self.dacoutdata[1][self.globalctreadings] = self.driver.dacout[self.driver.controlChannel]
                 else:
                     for j in range(3):
                         if self.driver.IMUEnableFlags[j]:
                             for k in range(3):
                                 self.accdata[j][k][self.globalctreadings] = self.driver.accreadings[j][k]
                                 self.gyrodata[j][k][self.globalctreadings] = self.driver.gyroreadings[j][k]
-                self.dacoutdata[0][self.globalctreadings] = self.driver.dacout[0]
-                self.dacoutdata[1][self.globalctreadings] = self.driver.dacout[1]
-                self.dacoutdata[2][self.globalctreadings] = self.driver.dacout[2]
-                self.dacoutdata[3][self.globalctreadings] = self.driver.dacout[3]
+                    self.dacoutdata[0][self.globalctreadings] = self.driver.dacout[0]
+                    self.dacoutdata[1][self.globalctreadings] = self.driver.dacout[1]
+                    self.dacoutdata[2][self.globalctreadings] = self.driver.dacout[2]
+                    self.dacoutdata[3][self.globalctreadings] = self.driver.dacout[3]
                 for k in range(4):
                     # if self.driver.adcenablemap[k] != 0:
                     self.adcdata[k][self.globalctreadings] = self.driver.adcin[k]
@@ -162,22 +168,22 @@ class dataman (QObject):
         if self.driver.controlMode:
             limf = self.globalctreadings
             df = pd.DataFrame({
-                'Tempo (s)': self.timereads[0:limf],
-                'Perturbacao': self.dacoutdata[0][0:limf],
-                'Controle': self.dacoutdata[1][0:limf],
-                'Referencia': self.xrefdata[0:limf],
-                'Erro': self.xerrodata[0:limf]
+                'time': self.timereads[0:limf],
+                'perturb': self.dacoutdata[0][0:limf],
+                'ctrl': self.dacoutdata[1][0:limf],
+                'ref': self.xrefdata[0:limf],
+                'err': self.xerrodata[0:limf]
             })
             
             if loglist:
-                df = pd.concat([df,pd.DataFrame({"Log":[" "]})],axis=1)
-                tempo = df["Tempo (s)"].values
+                df = pd.concat([df,pd.DataFrame({"log":[" "]})],axis=1)
+                tempo = df["time"].values
                 idx = 0
                 for item in loglist:
                     while tempo[idx] < item[0]:
                         idx += 1
                         pass
-                    df.at[idx, "Log"] = item[1]
+                    df.at[idx, "log"] = item[1]
                     idx += 1
 
             df.to_feather(filename)
@@ -185,23 +191,23 @@ class dataman (QObject):
         else:
             limf = self.globalctreadings
             thedict = {
-                "Tempo (s)": self.timereads[0:limf],                
-                "DAC 1": self.dacoutdata[0][0:limf],
-                "DAC 2": self.dacoutdata[1][0:limf],
-                "DAC 3": self.dacoutdata[2][0:limf],
-                "DAC 4": self.dacoutdata[3][0:limf]                
+                "time": self.timereads[0:limf],                
+                "dac1": self.dacoutdata[0][0:limf],
+                "dac2": self.dacoutdata[1][0:limf],
+                "dac3": self.dacoutdata[2][0:limf],
+                "dac4": self.dacoutdata[3][0:limf]                
             }
             if (self.driver.adcconfig[0] & 0x0F) > 0:
                 for k in range(4):
-                    thedict[f"ADC {k+1}.{self.driver.adcseq[k]+1}"] = self.adcdata[k][0:limf]
+                    thedict[f"adc{k+1}.{self.driver.adcseq[k]+1}"] = self.adcdata[k][0:limf]
             for k in range(3):
                 if self.driver.IMUEnableFlags[k]:
-                    thedict[f"IMU{k+1}AccX"] = self.accdata[k][0][0:limf]
-                    thedict[f"IMU{k+1}AccY"] = self.accdata[k][1][0:limf]
-                    thedict[f"IMU{k+1}AccZ"] = self.accdata[k][2][0:limf]
-                    thedict[f"IMU{k+1}GyroX"] = self.gyrodata[k][0][0:limf]
-                    thedict[f"IMU{k+1}GyroY"] = self.gyrodata[k][1][0:limf]
-                    thedict[f"IMU{k+1}GyroZ"] = self.gyrodata[k][2][0:limf]
+                    thedict[f"imu{k+1}accx"] = self.accdata[k][0][0:limf]
+                    thedict[f"imu{k+1}accy"] = self.accdata[k][1][0:limf]
+                    thedict[f"imu{k+1}accz"] = self.accdata[k][2][0:limf]
+                    thedict[f"imu{k+1}gyrox"] = self.gyrodata[k][0][0:limf]
+                    thedict[f"imu{k+1}gyroy"] = self.gyrodata[k][1][0:limf]
+                    thedict[f"imu{k+1}gyroz"] = self.gyrodata[k][2][0:limf]
                     
             df = pd.DataFrame(thedict)   
 
@@ -210,14 +216,14 @@ class dataman (QObject):
             # df.to_csv(filename)
             if loglist:
                 # print(loglist)
-                df = pd.concat([df,pd.DataFrame({"Log":[" "]})],axis=1)
+                df = pd.concat([df,pd.DataFrame({"log":[" "]})],axis=1)
                 tempo = df["Tempo (s)"].values
                 idx = 0
                 for item in loglist:
                     while tempo[idx] < item[0]:
                         idx += 1
                         pass
-                    df.at[idx, "Log"] = item[1]
+                    df.at[idx, "log"] = item[1]
                     idx += 1
                 # for item in loglist:
                 #     if item[0] == 0:

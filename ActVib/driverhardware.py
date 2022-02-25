@@ -180,7 +180,7 @@ class driverhardware:
             raise Exception(f'Error writing sampling rate.')
         
 
-    def writeGeneratorConfig(self, id=0):
+    def writeGeneratorConfig(self, id=0):        
         freqaux = [int(self.genfreq[id]), int(round((self.genfreq[id] - int(self.genfreq[id])) * 100))]
         if id < 2:  # Saída de 12 bits, MCP4725
             ampaux = int(round(self.genamp[id] * 2047))
@@ -348,8 +348,8 @@ class driverhardware:
             raise Exception('Falha na leitura de pacote: cabeçalho não encontrado.')
         if self.controlMode and self.taskIsControl:
             buf = self.serial.read(20)
-            self.dacout[0] = float(struct.unpack_from(">H",buf,0)[0]) * self.iampscaler[self.perturbChannel] - 1.0
-            self.dacout[1] = float(struct.unpack_from(">H",buf,2)[0]) * self.iampscaler[self.controlChannel] - 1.0
+            self.dacout[0] = float(struct.unpack_from(">h",buf,0)[0]) * self.iampscaler[self.perturbChannel] #- 1.0
+            self.dacout[1] = float(struct.unpack_from(">h",buf,2)[0]) * self.iampscaler[self.controlChannel] #- 1.0
             self.xref = struct.unpack_from("f",buf,4)[0]
             self.xerro = struct.unpack_from("f",buf,8)[0]
             self.calctime[0] = (struct.unpack_from(">H",buf,13)[0] << 4) / 240 # (((self.buf[13] << 8) + self.buf[14]) << 4) / 240
@@ -383,10 +383,10 @@ class driverhardware:
                     self.xerro = self.gyroreadings[self.errimuid][self.erroid-3]
                 else:
                     self.xerro = self.accreadings[self.errimuid][self.erroid]
-            self.dacout[0] = float(struct.unpack_from(">H",buf,ptr)[0]) * self.iampscaler[0] - 1.0
-            self.dacout[1] = float(struct.unpack_from(">H",buf,ptr+2)[0]) * self.iampscaler[1] - 1.0
-            self.dacout[2] = float(buf[ptr+4]) * self.iampscaler[2] - 1.0
-            self.dacout[3] = float(buf[ptr+5]) * self.iampscaler[3] - 1.0
+            self.dacout[0] = float(struct.unpack_from(">h",buf,ptr)[0]) * self.iampscaler[0] # - 1.0
+            self.dacout[1] = float(struct.unpack_from(">h",buf,ptr+2)[0]) * self.iampscaler[1] # - 1.0
+            self.dacout[2] = float(struct.unpack_from(">b",buf,ptr+4)[0]) * self.iampscaler[2] # - 1.0
+            self.dacout[3] = float(struct.unpack_from(">b",buf,ptr+5)[0]) * self.iampscaler[3] # - 1.0
             ptr += 6
             if (self.adcconfig[0] & 0x0F) > 0:
                 for k in range(4):

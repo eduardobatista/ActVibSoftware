@@ -14,7 +14,8 @@ import pyqtgraph as pg
 from .BaseFigQtGraph import BaseFigQtGraph
 from .WorkdirDialog import Ui_Dialog as WorkdirDialog
 from .UploadDialog import Ui_Dialog as UploadDialog
-
+from .PathModeling import Ui_PathModelingDialog as PathModelingDialog
+from .Adaptive import FIRNLMS
 
 class WorkdirManager():
 
@@ -75,6 +76,67 @@ class WorkdirManager():
             if orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole:
                 return self._data.columns[col]
             return None
+
+
+
+class MyPathModelingDialog():
+
+    def __init__(self,dataman):
+        self.dataman = dataman
+        self.pdialog = QDialog()
+        self.pdialog.ui = PathModelingDialog()
+        self.pdialog.ui.setupUi(self.pdialog)
+        self.endtime = np.ceil(self.dataman.timereads[self.dataman.globalctreadings-1])
+        print(self.endtime)
+        self.pdialog.ui.spinStartTime.setValue(0.0)
+        # self.endtime = 200.0
+        self.pdialog.ui.spinEndTime.setMaximum(self.endtime)
+        self.pdialog.ui.spinEndTime.setValue(self.endtime)
+        self.pdialog.ui.bRunModeling.clicked.connect(self.runModeling)
+        self.gwidget = pg.GraphicsLayoutWidget()
+        self.pdialog.ui.plotLayout.addWidget(self.gwidget)
+        # self.pdialog.ui.bAbre.clicked.connect(self.abreArquivo)
+        # self.pdialog.ui.progressBar.setValue(0)
+        
+        # self.pdialog.ui.bGravaFlash.clicked.connect(self.gravaFlash)
+
+    def showPathModelingdDialog(self):
+        self.pdialog.exec_()
+
+    def runModeling(self):
+        psi = float(self.pdialog.ui.textPenalization.text())
+        mu = float(self.pdialog.ui.textStepSize.text())
+        N = self.pdialog.ui.spinMemSize.value()
+        Navg = self.pdialog.ui.spinAveraging.value()
+        endtime = self.pdialog.ui.spinEndTime.value()
+        starttime = self.pdialog.ui.spinStartTime.value()
+        limf = self.dataman.globalctreadings
+        timemask = (self.dataman.timereads[0:limf] >= starttime) & (self.dataman.timereads[0:limf] <= endtime)
+        print(timemask)
+        x = self.dataman.dacoutdata[1][0:limf][timemask]
+        dfbk = self.dataman.xrefdata[0:limf][timemask]
+        dsec = self.dataman.xerrodata[0:limf][timemask]
+
+        filt = FIRNLMS(N,mu,psi,Navg)
+        filt.run(x,dfbk)
+        self.wfbk = filt.wwavg
+        filt2 = FIRNLMS(N,mu,psi,Navg)
+        filt2.run(x,dsec)
+        self.wsec = filt2.wwavg
+
+        item = self.gwidget.getItem(0,0)
+        if item is not None:
+            self.gwidget.removeItem(item)
+        item2 = self.gwidget.getItem(1,0)
+        if item2 is not None:
+            self.gwidget.removeItem(item2)
+        myplot1 = self.gwidget.addPlot(row=0,col=0)
+        myplot1.plot(self.wsec)
+        myplot2 = self.gwidget.addPlot(row=1,col=0)
+        myplot2.plot(self.wfbk)
+
+        # print(self.wsec)
+
 
 
 class MyUploadDialog():

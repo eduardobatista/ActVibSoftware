@@ -16,3 +16,4 @@ pyside2-uic --output=..\ActVib\GeneratorPanel.py GeneratorPanel.ui
 pyside2-uic --output=..\ActVib\PlotCfgPanel.py PlotCfgPanel.ui
 pyside2-uic --output=..\ActVib\ControlPanel.py ControlPanel.ui
 pyside2-uic --output=..\ActVib\ADCPanel.py ADCPanel.ui
+pyside2-uic --output=..\ActVib\PathModeling.py PathModeling.ui
