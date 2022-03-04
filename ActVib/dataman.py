@@ -41,6 +41,7 @@ class dataman (QObject):
         self.xerrodata = np.zeros(self.wsize)
         self.maxtime = int(self.wsize * self.samplingperiod)
         self.realtime = 0.0
+        self.hasPaths = False
 
     def ParaLeituras(self):
         self.flagparar = True

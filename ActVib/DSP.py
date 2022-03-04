@@ -1,5 +1,19 @@
 import numpy as np
 
+def easyFourier(x: np.ndarray, fs: float = 1.0):
+  """
+    Evaluate the magnitude Fourier spectrum in dB using the FFT.
+    Parameters:
+      x: vector containing the signal in time.
+      fs: the sampling frequency. 
+    Returns: (magdb,freqvec)
+      magdb: vector containing the magnitude samples of the fft (dB).
+      freqs: vector containing the frequency values (Hz).
+  """
+  nsamples = x.shape[0]
+  magdb = 20*np.log10( 2*np.abs(np.fft.fft(x)/nsamples)[0:int(np.floor(nsamples/2))] )
+  freqs = (np.fft.fftfreq(nsamples) * fs)[0:magdb.shape[0]]
+  return magdb,freqs
 
 class FIRNLMS:    
 

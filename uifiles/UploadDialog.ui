@@ -96,17 +96,22 @@
     <widget class="QComboBox" name="comboTipo">
      <item>
       <property name="text">
-       <string>Both Secondary and Feedback Paths</string>
+       <string>Both Secondary and Feedback Paths (from File)</string>
       </property>
      </item>
      <item>
       <property name="text">
-       <string>Secondary Path</string>
+       <string>Both Secondary and Feedback Paths (from Memory)</string>
       </property>
      </item>
      <item>
       <property name="text">
-       <string>Feedback Path</string>
+       <string>Secondary Path (from File)</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Feedback Path  (from File)</string>
       </property>
      </item>
     </widget>

@@ -6,7 +6,7 @@ from PySide2 import QtWidgets
 from .mainwindow import mainwindow
 from .driverhardware import driverhardware
 from .dataman import dataman
-from .others import MyFigQtGraph
+from .figures import MyFigQtGraph
 
 app = QtWidgets.QApplication([])
 app.setStyle('Fusion')

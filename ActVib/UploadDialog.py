@@ -76,6 +76,7 @@ class Ui_Dialog(object):
         self.comboTipo.addItem("")
         self.comboTipo.addItem("")
         self.comboTipo.addItem("")
+        self.comboTipo.addItem("")
         self.comboTipo.setObjectName(u"comboTipo")
 
         self.gridLayout.addWidget(self.comboTipo, 0, 0, 1, 3)
@@ -99,9 +100,10 @@ class Ui_Dialog(object):
         self.bAbre.setText(QCoreApplication.translate("Dialog", u"...", None))
         self.bGravar.setText(QCoreApplication.translate("Dialog", u"Upload data...", None))
         self.label.setText(QCoreApplication.translate("Dialog", u"Choose file:", None))
-        self.comboTipo.setItemText(0, QCoreApplication.translate("Dialog", u"Both Secondary and Feedback Paths", None))
-        self.comboTipo.setItemText(1, QCoreApplication.translate("Dialog", u"Secondary Path", None))
-        self.comboTipo.setItemText(2, QCoreApplication.translate("Dialog", u"Feedback Path", None))
+        self.comboTipo.setItemText(0, QCoreApplication.translate("Dialog", u"Both Secondary and Feedback Paths (from File)", None))
+        self.comboTipo.setItemText(1, QCoreApplication.translate("Dialog", u"Both Secondary and Feedback Paths (from Memory)", None))
+        self.comboTipo.setItemText(2, QCoreApplication.translate("Dialog", u"Secondary Path (from File)", None))
+        self.comboTipo.setItemText(3, QCoreApplication.translate("Dialog", u"Feedback Path  (from File)", None))
 
         self.bGravaFlash.setText(QCoreApplication.translate("Dialog", u"Record in Flash", None))
     # retranslateUi
