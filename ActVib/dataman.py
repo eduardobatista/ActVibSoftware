@@ -42,6 +42,9 @@ class dataman (QObject):
         self.maxtime = int(self.wsize * self.samplingperiod)
         self.realtime = 0.0
         self.hasPaths = False
+        self.ctrlmode = False
+        self.taskisctrl = False
+
 
     def ParaLeituras(self):
         self.flagparar = True
@@ -57,8 +60,8 @@ class dataman (QObject):
         try:
             # trd = Thread(target=self.updateFigs)
             # trd.start()
-            ctrlmode = self.driver.controlMode
-            taskisctrl = self.driver.taskIsControl
+            self.ctrlmode = self.driver.controlMode
+            self.taskisctrl = self.driver.taskIsControl
             self.flagrodando = True
             self.driver.openSerial()
             self.driver.handshake()
@@ -71,7 +74,7 @@ class dataman (QObject):
             for k in range(4):
                 self.driver.writeGeneratorConfig(id=k)
                 time.sleep(0.1)
-            if ctrlmode and taskisctrl:  # If control on and control task is control (not path modelling)                
+            if self.ctrlmode and self.taskisctrl:  # If control on and control task is control (not path modelling)                
                 self.driver.writeControlConfig()
                 self.driver.setAlgOn(False, 0, forcewrite=True)                
                 self.driver.startControl()
@@ -89,10 +92,10 @@ class dataman (QObject):
                 self.driver.getReading()
                 self.readtime = self.ctreadings * self.samplingperiod + timedelta
                 self.timereads[self.globalctreadings] = self.readtime
-                if ctrlmode:
+                if self.ctrlmode:
                     self.xrefdata[self.globalctreadings] = self.driver.xref
                     self.xerrodata[self.globalctreadings] = self.driver.xerro
-                    if taskisctrl:
+                    if self.taskisctrl:
                         self.dacoutdata[0][self.globalctreadings] = self.driver.dacout[0]
                         self.dacoutdata[1][self.globalctreadings] = self.driver.dacout[1]
                     else:   

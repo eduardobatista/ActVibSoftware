@@ -156,11 +156,20 @@ class FigOutputQtGraph(BaseFigQtGraph):
         else:
             npontos = self.npontosjanela[0]
 
-        for k in range(4):
-            if self.dacenable[k] and (npontos > 0):
-                self.lines[k].setData(self.vetoreixox[0][-npontos:], self.dman.dacoutdata[k][limi:limf])
-            else:
-                self.lines[k].setData([], [])
+        if self.dman.ctrlmode:
+            for k in range(2):
+                if (npontos > 0):
+                    self.lines[k].setData(self.vetoreixox[0][-npontos:], self.dman.dacoutdata[k][limi:limf])
+                else:
+                    self.lines[k].setData([], [])
+            self.lines[2].setData([], [])
+            self.lines[3].setData([], [])
+        else:
+            for k in range(4):
+                if self.dacenable[k] and (npontos > 0):
+                    self.lines[k].setData(self.vetoreixox[0][-npontos:], self.dman.dacoutdata[k][limi:limf])
+                else:
+                    self.lines[k].setData([], [])
 
         # if self.dacenable[0] and (npontos > 0):
         #     self.lines[0].setData(self.vetoreixox[0][-npontos:], self.dman.dacoutdata[0][limi:limf])
