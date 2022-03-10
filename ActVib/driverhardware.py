@@ -59,6 +59,7 @@ class driverhardware:
         self.ctrlfi = 1e-4
         self.refid = 0
         self.erroid = 0
+        self.ctrltask = 0
         self.refimuid = 0
         self.errimuid = 1
         self.packetsize = 17
@@ -225,7 +226,7 @@ class driverhardware:
             time.sleep(0.1)
         raise Exception("Handshake com dispositivo falhou.")
 
-    def setControlConfig(self, alg=0, mem=0, mu=0, fi=0, refimuid=0, errimuid=0, refid=0, erroid=0):
+    def setControlConfig(self, alg=0, mem=0, mu=0, fi=0, refimuid=0, errimuid=0, refid=0, erroid=0, ctrltask=0):
         self.ctrlalg = alg
         self.ctrlmem = mem
         self.ctrlmu = mu
@@ -234,6 +235,7 @@ class driverhardware:
         self.refid = refid
         self.errimuid = errimuid
         self.erroid = erroid
+        self.ctrltask = ctrltask
 
     def writeControlConfig(self):
         # Data to send: 
@@ -244,6 +246,7 @@ class driverhardware:
         #   Bytes 4 and 5: Memory size (from 0 to 65535)
         #   Bytes 6 to 9: Step size value (float encoded in 4 bytes)
         #   Bytes 10 to 13: Regularization factor (float enconded in 4 bytes) 
+        #   Byte 14: Control task (control or path modeling)
         self.serial.write(b'!')
         buf = [0] * 6
         buf[0] = (self.perturbChannel << 4) + self.controlChannel
@@ -255,6 +258,7 @@ class driverhardware:
         self.serial.write(bytearray(buf[0:6]))
         self.serial.write(bytearray(struct.pack("f", self.ctrlmu)))
         self.serial.write(bytearray(struct.pack("f", self.ctrlfi)))
+        self.serial.write(self.ctrltask.to_bytes(1,'big'))        
         if self.serial.read(3) != b'ok!':
             raise Exception("Fail recording control configurations.")
 
@@ -346,7 +350,7 @@ class driverhardware:
             ctaux = ctaux + 1
         if ctaux == 64:
             raise Exception('Falha na leitura de pacote: cabeçalho não encontrado.')
-        if self.controlMode and self.taskIsControl:
+        if self.controlMode: # and self.taskIsControl:
             buf = self.serial.read(20)
             self.dacout[0] = float(struct.unpack_from(">h",buf,0)[0]) * self.iampscaler[self.perturbChannel] #- 1.0
             self.dacout[1] = float(struct.unpack_from(">h",buf,2)[0]) * self.iampscaler[self.controlChannel] #- 1.0
@@ -374,15 +378,15 @@ class driverhardware:
                         for k in range(3): 
                             self.accreadings[j][k] = float(struct.unpack_from("<h",buf,2*k+6+ptr)[0]) * self.accscaler[j]
                         ptr += 12  
-            if (not self.taskIsControl):
-                if self.refid > 2:
-                    self.xref = self.gyroreadings[self.refimuid][self.refid-3]
-                else:
-                    self.xref = self.accreadings[self.refimuid][self.refid]
-                if self.erroid > 2:
-                    self.xerro = self.gyroreadings[self.errimuid][self.erroid-3]
-                else:
-                    self.xerro = self.accreadings[self.errimuid][self.erroid]
+            # if (not self.taskIsControl):
+            #     if self.refid > 2:
+            #         self.xref = self.gyroreadings[self.refimuid][self.refid-3]
+            #     else:
+            #         self.xref = self.accreadings[self.refimuid][self.refid]
+            #     if self.erroid > 2:
+            #         self.xerro = self.gyroreadings[self.errimuid][self.erroid-3]
+            #     else:
+            #         self.xerro = self.accreadings[self.errimuid][self.erroid]
             self.dacout[0] = float(struct.unpack_from(">h",buf,ptr)[0]) * self.iampscaler[0] # - 1.0
             self.dacout[1] = float(struct.unpack_from(">h",buf,ptr+2)[0]) * self.iampscaler[1] # - 1.0
             self.dacout[2] = float(struct.unpack_from(">b",buf,ptr+4)[0]) * self.iampscaler[2] # - 1.0

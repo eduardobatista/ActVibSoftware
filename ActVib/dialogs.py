@@ -85,9 +85,18 @@ class MyPathModelingDialog():
         self.pdialog.ui.setupUi(self.pdialog)
         self.endtime = np.ceil(self.dataman.timereads[self.dataman.globalctreadings-1])
         self.pdialog.ui.spinStartTime.setValue(0.0)
-        # self.endtime = 200.0
+        if self.endtime > 120:
+            self.starttime = 20
+        elif self.endtime > 60:
+            self.starttime = 10
+        elif self.endtime > 10:
+            self.starttime = 2
+        else: 
+            self.starttime = 0
         self.pdialog.ui.spinEndTime.setMaximum(self.endtime)
         self.pdialog.ui.spinEndTime.setValue(self.endtime)
+        self.pdialog.ui.spinStartTime.setMaximum(self.endtime)
+        self.pdialog.ui.spinStartTime.setValue(self.starttime)
         self.pdialog.ui.bRunModeling.clicked.connect(self.runModeling)
         self.gwidget = pg.GraphicsLayoutWidget()
         self.pdialog.ui.plotLayout.addWidget(self.gwidget)

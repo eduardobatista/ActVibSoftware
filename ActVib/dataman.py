@@ -74,7 +74,7 @@ class dataman (QObject):
             for k in range(4):
                 self.driver.writeGeneratorConfig(id=k)
                 time.sleep(0.1)
-            if self.ctrlmode and self.taskisctrl:  # If control on and control task is control (not path modelling)                
+            if self.ctrlmode:  # If control on and control task is control (not path modelling)                
                 self.driver.writeControlConfig()
                 self.driver.setAlgOn(False, 0, forcewrite=True)                
                 self.driver.startControl()
@@ -95,12 +95,12 @@ class dataman (QObject):
                 if self.ctrlmode:
                     self.xrefdata[self.globalctreadings] = self.driver.xref
                     self.xerrodata[self.globalctreadings] = self.driver.xerro
-                    if self.taskisctrl:
-                        self.dacoutdata[0][self.globalctreadings] = self.driver.dacout[0]
-                        self.dacoutdata[1][self.globalctreadings] = self.driver.dacout[1]
-                    else:   
-                        self.dacoutdata[0][self.globalctreadings] = self.driver.dacout[self.driver.perturbChannel]
-                        self.dacoutdata[1][self.globalctreadings] = self.driver.dacout[self.driver.controlChannel]
+                    # if self.taskisctrl:
+                    self.dacoutdata[0][self.globalctreadings] = self.driver.dacout[0]
+                    self.dacoutdata[1][self.globalctreadings] = self.driver.dacout[1]
+                    # else:   
+                    #     self.dacoutdata[0][self.globalctreadings] = self.driver.dacout[self.driver.perturbChannel]
+                    #     self.dacoutdata[1][self.globalctreadings] = self.driver.dacout[self.driver.controlChannel]
                 else:
                     for j in range(3):
                         if self.driver.IMUEnableFlags[j]:

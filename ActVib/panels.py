@@ -162,7 +162,8 @@ class ControlPanel(QtWidgets.QWidget,StateSaver):
             "refimuid": self.ui.comboIMURef.currentIndex(),
             "errimuid": self.ui.comboIMUError.currentIndex(),
             "refid": self.ui.comboRef.currentIndex(), # from 0 to 5, from AccX to GyroZ
-            "erroid": self.ui.comboErro.currentIndex()
+            "erroid": self.ui.comboErro.currentIndex(),
+            "ctrltask": self.ui.comboCtrlTask.currentIndex() # 0 for control, 1 for path modeling
         }
         return data
 

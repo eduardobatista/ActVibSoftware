@@ -170,12 +170,3 @@ class FigOutputQtGraph(BaseFigQtGraph):
                     self.lines[k].setData(self.vetoreixox[0][-npontos:], self.dman.dacoutdata[k][limi:limf])
                 else:
                     self.lines[k].setData([], [])
-
-        # if self.dacenable[0] and (npontos > 0):
-        #     self.lines[0].setData(self.vetoreixox[0][-npontos:], self.dman.dacoutdata[0][limi:limf])
-        # else:
-        #     self.lines[0].setData([], [])
-        # if self.dacenable[1] and (npontos > 0):
-        #     self.lines[1].setData(self.vetoreixox[0][-npontos:], self.dman.dacoutdata[1][limi:limf])
-        # else:
-        #     self.lines[1].setData([], [])
