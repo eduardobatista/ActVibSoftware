@@ -223,6 +223,7 @@ class Ui_ControlForm(object):
         self.comboAlgoritmo.addItem("")
         self.comboAlgoritmo.addItem("")
         self.comboAlgoritmo.addItem("")
+        self.comboAlgoritmo.addItem("")
         self.comboAlgoritmo.setObjectName(u"comboAlgoritmo")
         sizePolicy5 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         sizePolicy5.setHorizontalStretch(0)
@@ -251,7 +252,7 @@ class Ui_ControlForm(object):
         self.spinMemCtrl = QSpinBox(self.frame_2)
         self.spinMemCtrl.setObjectName(u"spinMemCtrl")
         self.spinMemCtrl.setMinimum(1)
-        self.spinMemCtrl.setMaximum(3000)
+        self.spinMemCtrl.setMaximum(1000)
         self.spinMemCtrl.setValue(100)
 
         self.horizontalLayout_2.addWidget(self.spinMemCtrl)
@@ -339,8 +340,9 @@ class Ui_ControlForm(object):
         self.label_8.setText(QCoreApplication.translate("ControlForm", u"Algorithm:", None))
         self.checkAlgOn.setText(QCoreApplication.translate("ControlForm", u"On \u2265", None))
         self.comboAlgoritmo.setItemText(0, QCoreApplication.translate("ControlForm", u"FxNLMS", None))
-        self.comboAlgoritmo.setItemText(1, QCoreApplication.translate("ControlForm", u"FxLMS", None))
-        self.comboAlgoritmo.setItemText(2, QCoreApplication.translate("ControlForm", u"FxNLMS Modificado Proposto", None))
+        self.comboAlgoritmo.setItemText(1, QCoreApplication.translate("ControlForm", u"FxNLMS with full buffers", None))
+        self.comboAlgoritmo.setItemText(2, QCoreApplication.translate("ControlForm", u"CVA-FxNLMS", None))
+        self.comboAlgoritmo.setItemText(3, QCoreApplication.translate("ControlForm", u"CVA-FxNLMS with full buffers", None))
 
         self.label_12.setText(QCoreApplication.translate("ControlForm", u"Memory size:", None))
         self.label_9.setText(QCoreApplication.translate("ControlForm", u"Step size:", None))

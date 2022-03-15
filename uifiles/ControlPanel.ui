@@ -480,12 +480,17 @@
            </item>
            <item>
             <property name="text">
-             <string>FxLMS</string>
+             <string>FxNLMS with full buffers</string>
             </property>
            </item>
            <item>
             <property name="text">
-             <string>FxNLMS Modificado Proposto</string>
+             <string>CVA-FxNLMS</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>CVA-FxNLMS with full buffers</string>
             </property>
            </item>
           </widget>
@@ -530,7 +535,7 @@
             <number>1</number>
            </property>
            <property name="maximum">
-            <number>3000</number>
+            <number>1000</number>
            </property>
            <property name="value">
             <number>100</number>
