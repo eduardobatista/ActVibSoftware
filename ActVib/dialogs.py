@@ -11,6 +11,7 @@ import pyqtgraph as pg
 from .WorkdirDialog import Ui_Dialog as WorkdirDialog
 from .UploadDialog import Ui_Dialog as UploadDialog
 from .PathModeling import Ui_PathModelingDialog as PathModelingDialog
+from .DataViewer import Ui_DataViewerDialog as DataViewerDialog
 from .DSP import FIRNLMS,easyFourier
 
 class WorkdirManager():
@@ -73,6 +74,103 @@ class WorkdirManager():
                 return self._data.columns[col]
             return None
 
+
+class MyDataViewer(QDialog):
+
+    def __init__(self,dataman):
+        super().__init__()
+        self.dataman = dataman
+        self.ui = DataViewerDialog()
+        self.ui.setupUi(self)
+        self.ui.bOpen.clicked.connect(self.openFile)
+        self.ui.bOpenDataInMemory.clicked.connect(self.openDataInMemory)
+        self.gwidget = pg.GraphicsLayoutWidget()
+        self.ui.plotLayout.addWidget(self.gwidget)
+        self.setAcceptDrops(True)
+
+    def dragEnterEvent(self, e):		
+      if e.mimeData().hasUrls():
+         e.accept()
+      else:
+         e.ignore()
+
+    def dropEvent(self, e):
+        droppedFile = Path(e.mimeData().text())
+        if str(droppedFile).endswith(".feather"):
+            self.openFile(droppedFile)
+        else:
+            self.ui.statusLabel.setText("File is not in feather format.")
+
+    def showDataViewerDialog(self):
+        self.exec_()
+
+    def openFile(self,fname=None):
+        try: 
+            if fname:
+                filename = [fname]
+            else:               
+                if self.dataman.lastdatafolder:
+                    if self.dataman.lastdatafolder.is_dir():
+                        refdir = str(self.dataman.lastdatafolder)
+                    else: 
+                        refdir = os.getenv('HOME')                    
+                else:         
+                    refdir = os.getenv('HOME')                
+                filename = QFileDialog.getOpenFileName(self, "Open File",
+                                                refdir, 'feather (*.feather)')
+                if filename[0] != '':
+                    auxf = Path(filename[0])
+                    self.dataman.lastdatafolder = auxf.parent if auxf.exists() else os.getenv('HOME')
+            if (filename[0] != ''):
+                self.ui.fileName.setText(str(filename[0]))
+                self.datafromfile = pd.read_feather(filename[0])
+                logs = self.datafromfile[["time","log"]][self.datafromfile["log"].notnull()].values.tolist()
+                self.ui.logText.setText("\n".join( [f"{aa[0]}: {aa[1]}" for aa in logs] ))
+                if "ctrl" not in self.datafromfile.columns:
+                    self.ui.statusLabel.setText("File not valid (Error 1).")
+                    return
+                self.plotData()                
+            else:
+                self.ui.fileName.setText('')
+                self.datafromfile = None
+        except BaseException as ex:
+            self.ui.statusLabel.setText(f"Error: {ex}")
+
+
+    def openDataInMemory(self):
+        if self.dataman.globalctreadings == 0:
+            self.ui.statusLabel.setText("Recorded data no found...")
+        elif (not self.dataman.ctrlmode): #or ( self.dataman.ctrlmode and (not self.dataman.taskisctrl) ):
+            self.ui.statusLabel.setText("Only Control Mode data can be viewed for now.")
+        else:
+            self.plotData(frommemory=True)
+
+
+    def plotData(self,frommemory=False):
+        pens = [pg.mkPen('r', width=1), pg.mkPen('b', width=1)]
+        item = self.gwidget.getItem(0,0)
+        if item is not None:
+            self.gwidget.removeItem(item)
+        item2 = self.gwidget.getItem(1,0)
+        if item2 is not None:
+            self.gwidget.removeItem(item2)
+        
+        myplot1 = self.gwidget.addPlot(row=0,col=0,labels={"bottom":"Time (s)"})        
+        myplot2 = self.gwidget.addPlot(row=1,col=0,labels={"bottom":"Time (s)"})
+        myplot1.addLegend(offset=(0,0),labelTextSize="7pt")
+        myplot2.addLegend(offset=(0,0),labelTextSize="7pt")
+        if frommemory:
+            limf = self.dataman.globalctreadings
+            myplot1.plot(self.dataman.timereads[:limf],self.dataman.dacoutdata[0][0:limf],pen=pens[0],name="Peturbation")
+            myplot1.plot(self.dataman.timereads[:limf],self.dataman.dacoutdata[1][0:limf],pen=pens[1],name="Control")
+            myplot2.plot(self.dataman.timereads[:limf],self.dataman.xerrodata[0:limf],pen=pens[0],name="Error")
+            myplot2.plot(self.dataman.timereads[:limf],self.dataman.xrefdata[0:limf],pen=pens[1],name="Reference")
+        else:
+            myplot1.plot(self.datafromfile.time,self.datafromfile.perturb,pen=pens[0],name="Peturbation")
+            myplot1.plot(self.datafromfile.time,self.datafromfile.ctrl,pen=pens[1],name="Control")
+            myplot2.plot(self.datafromfile.time,self.datafromfile.err,pen=pens[0],name="Error")
+            myplot2.plot(self.datafromfile.time,self.datafromfile.ref,pen=pens[1],name="Reference")
+        
 
 
 class MyPathModelingDialog():

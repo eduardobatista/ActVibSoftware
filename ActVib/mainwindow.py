@@ -11,7 +11,7 @@ from .VibViewWindow import Ui_MainWindow
 
 from .figures import (MyFigQtGraph, CtrlFigQtGraph, FigOutputQtGraph)
 
-from .dialogs import (WorkdirManager, MyUploadDialog, MyPathModelingDialog)
+from .dialogs import (WorkdirManager, MyUploadDialog, MyPathModelingDialog, MyDataViewer)
 
 from .panels import (IMUPanel,GeneratorPanel,PlotCfgPanel,ControlPanel,ADCPanel)
 
@@ -57,6 +57,7 @@ class mainwindow(QtWidgets.QMainWindow):
         self.ui.actionUpload.triggered.connect(self.openUploadDialog)
         self.ui.actionWorkdirManager.triggered.connect(self.openWorkdirManager)
         self.ui.actionPathModeling.triggered.connect(self.openPathModelingDialog)
+        self.ui.actionDataViewer.triggered.connect(self.openDataViewer)
         
         # IMU Connections:        
         self.ui.imutab1.layout().addWidget(self.imupanel[0])
@@ -97,12 +98,7 @@ class mainwindow(QtWidgets.QMainWindow):
         # ControlPanel:
         self.ui.controlFrame.layout().addWidget(self.ctrlpanel)  
         self.ctrlpanel.connectControlChanged(self.configControl)      
-        # self.ui.comboCanaisControle.activated.connect(self.configControl)
         self.ctrlpanel.ui.checkAlgOn.toggled.connect(self.configAlgOn)
-        # self.ui.passoCtrl.setValidator(QtGui.QDoubleValidator(0.0, 1000.0, 2, self))
-        # self.ui.passoCtrl.editingFinished.connect(self.validateStep)
-        # self.ui.normCtrl.setValidator(QtGui.QDoubleValidator(0.0, 1000.0, 2, self))
-        # self.ui.normCtrl.editingFinished.connect(self.validateRegularization)
 
         self.ui.notes.textChanged.connect(self.txtInputChanged)
         self.maxNoteLength = 1000
@@ -280,6 +276,8 @@ class mainwindow(QtWidgets.QMainWindow):
             self.setSampling(settings.value("TSampling"))            
         if (settings.value("WorkDir") is not None):
             self.workdir = settings.value("WorkDir")
+        if (settings.value("LastDataFolder") is not None):
+            self.dataman.lastdatafolder = Path(settings.value("LastDataFolder"))
         for imp in self.imupanel:
             imp.restoreState(settings)
         for gp in self.genpanel:
@@ -305,6 +303,7 @@ class mainwindow(QtWidgets.QMainWindow):
         settings.setValue("OFig", self.ofig.getConfigString())
         settings.setValue("CtrlFig", self.ctrlfig.getConfigString())
         settings.setValue('WorkDir', self.workdir)
+        settings.setValue("LastDataFolder", str(self.dataman.lastdatafolder))
         for imp in self.imupanel:
             imp.saveState(settings)
         for gp in self.genpanel:
@@ -542,6 +541,11 @@ class mainwindow(QtWidgets.QMainWindow):
             self.driver.setPort(self.porta)        
             self.pmd = MyPathModelingDialog(self.dataman,self.driver)
             self.pmd.showPathModelingdDialog()
+    
+    def openDataViewer(self):
+        if not self.dataman.flagrodando:
+            self.dvd = MyDataViewer(self.dataman)
+            self.dvd.showDataViewerDialog()
 
     def saveDialog(self):
         if self.dataman.flagrodando:

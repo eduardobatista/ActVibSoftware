@@ -844,6 +844,7 @@
     <addaction name="actionSalvar_dados"/>
     <addaction name="actionUpload"/>
     <addaction name="actionPathModeling"/>
+    <addaction name="actionDataViewer"/>
     <addaction name="menuSelecionar_Porta"/>
     <addaction name="menuSampling_Rate"/>
     <addaction name="separator"/>
@@ -979,6 +980,11 @@
   <action name="actionPathModeling">
    <property name="text">
     <string>Path modeling...</string>
+   </property>
+  </action>
+  <action name="actionDataViewer">
+   <property name="text">
+    <string>Data Viewer...</string>
    </property>
   </action>
  </widget>

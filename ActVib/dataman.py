@@ -44,6 +44,7 @@ class dataman (QObject):
         self.hasPaths = False
         self.ctrlmode = False
         self.taskisctrl = False
+        self.lastdatafolder = None
 
 
     def ParaLeituras(self):
