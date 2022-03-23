@@ -338,6 +338,13 @@
     </widget>
    </item>
    <item>
+    <widget class="QPushButton" name="bCheck">
+     <property name="text">
+      <string>Check Recorded Paths</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QLabel" name="statusLabel">
      <property name="text">
       <string/>

@@ -89,7 +89,7 @@ class dataman (QObject):
                 self.globalstarttime = self.starttime
             timedelta = self.starttime - self.globalstarttime
             self.logMessage.emit(timedelta,"Started")            
-            while not self.flagparar:
+            while (not self.flagparar) and (self.globalctreadings < self.wsize):
                 self.driver.getReading()
                 self.readtime = self.ctreadings * self.samplingperiod + timedelta
                 self.timereads[self.globalctreadings] = self.readtime
@@ -134,23 +134,30 @@ class dataman (QObject):
                     #     trd.start()
                     # print(f'{int(self.driver.calctime)} us')
                     self.updateFigures.emit()
-                ctaux = 0
+                ctaux = 0            
             self.driver.stopReadings()
             self.stopped.emit()
-            self.logMessage.emit((time.time() - self.globalstarttime),"Stopped")
+            self.logMessage.emit(self.readtime,"Stopped")
+            self.statusMessage.emit("Stopped.")            
             self.flagrodando = False
             self.flagparar = False
+            self.readtime = self.ctreadings * self.samplingperiod + timedelta
+            self.updateFigures.emit()
             # app.save(srcdir,"backup" + str(time.time()) + ".txt")
         except Exception as err:
             if self.driver.serial.isOpen():
                 self.driver.stopReadings()
             self.flagrodando = False
-            self.statusMessage.emit("Erro: " + str(err))
+            self.statusMessage.emit("Error: " + str(err))
             self.stopped.emit()
 
-    """
-    """
-    def ResetaDados(self, samplingperiod=4e-3, maxtime=10):
+
+    def resetData(self, samplingperiod=4e-3, maxtime=10):
+        """ 
+            Reset data with:
+              - samplingperiod in seconds
+              - maxtime in minutes
+        """
         self.samplingperiod = samplingperiod
         self.maxtime = maxtime * 60
         self.wsize = int(self.maxtime/self.samplingperiod)
@@ -192,6 +199,7 @@ class dataman (QObject):
                     idx += 1
 
             df.to_feather(filename)
+            self.statusMessage.emit("File saved successfully.")
 
         else:
             limf = self.globalctreadings
@@ -247,6 +255,7 @@ class dataman (QObject):
                 # # lista = [f"{item[0]}: {item[1]}" for item in loglist]
 
             df.to_feather(filename)
+            self.statusMessage.emit("File saved successfully.")
             
 
         self.flagsaved = setsaved

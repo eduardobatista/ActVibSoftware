@@ -203,6 +203,7 @@ class MyPathModelingDialog():
         self.pdialog.ui.bUploadAndRec.clicked.connect(self.recordData)
         self.pdialog.ui.progressBar.setValue(0)  
         self.pdialog.ui.bSaveToFile.clicked.connect(self.savePathsToFile)      
+        self.pdialog.ui.bCheck.clicked.connect(self.checkPaths)
         self.datafromfile = None
         self.dataman.hasPaths = False
         
@@ -222,6 +223,46 @@ class MyPathModelingDialog():
         else:
             self.pdialog.ui.fileName.setText('')
             self.datafromfile = None
+
+    def checkPaths(self):        
+        try:
+            self.pdialog.ui.statusLabel.setText("Wait... May take some time...")
+            self.driver.openSerial()
+            self.driver.handshake()
+            wsec,wfbk = self.driver.readPaths()
+            self.driver.stopReadings()
+
+            pens = [pg.mkPen('r', width=2), pg.mkPen('b', width=2), pg.mkPen('r', width=1), pg.mkPen('b', width=1)]
+            item = self.gwidget.getItem(0,0)
+            if item is not None:
+                self.gwidget.removeItem(item)
+            item2 = self.gwidget.getItem(1,0)
+            if item2 is not None:
+                self.gwidget.removeItem(item2)
+
+            myplot1 = self.gwidget.addPlot(row=0,col=0)
+            myplot1.addLegend(offset=(0,0),labelTextSize="7pt")            
+            myplot1.plot(wsec,pen=pens[0],name="Sec. Path from Device")
+            myplot2 = self.gwidget.addPlot(row=1,col=0)
+            myplot2.addLegend(offset=(0,0),labelTextSize="7pt")
+            myplot2.plot(wfbk,pen=pens[1],name="Feedback Path from Device")            
+            if self.dataman.hasPaths:
+                myplot1.plot(self.dataman.secpath,pen=pens[2],name="Sec. Path from Memory")
+                myplot2.plot(self.dataman.fbkpath,pen=pens[3],name="Feedback Path from Memory")
+            
+
+            self.pdialog.ui.statusLabel.setText("Paths successfully read.")
+            # sqerror = 0.0
+            # for k in range(len(wsec)):
+            #     sqerror = sqerror + (wsec[k]-self.dataman.secpath[k])**2
+            # print(sqerror)
+            # sqerror = 0.0
+            # for k in range(len(wfbk)):
+            #     sqerror = sqerror + (wfbk[k]-self.dataman.fbkpath[k])**2
+            # print(sqerror)
+        except BaseException as ex:
+            self.pdialog.ui.statusLabel.setText(f"Error: {ex}")
+
 
     def savePathsToFile(self):        
         if not self.dataman.hasPaths:

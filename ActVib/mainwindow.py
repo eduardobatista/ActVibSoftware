@@ -484,12 +484,12 @@ class mainwindow(QtWidgets.QMainWindow):
             buttonReply = QMessageBox.question(self, 'Atenção!', "Dados não salvos poderão ser apagados, confirma?",
                                                QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
             if buttonReply == QMessageBox.Yes:
-                self.dataman.ResetaDados(self.TSampling/1000)
+                self.dataman.resetData(self.TSampling/1000)
                 self.ui.statusbar.clearMessage()
             else:
                 self.ui.statusbar.showMessage("Cancelado...")
         else:
-            self.dataman.ResetaDados(self.TSampling/1000)
+            self.dataman.resetData(self.TSampling/1000)
             self.ui.statusbar.clearMessage()
         self.ctrlpanel.setEnabled(True,isreset=True)
 
@@ -506,7 +506,7 @@ class mainwindow(QtWidgets.QMainWindow):
                 else:
                     if sra.text().startswith(">"):
                         sra.setText(sra.text()[1:])
-            self.dataman.ResetaDados(self.TSampling/1000)
+            self.dataman.resetData(self.TSampling/1000)
             self.ui.statusbar.clearMessage()
             
         

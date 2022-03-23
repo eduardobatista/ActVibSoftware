@@ -230,6 +230,11 @@ class Ui_PathModelingDialog(object):
 
         self.verticalLayout.addWidget(self.widget_4)
 
+        self.bCheck = QPushButton(PathModelingDialog)
+        self.bCheck.setObjectName(u"bCheck")
+
+        self.verticalLayout.addWidget(self.bCheck)
+
         self.statusLabel = QLabel(PathModelingDialog)
         self.statusLabel.setObjectName(u"statusLabel")
 
@@ -260,6 +265,7 @@ class Ui_PathModelingDialog(object):
         self.bRunModeling.setText(QCoreApplication.translate("PathModelingDialog", u"Run...", None))
         self.bSaveToFile.setText(QCoreApplication.translate("PathModelingDialog", u"Save paths to file...", None))
         self.bUploadAndRec.setText(QCoreApplication.translate("PathModelingDialog", u"Upload and Record in Flash...", None))
+        self.bCheck.setText(QCoreApplication.translate("PathModelingDialog", u"Check Recorded Paths", None))
         self.statusLabel.setText("")
     # retranslateUi
 

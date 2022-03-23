@@ -336,6 +336,29 @@ class driverhardware:
                 buf = self.serial.read(2)
                 pbar.setValue(pbar.value() + (bb[0] << 8) + bb[1])
         pbar.setValue(dados.shape[0] - 2)
+
+
+    def readPaths(self):
+        wsectemp = []
+        wfbktemp = []
+        self.serial.write('c'.encode())
+        aux = self.serial.readline().decode("utf-8")
+        if not aux.startswith("WSec ="):
+            print(aux)
+            raise BaseException("Error reading paths (at the beginning).")
+        aux = self.serial.readline().decode("utf-8")
+        while aux and (not aux.startswith("WFbk =")):
+            wsectemp.append(float(aux))
+            aux = self.serial.readline().decode("utf-8")
+        aux = self.serial.readline().decode("utf-8")
+        while aux and (not aux.startswith("End")):
+            wfbktemp.append(float(aux))
+            aux = self.serial.readline().decode("utf-8")
+        return wsectemp,wfbktemp
+        
+        
+
+        
     
 
     def getReading(self):
