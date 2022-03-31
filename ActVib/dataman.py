@@ -63,6 +63,9 @@ class dataman (QObject):
             # trd.start()
             self.ctrlmode = self.driver.controlMode
             self.taskisctrl = self.driver.taskIsControl
+            self.debugmode = self.driver.debugMode
+            if self.debugmode:
+                self.driver.debugSetup()
             self.flagrodando = True
             self.driver.openSerial()
             self.driver.handshake()
@@ -90,6 +93,8 @@ class dataman (QObject):
             timedelta = self.starttime - self.globalstarttime
             self.logMessage.emit(timedelta,"Started")            
             while (not self.flagparar) and (self.globalctreadings < self.wsize):
+                if self.debugmode:
+                    self.driver.debugTalk()
                 self.driver.getReading()
                 self.readtime = self.ctreadings * self.samplingperiod + timedelta
                 self.timereads[self.globalctreadings] = self.readtime
@@ -222,7 +227,7 @@ class dataman (QObject):
                     thedict[f"imu{k+1}gyroy"] = self.gyrodata[k][1][0:limf]
                     thedict[f"imu{k+1}gyroz"] = self.gyrodata[k][2][0:limf]
                     
-            df = pd.DataFrame(thedict)   
+            df = pd.DataFrame(thedict)
 
             # df.to_feather(filename + "2")         
             

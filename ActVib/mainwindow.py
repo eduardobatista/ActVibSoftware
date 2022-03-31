@@ -365,6 +365,7 @@ class mainwindow(QtWidgets.QMainWindow):
                     gg.setEnabled(False)
                     self.ui.tabWidget.setTabText(k, f"Output {k+1}")
             self.driver.setControlConfig( **self.ctrlpanel.getControlConfiguration() )
+            self.driver.setDebugMode(False)
             if (self.mfig is not None):
                 self.ctrlfig.show()
                 self.mfig.hide()

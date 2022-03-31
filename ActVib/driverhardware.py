@@ -4,6 +4,8 @@
 import time
 import serial
 import struct
+from .CantileverBeam import CantileverBeam
+import numpy as np
 
 class driverhardware:
 
@@ -39,17 +41,17 @@ class driverhardware:
         self.setGeneratorConfig(id=2)
         self.setGeneratorConfig(id=3)
         self.serial = serial.Serial(port=None,
-                                    # baudrate=115200,
-                                    #baudrate = 230400,
-                                    baudrate = 500000,
+                                    baudrate=115200,
+                                    # baudrate = 500000,
                                     parity=serial.PARITY_NONE,
                                     stopbits=serial.STOPBITS_ONE,
                                     bytesize=serial.EIGHTBITS,
-                                    timeout=10)
+                                    timeout=1)
         if self.serial.isOpen():
             self.serial.close()
         self.controlMode = False
         self.taskIsControl = 0  # True for Control, False for Path Modelling
+        self.debugMode = False
         self.controlChannel = 0
         self.perturbChannel = 0
         self.ctrlalg = 0
@@ -68,6 +70,10 @@ class driverhardware:
         self.algonchanged = False
         self.calctime = [0,0,0]
         self.algontime = 0.0 
+        self.debugErr = 1.0
+        self.debugRef = -1.0
+        self.debugPerturb = 0.0
+        self.debugControl = 0.0
 
 
     def setPort(self,port):
@@ -78,11 +84,13 @@ class driverhardware:
         self.serial.open()
 
     
-    def setControlMode(self,mode=False,task=0):
+    def setControlMode(self,mode=False,task=0,debugmode=False):
         self.controlMode = mode
         if mode == False:  # if control is off
             self.taskIsControl = True
+            self.debugMode = False
         else:
+            self.debugMode = debugmode
             if task == 0:
                 self.taskIsControl = True
             else:
@@ -147,7 +155,7 @@ class driverhardware:
         # print(self.serial.read())
         aux = self.serial.read(3)
         if aux != b'ok!':
-            print(aux)
+            # print(aux)
             # axxx = self.serial.read(2000)
             # print(str(axxx.decode("ISO-8859-1")))
             raise Exception(f'Fail initializing the IMU with id={id}.')
@@ -237,6 +245,9 @@ class driverhardware:
         self.erroid = erroid
         self.ctrltask = ctrltask
 
+    def setDebugMode(self,debugmode):
+        self.debugMode = debugmode
+
     def writeControlConfig(self):
         # Data to send: 
         #   Byte 0: 4 bits for perturbation channel (MSBs) and 4 bits for control channel (LSBs)
@@ -246,7 +257,7 @@ class driverhardware:
         #   Bytes 4 and 5: Memory size (from 0 to 65535)
         #   Bytes 6 to 9: Step size value (float encoded in 4 bytes)
         #   Bytes 10 to 13: Regularization factor (float enconded in 4 bytes) 
-        #   Byte 14: Control task (control or path modeling)
+        #   Byte 14: Bit 0 for Control task (control or path modeling) and bit 1 for debugmode
         self.serial.write(b'!')
         buf = [0] * 6
         buf[0] = (self.perturbChannel << 4) + self.controlChannel
@@ -258,9 +269,11 @@ class driverhardware:
         self.serial.write(bytearray(buf[0:6]))
         self.serial.write(bytearray(struct.pack("f", self.ctrlmu)))
         self.serial.write(bytearray(struct.pack("f", self.ctrlfi)))
-        self.serial.write(self.ctrltask.to_bytes(1,'big'))        
+        self.serial.write((self.ctrltask + (2 if self.debugMode else 0) ).to_bytes(1,'big'))
         if self.serial.read(3) != b'ok!':
             raise Exception("Fail recording control configurations.")
+        # print(self.serial.readline())
+        # print(self.serial.readline())
 
     def setAlgOn(self, status=False, algontime=0.0, forcewrite=False):
         if (status != self.algon) or forcewrite:
@@ -274,6 +287,8 @@ class driverhardware:
             self.serial.write(b'a\x02')
             self.serial.write(bytearray(struct.pack("f", self.ctrlmu)))
             self.serial.write(bytearray(struct.pack("f", self.ctrlfi)))
+            # print(self.serial.readline())
+            # print(self.serial.readline())
         else:
             self.serial.write(b'a\x00')
         self.algonchanged = False
@@ -297,7 +312,8 @@ class driverhardware:
     def startControl(self):
         self.packetsize = 14
         self.serial.write(b'S')
-        if (len(self.serial.read(14)) < 14):
+        if self.serial.read() != b'K':
+            # if (len(self.serial.read(14)) < 14):
             raise Exception('Sem resposta nas leituras.')
         self.buf = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
@@ -355,12 +371,67 @@ class driverhardware:
             wfbktemp.append(float(aux))
             aux = self.serial.readline().decode("utf-8")
         return wsectemp,wfbktemp
-        
-        
 
         
-    
+    def debugSetup(self):
+        Tamostragem = 4e-3
+        dadosviga = {'length':0.538,'width':0.0507,'thickness':0.00474-0.0001*2,'damp':[0.010826771653543302,0.0076347771891554575,0,0,0],
+             'density':7850,'elasticmod':200e9}
+        self.cbeam = CantileverBeam(Tsampling=Tamostragem,nmodes=2,**dadosviga)
+        self.cbeam.configforcescaler(25.0/12.0,3e-3)
+        # Definições:
+        self.pperturb = round((0.34 / self.cbeam.length) * self.cbeam.npoints)
+        self.pref = round((0.29 / self.cbeam.length) * self.cbeam.npoints)
+        self.pcanc = round((0.20 / self.cbeam.length) * self.cbeam.npoints)
+        self.perro = round((0.53 / self.cbeam.length) * self.cbeam.npoints)
+        self.cbeam.noisestd = 0.0045 # Sempre em m/s^2
+        self.cbeam.setaccelg(False)
+        self.cbeam.reset()
+        self.debugControl = 0.0
+        self.debugPerturb = 0.0
 
+        
+    def debugTalk(self):       
+        # self.cbeam.setforce(self.pperturb, self.debugPerturb)
+        # self.cbeam.setforce(self.pcanc, self.debugControl)        
+        self.debugErr = self.cbeam.getaccel(self.perro)
+        self.debugRef = self.cbeam.getaccel(self.pref)
+        # print(self.debugRef)
+        transmitok = False
+        while not transmitok:
+            transmitok = True
+            self.serial.write(b'T')
+            mybytes = struct.pack("f", self.debugErr) + struct.pack("f", self.debugRef)
+            self.serial.write(mybytes)
+            buf = self.serial.read(8)
+            if len(buf) < 8:
+                transmitok = False
+                print("!!!")
+                self.serial.reset_output_buffer()
+                self.serial.reset_input_buffer()                
+            else:
+                if mybytes != buf[0:8]:
+                    print(mybytes)
+                    print(buf[0:8])
+                    transmitok = False
+                    print("!!")
+                    self.serial.reset_output_buffer()
+                    self.serial.reset_input_buffer()
+        self.serial.write(b'N')
+        buf = self.serial.read(4)
+        if (len(buf) == 4):
+            self.debugPerturb = -float(struct.unpack_from(">h",buf,0)[0] - self.dclevel[self.perturbChannel]) * self.iampscaler[self.perturbChannel]
+            self.debugControl = -float(struct.unpack_from(">h",buf,2)[0] - self.dclevel[self.controlChannel]) * self.iampscaler[self.controlChannel]
+            # print(self.debugPerturb)
+            # print(self.debugControl)
+        else:
+            self.debugPerturb = 0
+            self.debugControl = 0
+            print("!")
+        self.cbeam.setforce(self.pperturb, self.debugPerturb)
+        self.cbeam.setforce(self.pcanc, self.debugControl)
+        self.cbeam.update()  
+        
     def getReading(self):
         ctaux = 0
         val = 0
@@ -373,12 +444,19 @@ class driverhardware:
             ctaux = ctaux + 1
         if ctaux == 64:
             raise Exception('Falha na leitura de pacote: cabeçalho não encontrado.')
+        if ctaux > 3:
+            print(f"wtf:{ctaux}!")
         if self.controlMode: # and self.taskIsControl:
-            buf = self.serial.read(20)
-            self.dacout[0] = float(struct.unpack_from(">h",buf,0)[0]) * self.iampscaler[self.perturbChannel] #- 1.0
+            buf = self.serial.read(20)            
+            self.dacout[0] = float(struct.unpack_from(">h",buf,0)[0]) * self.iampscaler[self.perturbChannel] #- 1.0            
             self.dacout[1] = float(struct.unpack_from(">h",buf,2)[0]) * self.iampscaler[self.controlChannel] #- 1.0
+            # if self.debugPerturb != self.dacout[0]:
+            #     print(f"Perturb: {self.debugPerturb} - {self.dacout[0]}")   
+            # if self.debugControl != self.dacout[1]:
+            #     print(f"Ctrl: {self.debugControl} - {self.dacout[1]}") 
             self.xref = struct.unpack_from("f",buf,4)[0]
             self.xerro = struct.unpack_from("f",buf,8)[0]
+            # print(self.xref)
             self.calctime[0] = (struct.unpack_from(">H",buf,13)[0] << 4) / 240 # (((self.buf[13] << 8) + self.buf[14]) << 4) / 240
             self.calctime[1] = (struct.unpack_from(">H",buf,15)[0] << 4) / 240
             self.calctime[2] = (struct.unpack_from(">H",buf,17)[0] << 4) / 240

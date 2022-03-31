@@ -217,6 +217,7 @@ class MyPathModelingDialog():
                 self.pdialog.ui.statusLabel.setText("File not valid (Error 1).")
                 return
             self.endtime = self.datafromfile.time.values[-1]
+            self.pdialog.ui.spinStartTime.setMaximum(self.endtime)
             self.pdialog.ui.spinEndTime.setMaximum(self.endtime)
             self.pdialog.ui.spinEndTime.setValue(self.endtime)
             self.pdialog.ui.comboSource.setCurrentIndex(1)
@@ -289,7 +290,7 @@ class MyPathModelingDialog():
         self.pdialog.ui.statusLabel.setText("")
         try:                
             if self.dataman.hasPaths:
-                    datasize = self.dataman.secpath.shape[0]
+                datasize = self.dataman.secpath.shape[0]
             else:
                 raise Exception("Path data not found in memory.")
             self.driver.openSerial()
@@ -338,15 +339,15 @@ class MyPathModelingDialog():
                     raise BaseException("Path modeling recording not found (file not open)")
                 
 
-            dfbk = dfbk - np.mean(dfbk)
-            dsec = dsec - np.mean(dsec)  
+            # dfbk = dfbk - np.mean(dfbk)
+            # dsec = dsec - np.mean(dsec)  
 
-            filt = FIRNLMS(N,mu,psi,Navg)
+            filt = FIRNLMS(N,mu,psi,None)
             filt.run(x,dfbk)
-            self.wfbk = filt.wwavg
-            filt2 = FIRNLMS(N,mu,psi,Navg)
+            self.wfbk = filt.ww
+            filt2 = FIRNLMS(N,mu,psi,None)
             filt2.run(x,dsec)
-            self.wsec = filt2.wwavg
+            self.wsec = filt2.ww
 
             pens = [pg.mkPen('r', width=1), pg.mkPen('b', width=1)]
             item = self.gwidget.getItem(0,0)
