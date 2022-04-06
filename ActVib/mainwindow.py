@@ -11,7 +11,7 @@ from .VibViewWindow import Ui_MainWindow
 
 from .figures import (MyFigQtGraph, CtrlFigQtGraph, FigOutputQtGraph)
 
-from .dialogs import (WorkdirManager, MyUploadDialog, MyPathModelingDialog, MyDataViewer)
+from .dialogs import (WorkdirManager, MyUploadDialog, MyPathModelingDialog, MyDataViewer, MyPreDistDialog)
 
 from .panels import (IMUPanel,GeneratorPanel,PlotCfgPanel,ControlPanel,ADCPanel)
 
@@ -58,6 +58,7 @@ class mainwindow(QtWidgets.QMainWindow):
         self.ui.actionWorkdirManager.triggered.connect(self.openWorkdirManager)
         self.ui.actionPathModeling.triggered.connect(self.openPathModelingDialog)
         self.ui.actionDataViewer.triggered.connect(self.openDataViewer)
+        self.ui.actionPreDist.triggered.connect(self.openPreDistConfig)
         
         # IMU Connections:        
         self.ui.imutab1.layout().addWidget(self.imupanel[0])
@@ -278,6 +279,12 @@ class mainwindow(QtWidgets.QMainWindow):
             self.workdir = settings.value("WorkDir")
         if (settings.value("LastDataFolder") is not None):
             self.dataman.lastdatafolder = Path(settings.value("LastDataFolder"))
+        if (settings.value("PreDistEnMap") is not None):
+            tpredistmap = settings.value("PreDistEnMap")
+            for k in range(4):
+                self.driver.predistenablemap[k] = True if tpredistmap[k] == 'true' else False
+        if settings.value("PreDistCoefs"):
+            self.driver.predistcoefs = settings.value("PreDistCoefs")
         for imp in self.imupanel:
             imp.restoreState(settings)
         for gp in self.genpanel:
@@ -304,6 +311,8 @@ class mainwindow(QtWidgets.QMainWindow):
         settings.setValue("CtrlFig", self.ctrlfig.getConfigString())
         settings.setValue('WorkDir', self.workdir)
         settings.setValue("LastDataFolder", str(self.dataman.lastdatafolder))
+        settings.setValue("PreDistEnMap", self.driver.predistenablemap)
+        settings.setValue("PreDistCoefs", self.driver.predistcoefs)
         for imp in self.imupanel:
             imp.saveState(settings)
         for gp in self.genpanel:
@@ -547,6 +556,11 @@ class mainwindow(QtWidgets.QMainWindow):
         if not self.dataman.flagrodando:
             self.dvd = MyDataViewer(self.dataman)
             self.dvd.showDataViewerDialog()
+
+    def openPreDistConfig(self):
+        if not self.dataman.flagrodando:
+            self.pdd = MyPreDistDialog(self.driver)
+            self.pdd.showPreDistDialog()
 
     def saveDialog(self):
         if self.dataman.flagrodando:

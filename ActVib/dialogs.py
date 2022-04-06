@@ -12,6 +12,7 @@ from .WorkdirDialog import Ui_Dialog as WorkdirDialog
 from .UploadDialog import Ui_Dialog as UploadDialog
 from .PathModeling import Ui_PathModelingDialog as PathModelingDialog
 from .DataViewer import Ui_DataViewerDialog as DataViewerDialog
+from .PreDist import Ui_PreDistDialog as PreDistDialog
 from .DSP import FIRNLMS,easyFourier
 
 class WorkdirManager():
@@ -73,6 +74,43 @@ class WorkdirManager():
             if orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole:
                 return self._data.columns[col]
             return None
+
+
+class MyPreDistDialog(QDialog):
+
+    def __init__(self,driver):
+        super().__init__()
+        self.driver = driver
+        self.ui = PreDistDialog()
+        self.ui.setupUi(self)
+        self.ui.bSave.clicked.connect(self.checkAndSave)
+        self.textFields = [self.ui.textPoly1,self.ui.textPoly2,self.ui.textPoly3,self.ui.textPoly4]
+        self.checks = [self.ui.checkEnable1,self.ui.checkEnable2,self.ui.checkEnable3,self.ui.checkEnable4]
+        
+    def showPreDistDialog(self):
+        for k,pflag in enumerate(self.driver.predistenablemap):
+            self.textFields[k].setText(np.array2string(self.driver.predistcoefs[k],separator=","))
+            self.checks[k].setChecked(pflag)
+        self.exec_()
+
+    def checkAndSave(self):
+        self.ui.statusLabel.setText("")
+        try:
+            for k in range(4):
+                self.driver.predistenablemap[k] = self.checks[k].isChecked()
+                self.driver.predistcoefs[k] = np.fromstring(self.textFields[k].text().strip("[]"),sep=",") 
+                if len(self.driver.predistcoefs[k].shape) > 1:
+                    self.driver.predistenablemap[k] = False
+                    self.driver.predistcoefs[k] = np.array([1.0,0.0])
+                    raise BaseException("Must be an array.")
+                if len(self.driver.predistcoefs[k].shape) > 10:
+                    self.driver.predistenablemap[k]
+                    self.driver.predistcoefs[k] = np.array([1.0,0.0])
+                    raise BaseException("Maximum order is 9.")
+            print(self.driver.predistcoefs)
+            self.ui.statusLabel.setText("Coefficients checked and salved successfully!")
+        except BaseException as ex:
+            self.ui.statusLabel.setText(f"Error: {ex}")
 
 
 class MyDataViewer(QDialog):

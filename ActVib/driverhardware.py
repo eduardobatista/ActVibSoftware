@@ -74,6 +74,8 @@ class driverhardware:
         self.debugRef = -1.0
         self.debugPerturb = 0.0
         self.debugControl = 0.0
+        self.predistenablemap = [False,False,False,False]
+        self.predistcoefs = [np.array([1.0,0.0]),np.array([1.0,0.0]),np.array([1.0,0.0])]
 
 
     def setPort(self,port):
@@ -150,14 +152,10 @@ class driverhardware:
 
     def initHardware(self,id=0):
         aux = bytearray([ord('i')] + [id])
-        # print(aux)
         self.serial.write(aux)
-        # print(self.serial.read())
+        self.serial.flush()
         aux = self.serial.read(3)
         if aux != b'ok!':
-            # print(aux)
-            # axxx = self.serial.read(2000)
-            # print(str(axxx.decode("ISO-8859-1")))
             raise Exception(f'Fail initializing the IMU with id={id}.')
 
 
@@ -173,8 +171,9 @@ class driverhardware:
         # print("writeIMU")
         aux = bytearray([ord('I')] + [id] + self.imuconfigdata[id])
         self.serial.write(aux)
+        self.serial.flush()
         aux = self.serial.read(2)
-        if aux != b'ok':
+        if aux != b'KI':
             print(aux)
             raise Exception(f'Error writing IMU{id+1} Config.')
 
@@ -183,20 +182,42 @@ class driverhardware:
         # print("writeIMU")
         aux = bytearray([ord('f')] + [TSampling])
         self.serial.write(aux)
+        self.serial.flush() 
         aux = self.serial.read(2)
-        if aux[0] != ord('k'):
+        if (aux[0] != ord('f')) or (aux[1] != TSampling):
             print(aux)
             raise Exception(f'Error writing sampling rate.')
-        
+
+    
+    def writePredistConfig(self, id=0):
+        order = (self.predistcoefs[id].shape[0] - 1) if self.predistenablemap[id] else 0
+        aux = 'p'.encode() + bytes([id, order])
+        if order > 0:
+            for k in range(order+1):
+                aux = aux + struct.pack("f",self.predistcoefs[id][k])
+        print(aux)
+        tries = 0
+        while tries < 5:
+            self.serial.write(aux)   
+            self.serial.flush()   
+            auxr = self.serial.read(2)
+            if auxr != b'ok':
+                print(auxr)
+                print(id)
+                tries += 1
+                self.serial.reset_output_buffer()
+                self.serial.reset_input_buffer()
+                time.sleep(0.05)
+            else: 
+                break
+        if tries >= 5:
+            raise Exception(f'Error configuring predistorter {id}.')
+
 
     def writeGeneratorConfig(self, id=0):        
         freqaux = [int(self.genfreq[id]), int(round((self.genfreq[id] - int(self.genfreq[id])) * 100))]
-        if id < 2:  # Saída de 12 bits, MCP4725
-            ampaux = int(round(self.genamp[id] * 2047))
-            dcl = self.dclevel[id]  # Para não saturar. TODO: Expor isso como configuração para o programa.
-        else:  # Saída direta do ESP32, com 8 bits.
-            ampaux = int(round(self.genamp[id] * 127))
-            dcl = self.dclevel[id]  # Para não saturar. TODO: Expor isso como configuração para o programa.
+        ampaux = int(round(self.genamp[id] * 2047))
+        dcl = self.dclevel[id]  
         aux = 'G'
         aux = aux.encode() + bytes([id, self.gentipo[id], (ampaux >> 8) & 0xFF, ampaux & 0xFF] + freqaux + [dcl >> 8, dcl & 0xFF])
         if self.gentipo[id] == 2:  # Chirp, manda mais 4 bytes [tinicio,deltai,tfim,deltaf]
@@ -212,7 +233,7 @@ class driverhardware:
         aux = 'd'.encode() + bytes(self.adcconfig)
         self.serial.write(aux)
         aux = self.serial.read(2);
-        if aux != b'ok':
+        if aux != b'KA':
             print(aux)
             raise Exception('Erro na configuração do ADC.')
         else:
@@ -224,15 +245,15 @@ class driverhardware:
     def handshake(self):
         self.serial.reset_output_buffer()
         self.serial.reset_input_buffer()
-        for k in range(5):
+        for k in range(5):            
             self.serial.write(b'h')
             if self.serial.read(1) == b'k':
-                # time.sleep(0.1)
                 return True
             self.serial.reset_output_buffer()
             self.serial.reset_input_buffer()
             time.sleep(0.1)
         raise Exception("Handshake com dispositivo falhou.")
+    
 
     def setControlConfig(self, alg=0, mem=0, mu=0, fi=0, refimuid=0, errimuid=0, refid=0, erroid=0, ctrltask=0):
         self.ctrlalg = alg
@@ -272,8 +293,6 @@ class driverhardware:
         self.serial.write((self.ctrltask + (2 if self.debugMode else 0) ).to_bytes(1,'big'))
         if self.serial.read(3) != b'ok!':
             raise Exception("Fail recording control configurations.")
-        # print(self.serial.readline())
-        # print(self.serial.readline())
 
     def setAlgOn(self, status=False, algontime=0.0, forcewrite=False):
         if (status != self.algon) or forcewrite:
@@ -448,8 +467,8 @@ class driverhardware:
             print(f"wtf:{ctaux}!")
         if self.controlMode: # and self.taskIsControl:
             buf = self.serial.read(20)            
-            self.dacout[0] = float(struct.unpack_from(">h",buf,0)[0]) * self.iampscaler[self.perturbChannel] #- 1.0            
-            self.dacout[1] = float(struct.unpack_from(">h",buf,2)[0]) * self.iampscaler[self.controlChannel] #- 1.0
+            self.dacout[0] = float(struct.unpack_from(">h",buf,0)[0]) * self.iampscaler[self.perturbChannel]          
+            self.dacout[1] = float(struct.unpack_from(">h",buf,2)[0]) * self.iampscaler[self.controlChannel]
             # if self.debugPerturb != self.dacout[0]:
             #     print(f"Perturb: {self.debugPerturb} - {self.dacout[0]}")   
             # if self.debugControl != self.dacout[1]:
@@ -479,19 +498,10 @@ class driverhardware:
                         for k in range(3): 
                             self.accreadings[j][k] = float(struct.unpack_from("<h",buf,2*k+6+ptr)[0]) * self.accscaler[j]
                         ptr += 12  
-            # if (not self.taskIsControl):
-            #     if self.refid > 2:
-            #         self.xref = self.gyroreadings[self.refimuid][self.refid-3]
-            #     else:
-            #         self.xref = self.accreadings[self.refimuid][self.refid]
-            #     if self.erroid > 2:
-            #         self.xerro = self.gyroreadings[self.errimuid][self.erroid-3]
-            #     else:
-            #         self.xerro = self.accreadings[self.errimuid][self.erroid]
-            self.dacout[0] = float(struct.unpack_from(">h",buf,ptr)[0]) * self.iampscaler[0] # - 1.0
-            self.dacout[1] = float(struct.unpack_from(">h",buf,ptr+2)[0]) * self.iampscaler[1] # - 1.0
-            self.dacout[2] = float(struct.unpack_from(">b",buf,ptr+4)[0]) * self.iampscaler[2] # - 1.0
-            self.dacout[3] = float(struct.unpack_from(">b",buf,ptr+5)[0]) * self.iampscaler[3] # - 1.0
+            self.dacout[0] = float(struct.unpack_from(">h",buf,ptr)[0]) * self.iampscaler[0]
+            self.dacout[1] = float(struct.unpack_from(">h",buf,ptr+2)[0]) * self.iampscaler[1]
+            self.dacout[2] = float(struct.unpack_from(">b",buf,ptr+4)[0]) * self.iampscaler[2]
+            self.dacout[3] = float(struct.unpack_from(">b",buf,ptr+5)[0]) * self.iampscaler[3]
             ptr += 6
             if (self.adcconfig[0] & 0x0F) > 0:
                 for k in range(4):

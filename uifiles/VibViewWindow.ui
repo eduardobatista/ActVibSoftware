@@ -845,6 +845,7 @@
     <addaction name="actionUpload"/>
     <addaction name="actionPathModeling"/>
     <addaction name="actionDataViewer"/>
+    <addaction name="actionPreDist"/>
     <addaction name="menuSelecionar_Porta"/>
     <addaction name="menuSampling_Rate"/>
     <addaction name="separator"/>
@@ -985,6 +986,11 @@
   <action name="actionDataViewer">
    <property name="text">
     <string>Data Viewer...</string>
+   </property>
+  </action>
+  <action name="actionPreDist">
+   <property name="text">
+    <string>Output pre-distortion setup...</string>
    </property>
   </action>
  </widget>

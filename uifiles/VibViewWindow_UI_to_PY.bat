@@ -18,3 +18,4 @@ pyside2-uic --output=..\ActVib\ControlPanel.py ControlPanel.ui
 pyside2-uic --output=..\ActVib\ADCPanel.py ADCPanel.ui
 pyside2-uic --output=..\ActVib\PathModeling.py PathModeling.ui
 pyside2-uic --output=..\ActVib\DataViewer.py DataViewer.ui
+pyside2-uic --output=..\ActVib\PreDist.py PreDist.ui
