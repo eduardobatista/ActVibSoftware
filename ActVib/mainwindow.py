@@ -285,6 +285,8 @@ class mainwindow(QtWidgets.QMainWindow):
                 self.driver.predistenablemap[k] = True if tpredistmap[k] == 'true' else False
         if settings.value("PreDistCoefs"):
             self.driver.predistcoefs = settings.value("PreDistCoefs")
+            if len(self.driver.predistcoefs) != 4:
+                self.driver.predistcoefs = [np.array([1.0,0.0]),np.array([1.0,0.0]),np.array([1.0,0.0]),np.array([1.0,0.0])]
         for imp in self.imupanel:
             imp.restoreState(settings)
         for gp in self.genpanel:

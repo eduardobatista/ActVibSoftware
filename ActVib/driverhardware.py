@@ -75,7 +75,7 @@ class driverhardware:
         self.debugPerturb = 0.0
         self.debugControl = 0.0
         self.predistenablemap = [False,False,False,False]
-        self.predistcoefs = [np.array([1.0,0.0]),np.array([1.0,0.0]),np.array([1.0,0.0])]
+        self.predistcoefs = [np.array([1.0,0.0]),np.array([1.0,0.0]),np.array([1.0,0.0]),np.array([1.0,0.0])]
 
 
     def setPort(self,port):
