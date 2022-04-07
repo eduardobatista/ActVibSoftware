@@ -478,7 +478,7 @@ class mainwindow(QtWidgets.QMainWindow):
                 self.driver.setIMUConfig(k,self.imupanel[k].getIMUConfig())
             self.changeADCConfig()
 
-            self.driver.setPort(self.porta)
+            # self.driver.setPort(self.porta)
             self.dataman.IniciaLeituras()
 
 
@@ -534,6 +534,7 @@ class mainwindow(QtWidgets.QMainWindow):
                     if acc.text().startswith(">"):
                         acc.setText(acc.text()[1:])
             self.ui.statusbar.clearMessage()
+            self.driver.setPort(self.porta)
         else: 
             self.ui.statusbar.setMessage("Not allowed when running.")
 

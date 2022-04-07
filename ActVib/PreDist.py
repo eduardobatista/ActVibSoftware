@@ -17,7 +17,7 @@ class Ui_PreDistDialog(object):
     def setupUi(self, PreDistDialog):
         if not PreDistDialog.objectName():
             PreDistDialog.setObjectName(u"PreDistDialog")
-        PreDistDialog.resize(518, 204)
+        PreDistDialog.resize(518, 255)
         self.gridLayout_2 = QGridLayout(PreDistDialog)
         self.gridLayout_2.setObjectName(u"gridLayout_2")
         self.gridLayout_2.setContentsMargins(3, 3, 3, 3)
@@ -87,17 +87,17 @@ class Ui_PreDistDialog(object):
 
     def retranslateUi(self, PreDistDialog):
         PreDistDialog.setWindowTitle(QCoreApplication.translate("PreDistDialog", u"Pre-distortion Configuration", None))
-        self.label.setText(QCoreApplication.translate("PreDistDialog", u"<html><head/><body><p align=\"justify\"><span style=\" font-size:9pt;\">Input must be an array containing the polynomial coefficients </span><span style=\" font-size:9pt; font-weight:600;\">[a(k), a(k-1), ... , a(0)]</span><span style=\" font-size:9pt;\">,<br/>where </span><span style=\" font-size:9pt; font-weight:600;\">y = a(k)*x</span><span style=\" font-size:9pt; font-weight:600; vertical-align:super;\">k</span><span style=\" font-size:9pt; font-weight:600;\"> + a(k-1)*x</span><span style=\" font-size:9pt; font-weight:600; vertical-align:super;\">k-1</span><span style=\" font-size:9pt; font-weight:600;\"> + ... + a(1)*x</span><span style=\" font-size:9pt; font-weight:600;\"> + </span><span style=\" font-size:9pt; font-weight:600;\">a(0)</span><span style=\" font-size:9pt;\">. Thus, for a </span><span style=\" font-size:9pt; font-weight:600;\">K-th</span><span style=\" font-size:9pt;\"> order <br/>polynomial, </span><span style=\" font-size:9pt; font-weight:600;\">K+1</span><span style=\" font-size:9pt;\"> "
-                        "coefficients are required. Maximum order is </span><span style=\" font-size:9pt; font-weight:600;\">9</span><span style=\" font-size:9pt;\">.</span></p></body></html>", None))
+        self.label.setText(QCoreApplication.translate("PreDistDialog", u"<html><head/><body><p align=\"center\"><span style=\" font-size:9pt;\"><br/>Input must be an array containing the polynomial coefficients </span><span style=\" font-size:9pt; font-weight:600;\">[a(k) a(k-1) ... a(0)]</span><span style=\" font-size:9pt;\">,</span></p><p align=\"center\"><span style=\" font-size:9pt;\">where </span><span style=\" font-size:9pt; font-weight:600;\">y = a(k)*x</span><span style=\" font-size:9pt; font-weight:600; vertical-align:super;\">k</span><span style=\" font-size:9pt; font-weight:600;\"> + a(k-1)*x</span><span style=\" font-size:9pt; font-weight:600; vertical-align:super;\">k-1</span><span style=\" font-size:9pt; font-weight:600;\"> + ... + a(1)*x + a(0)</span><span style=\" font-size:9pt;\">. Thus, for a </span><span style=\" font-size:9pt; font-weight:600;\">K-th</span><span style=\" font-size:9pt;\"> order </span></p><p align=\"center\"><span style=\" font-size:9pt;\">polynomial, </span><span style=\" font-size:9pt; font-weight:600;\">K+1</span><span style=\" font-size:9pt;"
+                        "\"> coefficients are required. Maximum order is </span><span style=\" font-size:9pt; font-weight:600;\">9</span><span style=\" font-size:9pt;\">.<br/></span></p></body></html>", None))
         self.checkEnable4.setText(QCoreApplication.translate("PreDistDialog", u"Enable for Output 4:", None))
         self.checkEnable3.setText(QCoreApplication.translate("PreDistDialog", u"Enable for Output 3:", None))
         self.checkEnable2.setText(QCoreApplication.translate("PreDistDialog", u"Enable for Output 2:", None))
         self.statusLabel.setText("")
         self.bSave.setText(QCoreApplication.translate("PreDistDialog", u"Check and Save", None))
-        self.textPoly3.setText(QCoreApplication.translate("PreDistDialog", u"[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]", None))
-        self.textPoly2.setText(QCoreApplication.translate("PreDistDialog", u"[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]", None))
+        self.textPoly3.setText(QCoreApplication.translate("PreDistDialog", u"[0.0  0.0  0.0  0.0  0.0  0.0  0.0]", None))
+        self.textPoly2.setText(QCoreApplication.translate("PreDistDialog", u"[0.0  0.0  0.0  0.0  0.0  0.0  0.0]", None))
         self.checkEnable1.setText(QCoreApplication.translate("PreDistDialog", u"Enable for Output 1:", None))
-        self.textPoly1.setText(QCoreApplication.translate("PreDistDialog", u"[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]", None))
-        self.textPoly4.setText(QCoreApplication.translate("PreDistDialog", u"[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]", None))
+        self.textPoly1.setText(QCoreApplication.translate("PreDistDialog", u"[0.0  0.0  0.0  0.0  0.0  0.0  0.0]", None))
+        self.textPoly4.setText(QCoreApplication.translate("PreDistDialog", u"[0.0  0.0  0.0  0.0  0.0  0.0  0.0]", None))
     # retranslateUi
 

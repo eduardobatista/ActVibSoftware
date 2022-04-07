@@ -89,7 +89,7 @@ class MyPreDistDialog(QDialog):
         
     def showPreDistDialog(self):
         for k,pflag in enumerate(self.driver.predistenablemap):
-            self.textFields[k].setText(np.array2string(self.driver.predistcoefs[k],separator=","))
+            self.textFields[k].setText(np.array2string(self.driver.predistcoefs[k]))
             self.checks[k].setChecked(pflag)
         self.exec_()
 
@@ -98,7 +98,7 @@ class MyPreDistDialog(QDialog):
         try:
             for k in range(4):
                 self.driver.predistenablemap[k] = self.checks[k].isChecked()
-                self.driver.predistcoefs[k] = np.fromstring(self.textFields[k].text().strip("[]"),sep=",") 
+                self.driver.predistcoefs[k] = np.fromstring(self.textFields[k].text().strip("[]"),sep=" ") 
                 if len(self.driver.predistcoefs[k].shape) > 1:
                     self.driver.predistenablemap[k] = False
                     self.driver.predistcoefs[k] = np.array([1.0,0.0])
@@ -108,7 +108,14 @@ class MyPreDistDialog(QDialog):
                     self.driver.predistcoefs[k] = np.array([1.0,0.0])
                     raise BaseException("Maximum order is 9.")
             print(self.driver.predistcoefs)
-            self.ui.statusLabel.setText("Coefficients checked and salved successfully!")
+            print(self.driver.predistenablemap)
+            self.driver.openSerial()
+            for k in range(4):
+                self.driver.writePredistConfig(id=k)
+                # print(k)
+            self.driver.recordPredistConfig()
+            self.driver.serial.close()
+            self.ui.statusLabel.setText("Coefficients checked, salved and written to device.")
         except BaseException as ex:
             self.ui.statusLabel.setText(f"Error: {ex}")
 

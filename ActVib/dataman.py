@@ -75,12 +75,11 @@ class dataman (QObject):
                 if self.driver.IMUEnableFlags[k]:
                     self.driver.initHardware(k)
             self.driver.writeADCConfig()   
-            for k in range(4):
-                self.driver.writePredistConfig(id=k)         
+            # for k in range(4):
+            #     self.driver.writePredistConfig(id=k)         
             for k in range(4):
                 self.driver.writeGeneratorConfig(id=k)
-                time.sleep(0.1)    
-                    
+                time.sleep(0.1)
             if self.ctrlmode:  # If control on and control task is control (not path modelling)                
                 self.driver.writeControlConfig()
                 self.driver.setAlgOn(False, 0, forcewrite=True)                

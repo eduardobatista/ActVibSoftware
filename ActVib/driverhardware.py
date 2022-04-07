@@ -181,37 +181,55 @@ class driverhardware:
     def writeSampling(self,TSampling: int):
         # print("writeIMU")
         aux = bytearray([ord('f')] + [TSampling])
-        self.serial.write(aux)
-        self.serial.flush() 
-        aux = self.serial.read(2)
-        if (aux[0] != ord('f')) or (aux[1] != TSampling):
-            print(aux)
-            raise Exception(f'Error writing sampling rate.')
+        tries = 0
+        while tries < 5:
+            self.serial.write(aux)
+            self.serial.flush() 
+            aux = self.serial.read(2)
+            if (aux[0] != ord('f')) or (aux[1] != TSampling):
+                print(aux)
+                tries += 1
+                self.serial.reset_output_buffer()
+                self.serial.reset_input_buffer()
+                # time.sleep(0.1)
+            else: 
+                return True
+        raise Exception(f'Error writing sampling rate.')
 
     
     def writePredistConfig(self, id=0):
+        self.serial.reset_output_buffer()
+        self.serial.reset_input_buffer()
         order = (self.predistcoefs[id].shape[0] - 1) if self.predistenablemap[id] else 0
         aux = 'p'.encode() + bytes([id, order])
         if order > 0:
             for k in range(order+1):
                 aux = aux + struct.pack("f",self.predistcoefs[id][k])
-        print(aux)
         tries = 0
         while tries < 5:
             self.serial.write(aux)   
             self.serial.flush()   
             auxr = self.serial.read(2)
             if auxr != b'ok':
-                print(auxr)
-                print(id)
+                print(f"id={id}: {auxr}")
                 tries += 1
+                time.sleep(0.1)
                 self.serial.reset_output_buffer()
-                self.serial.reset_input_buffer()
-                time.sleep(0.05)
-            else: 
-                break
-        if tries >= 5:
-            raise Exception(f'Error configuring predistorter {id}.')
+                self.serial.reset_input_buffer()                
+            else:
+                if order > 0:
+                    auxr = self.serial.read((order+1)*4)
+                    if auxr != aux[3:]:
+                        raise Exception(f'Byte check failed for predistorter {id}. Please try again.')
+                return
+        raise Exception(f'Error configuring predistorter {id}.')
+
+    def recordPredistConfig(self):
+        aux = 'w'.encode()
+        self.serial.write(aux)
+        auxr = self.serial.read(3)
+        if auxr != b'ok!':
+            raise Exception("Failed record predist data in device memory.")
 
 
     def writeGeneratorConfig(self, id=0):        
