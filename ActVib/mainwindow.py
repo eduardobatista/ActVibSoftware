@@ -11,7 +11,7 @@ from .VibViewWindow import Ui_MainWindow
 
 from .figures import (MyFigQtGraph, CtrlFigQtGraph, FigOutputQtGraph)
 
-from .dialogs import (WorkdirManager, MyUploadDialog, MyPathModelingDialog, MyDataViewer, MyPreDistDialog)
+from .dialogs import (WorkdirManager, MyUploadDialog, MyPathModelingDialog, MyDataViewer, MyAdditionalDialog)
 
 from .panels import (IMUPanel,GeneratorPanel,PlotCfgPanel,ControlPanel,ADCPanel)
 
@@ -58,7 +58,7 @@ class mainwindow(QtWidgets.QMainWindow):
         self.ui.actionWorkdirManager.triggered.connect(self.openWorkdirManager)
         self.ui.actionPathModeling.triggered.connect(self.openPathModelingDialog)
         self.ui.actionDataViewer.triggered.connect(self.openDataViewer)
-        self.ui.actionPreDist.triggered.connect(self.openPreDistConfig)
+        self.ui.actionAdditional.triggered.connect(self.openAdditionalConfig)
         
         # IMU Connections:        
         self.ui.imutab1.layout().addWidget(self.imupanel[0])
@@ -287,6 +287,8 @@ class mainwindow(QtWidgets.QMainWindow):
             self.driver.predistcoefs = settings.value("PreDistCoefs")
             if len(self.driver.predistcoefs) != 4:
                 self.driver.predistcoefs = [np.array([1.0,0.0]),np.array([1.0,0.0]),np.array([1.0,0.0]),np.array([1.0,0.0])]
+        if settings.value("FusionWeights"):            
+            self.driver.fusionweights = [float(x) for x in settings.value("FusionWeights")]
         for imp in self.imupanel:
             imp.restoreState(settings)
         for gp in self.genpanel:
@@ -315,6 +317,7 @@ class mainwindow(QtWidgets.QMainWindow):
         settings.setValue("LastDataFolder", str(self.dataman.lastdatafolder))
         settings.setValue("PreDistEnMap", self.driver.predistenablemap)
         settings.setValue("PreDistCoefs", self.driver.predistcoefs)
+        settings.setValue("FusionWeights", self.driver.fusionweights)
         for imp in self.imupanel:
             imp.saveState(settings)
         for gp in self.genpanel:
@@ -560,10 +563,10 @@ class mainwindow(QtWidgets.QMainWindow):
             self.dvd = MyDataViewer(self.dataman)
             self.dvd.showDataViewerDialog()
 
-    def openPreDistConfig(self):
+    def openAdditionalConfig(self):
         if not self.dataman.flagrodando:
-            self.pdd = MyPreDistDialog(self.driver)
-            self.pdd.showPreDistDialog()
+            self.pdd = MyAdditionalDialog(self.driver)
+            self.pdd.showAdditionalDialog()
 
     def saveDialog(self):
         if self.dataman.flagrodando:

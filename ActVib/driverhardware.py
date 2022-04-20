@@ -76,6 +76,7 @@ class driverhardware:
         self.debugControl = 0.0
         self.predistenablemap = [False,False,False,False]
         self.predistcoefs = [np.array([1.0,0.0]),np.array([1.0,0.0]),np.array([1.0,0.0]),np.array([1.0,0.0])]
+        self.fusionweights = [0.5,0.5]
 
 
     def setPort(self,port):
@@ -224,7 +225,31 @@ class driverhardware:
                 return
         raise Exception(f'Error configuring predistorter {id}.')
 
-    def recordPredistConfig(self):
+    def writeFusionConfig(self):
+        self.serial.reset_output_buffer()
+        self.serial.reset_input_buffer()
+        aux = 'F'.encode()
+        for k in range(2):
+            aux = aux + struct.pack("f",self.fusionweights[k])
+        tries = 0
+        while tries < 5:
+            self.serial.write(aux)   
+            self.serial.flush()   
+            auxr = self.serial.read(2)
+            if auxr != b'ok':
+                print(f"{auxr}")
+                tries += 1
+                time.sleep(0.1)
+                self.serial.reset_output_buffer()
+                self.serial.reset_input_buffer()                
+            else:
+                auxr = self.serial.read(8)
+                if auxr != aux[1:]:
+                    raise Exception(f'Byte check failed for sensor fusion weights. Please try again.')
+                return
+        raise Exception(f'Error configuring fusion coefficients.')
+
+    def recordAdditionalConfigs(self):
         aux = 'w'.encode()
         self.serial.write(aux)
         auxr = self.serial.read(3)

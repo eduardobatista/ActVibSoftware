@@ -86,6 +86,7 @@ class Ui_ControlForm(object):
         self.comboRef.addItem("")
         self.comboRef.addItem("")
         self.comboRef.addItem("")
+        self.comboRef.addItem("")
         self.comboRef.setObjectName(u"comboRef")
         sizePolicy1 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
         sizePolicy1.setHorizontalStretch(0)
@@ -117,6 +118,7 @@ class Ui_ControlForm(object):
         self.gridLayout.addWidget(self.comboIMUError, 1, 8, 1, 1)
 
         self.comboErro = QComboBox(self.frame)
+        self.comboErro.addItem("")
         self.comboErro.addItem("")
         self.comboErro.addItem("")
         self.comboErro.addItem("")
@@ -308,6 +310,7 @@ class Ui_ControlForm(object):
         self.comboRef.setItemText(3, QCoreApplication.translate("ControlForm", u"X Gyro", None))
         self.comboRef.setItemText(4, QCoreApplication.translate("ControlForm", u"Y Gyro", None))
         self.comboRef.setItemText(5, QCoreApplication.translate("ControlForm", u"Z Gyro", None))
+        self.comboRef.setItemText(6, QCoreApplication.translate("ControlForm", u"Z Accel + X Gyro", None))
 
         self.comboControlChannel.setItemText(0, QCoreApplication.translate("ControlForm", u"Output 1", None))
         self.comboControlChannel.setItemText(1, QCoreApplication.translate("ControlForm", u"Output 2", None))
@@ -325,6 +328,7 @@ class Ui_ControlForm(object):
         self.comboErro.setItemText(3, QCoreApplication.translate("ControlForm", u"X Gyro", None))
         self.comboErro.setItemText(4, QCoreApplication.translate("ControlForm", u"Y Gyro", None))
         self.comboErro.setItemText(5, QCoreApplication.translate("ControlForm", u"Z Gyro", None))
+        self.comboErro.setItemText(6, QCoreApplication.translate("ControlForm", u"Z Accel + X Gyro", None))
 
         self.label_48.setText(QCoreApplication.translate("ControlForm", u"Control:", None))
         self.label_24.setText(QCoreApplication.translate("ControlForm", u"Perturb.:", None))

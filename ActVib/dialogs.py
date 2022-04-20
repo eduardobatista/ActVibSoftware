@@ -12,7 +12,7 @@ from .WorkdirDialog import Ui_Dialog as WorkdirDialog
 from .UploadDialog import Ui_Dialog as UploadDialog
 from .PathModeling import Ui_PathModelingDialog as PathModelingDialog
 from .DataViewer import Ui_DataViewerDialog as DataViewerDialog
-from .PreDist import Ui_PreDistDialog as PreDistDialog
+from .Additional import Ui_AdditionalConfigDialog as AdditionalDialog
 from .DSP import FIRNLMS,easyFourier
 
 class WorkdirManager():
@@ -76,21 +76,23 @@ class WorkdirManager():
             return None
 
 
-class MyPreDistDialog(QDialog):
+class MyAdditionalDialog(QDialog):
 
     def __init__(self,driver):
         super().__init__()
         self.driver = driver
-        self.ui = PreDistDialog()
+        self.ui = AdditionalDialog()
         self.ui.setupUi(self)
         self.ui.bSave.clicked.connect(self.checkAndSave)
         self.textFields = [self.ui.textPoly1,self.ui.textPoly2,self.ui.textPoly3,self.ui.textPoly4]
         self.checks = [self.ui.checkEnable1,self.ui.checkEnable2,self.ui.checkEnable3,self.ui.checkEnable4]
         
-    def showPreDistDialog(self):
+    def showAdditionalDialog(self):
         for k,pflag in enumerate(self.driver.predistenablemap):
             self.textFields[k].setText(np.array2string(self.driver.predistcoefs[k]))
             self.checks[k].setChecked(pflag)
+        self.ui.spinFusionW1.setValue(self.driver.fusionweights[0])
+        self.ui.spinFusionW2.setValue(self.driver.fusionweights[1])
         self.exec_()
 
     def checkAndSave(self):
@@ -107,13 +109,15 @@ class MyPreDistDialog(QDialog):
                     self.driver.predistenablemap[k]
                     self.driver.predistcoefs[k] = np.array([1.0,0.0])
                     raise BaseException("Maximum order is 9.")
-            print(self.driver.predistcoefs)
-            print(self.driver.predistenablemap)
+            self.driver.fusionweights = [self.ui.spinFusionW1.value(),self.ui.spinFusionW2.value()]
+            # print(self.driver.predistcoefs)
+            # print(self.driver.predistenablemap)
+            # print(self.driver.fusionweights)
             self.driver.openSerial()
             for k in range(4):
                 self.driver.writePredistConfig(id=k)
-                # print(k)
-            self.driver.recordPredistConfig()
+            self.driver.writeFusionConfig()
+            self.driver.recordAdditionalConfigs()
             self.driver.serial.close()
             self.ui.statusLabel.setText("Coefficients checked, salved and written to device.")
         except BaseException as ex:

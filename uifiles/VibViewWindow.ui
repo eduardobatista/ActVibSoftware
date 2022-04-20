@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1090</width>
+    <width>1098</width>
     <height>732</height>
    </rect>
   </property>
@@ -803,8 +803,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1090</width>
-     <height>21</height>
+     <width>1098</width>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuArquivo">
@@ -845,7 +845,7 @@
     <addaction name="actionUpload"/>
     <addaction name="actionPathModeling"/>
     <addaction name="actionDataViewer"/>
-    <addaction name="actionPreDist"/>
+    <addaction name="actionAdditional"/>
     <addaction name="menuSelecionar_Porta"/>
     <addaction name="menuSampling_Rate"/>
     <addaction name="separator"/>
@@ -988,9 +988,9 @@
     <string>Data Viewer...</string>
    </property>
   </action>
-  <action name="actionPreDist">
+  <action name="actionAdditional">
    <property name="text">
-    <string>Output pre-distortion setup...</string>
+    <string>Additional system setup...</string>
    </property>
   </action>
  </widget>

@@ -197,6 +197,11 @@
              <string>Z Gyro</string>
             </property>
            </item>
+           <item>
+            <property name="text">
+             <string>Z Accel + X Gyro</string>
+            </property>
+           </item>
           </widget>
          </item>
          <item row="1" column="5">
@@ -293,6 +298,11 @@
            <item>
             <property name="text">
              <string>Z Gyro</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Z Accel + X Gyro</string>
             </property>
            </item>
           </widget>
