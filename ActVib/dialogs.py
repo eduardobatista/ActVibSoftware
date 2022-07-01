@@ -221,7 +221,6 @@ class MyDataViewer(QDialog):
             myplot2.plot(self.datafromfile.time,self.datafromfile.ref,pen=pens[1],name="Reference")
         
 
-
 class MyPathModelingDialog():
 
     def __init__(self,dataman,driver):
@@ -427,8 +426,6 @@ class MyPathModelingDialog():
             self.pdialog.ui.statusLabel.setText(f"Error: {ex}.")
         
 
-
-
 class MyUploadDialog():
 
     def __init__(self, driver, dataman):
@@ -515,3 +512,18 @@ class MyUploadDialog():
             if self.driver.serial.isOpen():
                 self.driver.stopReadings()
             self.uploaddialog.ui.status.setText(str(err))
+
+
+
+# class MyAutomatorDialog():
+
+#     def __init__(self):
+#         self.adialog = QDialog()
+#         self.adialog.ui = AutomatorDialog()
+#         self.adialog.ui.setupUi(self.adialog)
+
+#     def showAutomatorDialog(self):
+#         self.adialog.exec_()
+
+#     def printMessage(self,msg):
+#         self.adialog.ui.messageArea.insertPlainText(msg)

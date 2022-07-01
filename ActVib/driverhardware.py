@@ -152,12 +152,21 @@ class driverhardware:
 
 
     def initHardware(self,id=0):
-        aux = bytearray([ord('i')] + [id])
-        self.serial.write(aux)
-        self.serial.flush()
-        aux = self.serial.read(3)
-        if aux != b'ok!':
-            raise Exception(f'Fail initializing the IMU with id={id}.')
+        ntries = 3
+        while ntries > 0:
+            aux = bytearray([ord('i')] + [id])
+            self.serial.write(aux)
+            self.serial.flush()
+            time.sleep(0.1)
+            aux = self.serial.read(3)
+            if aux == b'ok!':
+                return
+            else:
+                ntries -= 1
+                self.serial.reset_output_buffer()
+                self.serial.reset_input_buffer()
+                time.sleep(0.1)
+        raise Exception(f'Fail initializing the IMU with id={id}.')        
 
 
     def setIMUConfig(self,id: int, imucfgdata: list):

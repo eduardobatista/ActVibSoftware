@@ -15,7 +15,11 @@ from .dialogs import (WorkdirManager, MyUploadDialog, MyPathModelingDialog, MyDa
 
 from .panels import (IMUPanel,GeneratorPanel,PlotCfgPanel,ControlPanel,ADCPanel)
 
+from .automator import Automator
+
 class mainwindow(QtWidgets.QMainWindow):
+
+    resumeAutomator = QtCore.Signal()
 
     def __init__(self, app, driver, dataman, mainfig):
         super(mainwindow, self).__init__()
@@ -25,7 +29,7 @@ class mainwindow(QtWidgets.QMainWindow):
         self.cw = self.ui.centralwidget
         self.porta = "COM3"
         self.TSampling = 4   # 4 ms is the default
-        self.workdir = "D://"
+        self.workdir = Path.home()
         self.dataman = dataman
         self.driver = driver
         self.saveconfigtypes = [QtWidgets.QCheckBox, QtWidgets.QComboBox,
@@ -37,14 +41,14 @@ class mainwindow(QtWidgets.QMainWindow):
         self.plotcfgpanel = PlotCfgPanel()
         self.ctrlpanel = ControlPanel()
         self.readConfig()        
-        self.ui.bInit.clicked.connect(self.bInit)
-        self.ui.bLimpar.clicked.connect(self.bReset)
+        self.ui.bInit.clicked.connect(lambda: self.bInit(3600.0))
+        self.ui.bLimpar.clicked.connect(lambda: self.bReset(ignoreunsaved=False))
 
         self.mapper = QtCore.QSignalMapper(self)
         for acc in self.ui.menuSelecionar_Porta.actions():
             self.mapper.setMapping(acc, acc.text())
             acc.triggered.connect(self.mapper.map)
-        self.mapper.mapped['QString'].connect(self.setaPorta)
+        self.mapper.mapped['QString'].connect(self.setPort)
 
         self.mapper2 = QtCore.QSignalMapper(self)
         for sra in self.ui.menuSampling_Rate.actions():
@@ -53,7 +57,7 @@ class mainwindow(QtWidgets.QMainWindow):
         self.mapper2.mapped['QString'].connect(self.setSampling)
 
         self.ui.actionSair.triggered.connect(self.closeEvent)
-        self.ui.actionSalvar_dados.triggered.connect(self.saveDialog)
+        self.ui.actionSalvar_dados.triggered.connect(self.saveFile)
         self.ui.actionUpload.triggered.connect(self.openUploadDialog)
         self.ui.actionWorkdirManager.triggered.connect(self.openWorkdirManager)
         self.ui.actionPathModeling.triggered.connect(self.openPathModelingDialog)
@@ -121,16 +125,106 @@ class mainwindow(QtWidgets.QMainWindow):
         self.changeADCConfig()
         self.configControl()
 
-        saveplussc = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+S"), self, self.saveDialog)
+        saveplussc = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+S"), self, self.saveFile)
         saveplus2sc = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+Shift+S"), self, self.savePlus2)
         initstop = QtWidgets.QShortcut(QtGui.QKeySequence("Space"), self, self.kSpace)
         stepfocus = QtWidgets.QShortcut(QtGui.QKeySequence("Alt+P"), self, self.pFocus)
         self.ui.actionSavePlus.triggered.connect(self.savePlus)
         self.ui.actionDefineWorkdir.triggered.connect(self.defWorkdir)
         self.flagsaveplus = False
+        
+        self.ui.actionAutomator.triggered.connect(self.showAutomator)
 
         self.disabledwhenrunning = []
 
+        self.automator = Automator(self.app)
+        self.automatorWaiting = False
+        self.automator.actionMessage.connect(self.processActions)
+        self.resumeAutomator.connect(self.automator.resume)
+    
+    def showAutomator(self):
+        self.automatorWaiting = False        
+        self.automator.showAutomatorDialog() 
+
+    def processActions(self,msg,opts):
+        dialogmsg = f"{self.automator.elapsedTime():.0f}: {msg}"
+        if msg == "Reset":
+            self.bReset(ignoreunsaved=True)
+            self.resumeAutomator.emit()            
+        elif msg == "ConfigOutput":
+            dialogmsg += f" - {opts}"
+            idxoutput = int(opts[0]) - 1
+            if (idxoutput >= 0) and (idxoutput < 4):
+                genenabled = True if (opts[1] in ["Enabled","True"]) else False
+                # self.genpanel[idxoutput].setEnabled(genenabled)
+                self.genpanel[idxoutput].ui.checkEnable.setChecked(genenabled)
+                if genenabled:
+                    self.genpanel[idxoutput].setGeneratorConfig(opts[2], float(opts[3]), float(opts[4]))
+            else: 
+                dialogmsg += f" Error: {str(ex)}"
+                self.automator.stop()
+            self.resumeAutomator.emit()
+        elif msg == "ControlChannels":
+            dialogmsg += f" - {opts}"
+            self.ctrlpanel.ui.comboPerturbChannel.setCurrentText(opts[0])
+            self.ctrlpanel.ui.comboControlChannel.setCurrentText(opts[1])
+            self.ctrlpanel.ui.comboIMURef.setCurrentText(opts[2])
+            self.ctrlpanel.ui.comboRef.setCurrentText(opts[3])
+            self.ctrlpanel.ui.comboIMUError.setCurrentText(opts[4])
+            self.ctrlpanel.ui.comboErro.setCurrentText(opts[5])
+            self.resumeAutomator.emit()
+        elif msg == "SetControlMode": 
+            dialogmsg += f" - {opts}"
+            self.ctrlpanel.ui.checkControle.setChecked(True)
+            self.ctrlpanel.ui.comboCtrlTask.setCurrentIndex(0)
+            self.ctrlpanel.ui.comboAlgoritmo.setCurrentText(opts[0])
+            self.ctrlpanel.ui.spinTAlgOn.setValue(int(opts[1]))
+            self.ctrlpanel.ui.spinMemCtrl.setValue(int(opts[2]))
+            self.ctrlpanel.ui.passoCtrl.setText(opts[3])
+            self.ctrlpanel.ui.normCtrl.setText(opts[4]) 
+            self.resumeAutomator.emit()
+        elif msg == "SetPathModeling":            
+            self.ctrlpanel.ui.checkControle.setChecked(True)
+            self.ctrlpanel.ui.comboCtrlTask.setCurrentIndex(1)            
+            self.resumeAutomator.emit() 
+        elif msg == "Wait":            
+            if not self.dataman.flagrodando:
+                self.resumeAutomator.emit()
+                self.automatorWaiting = False
+            else:
+                self.automatorWaiting = True
+        elif msg == "Start":
+            dialogmsg += f" with stop time {opts[0]}"
+            self.automatorWaiting = False
+            self.bInit(stoptime=int(opts[0])) 
+            self.resumeAutomator.emit() 
+        elif msg == "AlgOn":
+            self.ctrlpanel.ui.checkAlgOn.setChecked(True if (opts[0] == "True") else False)  
+            self.resumeAutomator.emit() 
+        elif msg == "Stopping":
+            if self.dataman.flagrodando:
+                self.bInit()       
+        elif msg == "Print":
+            print(opts[0])
+            self.resumeAutomator.emit()
+        elif msg == "SaveFile":
+            try:
+                self.saveFile(fname=Path(self.workdir,opts[0]))
+                self.resumeAutomator.emit()
+            except BaseException as ex:
+                dialogmsg += f" Error: {str(ex)}"
+                self.automator.stop()
+        elif msg == "SetWorkDir":
+            try:
+                aux = Path.home() / opts[0]
+                aux.mkdir(parents=True,exist_ok=True)
+                print(aux)
+                self.workdir = aux
+                self.resumeAutomator.emit()
+            except BaseException as ex:
+                dialogmsg += f" Error: {str(ex)}"
+                self.automator.stop()
+        self.automator.printMessage(dialogmsg + "\n") 
 
     def processLogMsg(self,tstamp,msg):
         if tstamp == 0:
@@ -247,7 +341,7 @@ class mainwindow(QtWidgets.QMainWindow):
 
 
     def defWorkdir(self):
-        fdg = QFileDialog(self, "Escolha Diretório de Trabalho (workdir)", getenv('HOME'))
+        fdg = QFileDialog(self, "Escolha Diretório de Trabalho (workdir)", Path.home())
         fdg.setFileMode(QFileDialog.DirectoryOnly)
         if fdg.exec():
             dirnames = fdg.selectedFiles()
@@ -272,7 +366,7 @@ class mainwindow(QtWidgets.QMainWindow):
                     w.setText(settings.value(w.objectName()))
         if (settings.value("Porta") is not None):
             self.porta = settings.value("Porta")
-            self.setaPorta(self.porta)
+            self.setPort(self.porta)
         if (settings.value("TSampling") is not None):
             self.setSampling(settings.value("TSampling"))            
         if (settings.value("WorkDir") is not None):
@@ -450,7 +544,7 @@ class mainwindow(QtWidgets.QMainWindow):
         self.ui.plotLayout2.addWidget(self.ofig)
         
     
-    def bInit(self):
+    def bInit(self,stoptime=3600.0):
         if self.dataman.flagrodando:
             self.dataman.ParaLeituras()
         else:
@@ -482,20 +576,27 @@ class mainwindow(QtWidgets.QMainWindow):
             self.changeADCConfig()
 
             # self.driver.setPort(self.porta)
-            self.dataman.IniciaLeituras()
+            self.dataman.IniciaLeituras(stoptime=stoptime)
 
 
     def readingsStopped(self):
         for cc in self.disabledwhenrunning:
             cc.setEnabled(True)
+        print("Uepa!!")
         self.ctrlpanel.ui.checkAlgOn.setEnabled(False)
         self.ctrlpanel.ui.checkAlgOn.setChecked(False)
+        if (self.dataman.errorlevel > 0) and self.automator.running:
+            self.automator.stop()
+        elif self.automatorWaiting:
+            print("Uepa!!!")
+            self.resumeAutomator.emit()
 
-    def bReset(self):
+
+    def bReset(self,ignoreunsaved=False):
         if self.dataman.flagrodando:
             self.ui.statusbar.showMessage("Leituras sendo realizadas, dados não podem ser apagados.")
             return
-        if not self.dataman.flagsaved:
+        if (not self.dataman.flagsaved) and (not ignoreunsaved):
             buttonReply = QMessageBox.question(self, 'Atenção!', "Dados não salvos poderão ser apagados, confirma?",
                                                QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
             if buttonReply == QMessageBox.Yes:
@@ -525,7 +626,7 @@ class mainwindow(QtWidgets.QMainWindow):
             self.ui.statusbar.clearMessage()
             
         
-    def setaPorta(self, portasel):
+    def setPort(self, portasel):
         if not self.dataman.flagrodando:
             if portasel.startswith(">"):
                 portasel = portasel[1:]
@@ -568,11 +669,14 @@ class mainwindow(QtWidgets.QMainWindow):
             self.pdd = MyAdditionalDialog(self.driver)
             self.pdd.showAdditionalDialog()
 
-    def saveDialog(self):
+    def saveFile(self,fname=None):
         if self.dataman.flagrodando:
             self.ui.statusbar.showMessage("Leituras sendo realizadas, dados não podem ser salvos.")
             return
-        filename = QFileDialog.getSaveFileName(self, "Salvar Arquivo", getenv('HOME'), 'feather (*.feather)')
+        if fname:
+            filename = [fname]
+        else:
+            filename = QFileDialog.getSaveFileName(self, "Salvar Arquivo", getenv('HOME'), 'feather (*.feather)')
         if (filename[0] != ''):
             try:
                 notes = self.ui.notes.toPlainText()

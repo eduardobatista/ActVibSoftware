@@ -45,15 +45,17 @@ class dataman (QObject):
         self.ctrlmode = False
         self.taskisctrl = False
         self.lastdatafolder = None
+        self.errorlevel = 0
 
 
     def ParaLeituras(self):
         self.flagparar = True
         self.statusMessage.emit(None)
 
-    def IniciaLeituras(self):
+    def IniciaLeituras(self,stoptime=3600.0):
         self.statusMessage.emit(None)      
         self.flagparar = False
+        self.stoptime = stoptime
         self.mythread = Thread(target=self.LeDados)
         self.mythread.start()
 
@@ -61,6 +63,7 @@ class dataman (QObject):
         try:
             # trd = Thread(target=self.updateFigs)
             # trd.start()
+            self.errorlevel = 0
             self.ctrlmode = self.driver.controlMode
             self.taskisctrl = self.driver.taskIsControl
             self.debugmode = self.driver.debugMode
@@ -141,6 +144,8 @@ class dataman (QObject):
                     #     trd.start()
                     # print(f'{int(self.driver.calctime)} us')
                     self.updateFigures.emit()
+                    if self.readtime >= self.stoptime:
+                        self.ParaLeituras()
                 ctaux = 0            
             self.driver.stopReadings()
             self.stopped.emit()
@@ -156,6 +161,7 @@ class dataman (QObject):
                 self.driver.stopReadings()
             self.flagrodando = False
             self.statusMessage.emit("Error: " + str(err))
+            self.errorlevel = 1
             self.stopped.emit()
 
 
@@ -231,13 +237,13 @@ class dataman (QObject):
                     
             df = pd.DataFrame(thedict)
 
-            # df.to_feather(filename + "2")         
+            # df.to_feather(filename + "2")
             
             # df.to_csv(filename)
             if loglist:
                 # print(loglist)
                 df = pd.concat([df,pd.DataFrame({"log":[" "]})],axis=1)
-                tempo = df["Tempo (s)"].values
+                tempo = df["time"].values
                 idx = 0
                 for item in loglist:
                     while tempo[idx] < item[0]:

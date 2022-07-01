@@ -154,11 +154,21 @@ class ControlPanel(QtWidgets.QWidget,StateSaver):
         return self.ui.comboPerturbChannel.currentIndex()
 
     def getControlConfiguration(self):
+        try:
+            fifloat = float(self.ui.normCtrl.text())            
+        except:
+            self.ui.normCtrl.setText("0.01")
+            fifloat = 0.01
+        try:
+            mufloat = float(self.ui.passoCtrl.text())
+        except:
+            self.ui.passoCtrl.setText("0.01")
+            mufloat = 0.01
         data = {
             "alg": self.ui.comboAlgoritmo.currentIndex(),
             "mem": int(self.ui.spinMemCtrl.value()),
-            "mu": float(self.ui.passoCtrl.text()),
-            "fi": float(self.ui.normCtrl.text()),
+            "mu": mufloat,
+            "fi": fifloat,
             "refimuid": self.ui.comboIMURef.currentIndex(),
             "errimuid": self.ui.comboIMUError.currentIndex(),
             "refid": self.ui.comboRef.currentIndex(), # from 0 to 5, from AccX to GyroZ
@@ -225,6 +235,17 @@ class GeneratorPanel(QtWidgets.QWidget,StateSaver):
                 aa.setEnabled(False)
             self.ui.spinAmpl.setEnabled(True)
             self.ui.spinFreq.setEnabled(True)
+    
+    def setGeneratorConfig(self,signaltype,amp,freq,dclevel=None):
+        if isinstance(signaltype, str):
+            self.ui.comboType.setCurrentText(signaltype)
+        elif isinstance(signaltype, int):
+            self.ui.comboType.setCurrentIndex(signaltype)
+        self.ui.spinAmpl.setValue(amp)
+        self.ui.spinFreq.setValue(freq)
+        if dclevel:
+            self.ui.spinDCLevel.setValue(dclevel)
+
     
     def setEnabled(self,en):
         self.ui.checkEnable.setEnabled(en)

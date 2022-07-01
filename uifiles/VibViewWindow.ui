@@ -804,7 +804,7 @@
      <x>0</x>
      <y>0</y>
      <width>1098</width>
-     <height>26</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuArquivo">
@@ -845,6 +845,7 @@
     <addaction name="actionUpload"/>
     <addaction name="actionPathModeling"/>
     <addaction name="actionDataViewer"/>
+    <addaction name="actionAutomator"/>
     <addaction name="actionAdditional"/>
     <addaction name="menuSelecionar_Porta"/>
     <addaction name="menuSampling_Rate"/>
@@ -991,6 +992,11 @@
   <action name="actionAdditional">
    <property name="text">
     <string>Additional system setup...</string>
+   </property>
+  </action>
+  <action name="actionAutomator">
+   <property name="text">
+    <string>Automator...</string>
    </property>
   </action>
  </widget>
