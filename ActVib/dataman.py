@@ -210,9 +210,11 @@ class dataman (QObject):
                         pass
                     df.at[idx, "log"] = item[1]
                     idx += 1
-
-            df.to_feather(filename)
-            self.statusMessage.emit("File saved successfully.")
+            if filename.endswith("feather"):
+                df.to_feather(filename)
+            elif filename.endswith("csv"):
+                df.to_csv(filename)
+            self.statusMessage.emit(f"File {filename} saved successfully.")
 
         else:
             limf = self.globalctreadings
@@ -267,8 +269,11 @@ class dataman (QObject):
                 #         # df["Log"][df["Tempo (s)"] == float(item[0])] = item[1]
                 # # lista = [f"{item[0]}: {item[1]}" for item in loglist]
 
-            df.to_feather(filename)
-            self.statusMessage.emit("File saved successfully.")
+            if filename.endswith("feather"):
+                df.to_feather(filename)
+            elif filename.endswith("csv"):
+                df.to_csv(filename)
+            self.statusMessage.emit(f"File {filename} saved successfully.")
             
 
         self.flagsaved = setsaved

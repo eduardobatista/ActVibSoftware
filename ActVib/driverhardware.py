@@ -3,6 +3,7 @@
 """
 import time
 import serial
+import serial.tools.list_ports
 import struct
 from .CantileverBeam import CantileverBeam
 import numpy as np
@@ -78,6 +79,9 @@ class driverhardware:
         self.predistcoefs = [np.array([1.0,0.0]),np.array([1.0,0.0]),np.array([1.0,0.0]),np.array([1.0,0.0])]
         self.fusionweights = [0.5,0.5]
 
+    def listPorts(self):
+        ports = serial.tools.list_ports.comports()
+        return ports
 
     def setPort(self,port):
         self.serial.port = port

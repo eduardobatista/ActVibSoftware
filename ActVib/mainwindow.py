@@ -45,9 +45,9 @@ class mainwindow(QtWidgets.QMainWindow):
         self.ui.bLimpar.clicked.connect(lambda: self.bReset(ignoreunsaved=False))
 
         self.mapper = QtCore.QSignalMapper(self)
-        for acc in self.ui.menuSelecionar_Porta.actions():
-            self.mapper.setMapping(acc, acc.text())
-            acc.triggered.connect(self.mapper.map)
+        # for acc in self.ui.menuSelecionar_Porta.actions():
+        #     self.mapper.setMapping(acc, acc.text())
+        #     acc.triggered.connect(self.mapper.map)
         self.mapper.mapped['QString'].connect(self.setPort)
 
         self.mapper2 = QtCore.QSignalMapper(self)
@@ -55,6 +55,8 @@ class mainwindow(QtWidgets.QMainWindow):
             self.mapper2.setMapping(sra, sra.text())
             sra.triggered.connect(self.mapper2.map)
         self.mapper2.mapped['QString'].connect(self.setSampling)
+        
+        self.ui.menuSelecionar_Porta.aboutToShow.connect(self.populatePorts)
 
         self.ui.actionSair.triggered.connect(self.closeEvent)
         self.ui.actionSalvar_dados.triggered.connect(self.saveFile)
@@ -135,12 +137,15 @@ class mainwindow(QtWidgets.QMainWindow):
         
         self.ui.actionAutomator.triggered.connect(self.showAutomator)
 
+        self.lastSavedExtension = None
+
         self.disabledwhenrunning = []
 
         self.automator = Automator(self.app)
         self.automatorWaiting = False
         self.automator.actionMessage.connect(self.processActions)
         self.resumeAutomator.connect(self.automator.resume)
+
     
     def showAutomator(self):
         self.automatorWaiting = False        
@@ -623,10 +628,22 @@ class mainwindow(QtWidgets.QMainWindow):
                     if sra.text().startswith(">"):
                         sra.setText(sra.text()[1:])
             self.dataman.resetData(self.TSampling/1000)
-            self.ui.statusbar.clearMessage()
-            
+            self.ui.statusbar.clearMessage()   
+
+    def populatePorts(self):
+        self.ui.menuSelecionar_Porta.clear()
+        ports = self.driver.listPorts()
+        for port, desc, hwid in sorted(ports):
+            # print("{}: {} [{}]".format(port, desc, hwid))
+            if port == self.porta:
+                port = f">{port}"
+            self.ui.menuSelecionar_Porta.addAction(port)
+        for acc in self.ui.menuSelecionar_Porta.actions():
+            self.mapper.setMapping(acc, acc.text())
+            acc.triggered.connect(self.mapper.map)
         
     def setPort(self, portasel):
+        # print(portasel)
         if not self.dataman.flagrodando:
             if portasel.startswith(">"):
                 portasel = portasel[1:]
@@ -676,13 +693,29 @@ class mainwindow(QtWidgets.QMainWindow):
         if fname:
             filename = [fname]
         else:
-            filename = QFileDialog.getSaveFileName(self, "Salvar Arquivo", getenv('HOME'), 'feather (*.feather)')
+            extensionlist = 'feather (*.feather);;csv (*.csv)'
+            if self.lastSavedExtension:
+                if self.lastSavedExtension.startswith("csv"):
+                    extensionlist = 'csv (*.csv);;feather (*.feather)'
+            filename = QFileDialog.getSaveFileName(self, "Salvar Arquivo", getenv('HOME'), extensionlist)
         if (filename[0] != ''):
             try:
+                if filename[0].endswith(".csv"):
+                    extension = "csv"
+                elif filename[0].endswith(".feather"):
+                    extension = "feather"
+                else:
+                    extension = filename[1].split(" ")[0]
+                print(extension)
+                if not filename[0].endswith(f".{extension}"):
+                    ffname = filename[0] + f".{extension}"
+                else:
+                    ffname = filename[0]
                 notes = self.ui.notes.toPlainText()
                 if len(notes) > 0:
-                    self.loglist = [(0,notes)] + self.loglist
-                self.dataman.salvaArquivo(filename[0], True, loglist=self.loglist)
+                    self.loglist = [(0,notes)] + self.loglist                
+                self.dataman.salvaArquivo(ffname, True, loglist=self.loglist)
+                self.lastSavedExtension = extension
             except Exception as err:
                 QMessageBox.question(self.app, "Erro!", str(err), QMessageBox.Ok)
 
