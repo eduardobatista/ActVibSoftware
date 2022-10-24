@@ -29,6 +29,7 @@ class mainwindow(QtWidgets.QMainWindow):
         self.cw = self.ui.centralwidget
         self.porta = "COM3"
         self.TSampling = 4   # 4 ms is the default
+        self.MaxTime = 10   # 10 min is the default
         self.workdir = Path.home()
         self.dataman = dataman
         self.driver = driver
@@ -55,6 +56,12 @@ class mainwindow(QtWidgets.QMainWindow):
             self.mapper2.setMapping(sra, sra.text())
             sra.triggered.connect(self.mapper2.map)
         self.mapper2.mapped['QString'].connect(self.setSampling)
+
+        self.mapper3 = QtCore.QSignalMapper(self)
+        for sra in self.ui.menuMax_Time.actions():
+            self.mapper3.setMapping(sra, sra.text())
+            sra.triggered.connect(self.mapper3.map)
+        self.mapper3.mapped['QString'].connect(self.setMaxTime)
         
         self.ui.menuSelecionar_Porta.aboutToShow.connect(self.populatePorts)
 
@@ -373,7 +380,9 @@ class mainwindow(QtWidgets.QMainWindow):
             self.porta = settings.value("Porta")
             self.setPort(self.porta)
         if (settings.value("TSampling") is not None):
-            self.setSampling(settings.value("TSampling"))            
+            self.setSampling(settings.value("TSampling"))  
+        if (settings.value("MaxTime") is not None):
+            self.setMaxTime(settings.value("MaxTime"))          
         if (settings.value("WorkDir") is not None):
             self.workdir = settings.value("WorkDir")
         if (settings.value("LastDataFolder") is not None):
@@ -409,6 +418,7 @@ class mainwindow(QtWidgets.QMainWindow):
                 settings.setValue(w.objectName(), w.text())
         settings.setValue("Porta", self.porta)
         settings.setValue("TSampling", str(self.TSampling) + " ms")
+        settings.setValue("MaxTime", str(self.MaxTime) + " min")
         settings.setValue("MFig", self.mfig.getConfigString())
         settings.setValue("OFig", self.ofig.getConfigString())
         settings.setValue("CtrlFig", self.ctrlfig.getConfigString())
@@ -605,14 +615,30 @@ class mainwindow(QtWidgets.QMainWindow):
             buttonReply = QMessageBox.question(self, 'Atenção!', "Dados não salvos poderão ser apagados, confirma?",
                                                QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
             if buttonReply == QMessageBox.Yes:
-                self.dataman.resetData(self.TSampling/1000)
+                self.dataman.resetData(self.TSampling/1000,self.MaxTime)
                 self.ui.statusbar.clearMessage()
             else:
                 self.ui.statusbar.showMessage("Cancelado...")
         else:
-            self.dataman.resetData(self.TSampling/1000)
+            self.dataman.resetData(self.TSampling/1000,self.MaxTime)
             self.ui.statusbar.clearMessage()
         self.ctrlpanel.setEnabled(True,isreset=True)
+    
+    def setMaxTime(self, selmaxtime):
+        if self.dataman.flagrodando or (not self.dataman.flagsaved):
+            self.ui.statusbar.setMessage("Not allowed when running or with unsaved data.")
+        else:
+            if selmaxtime.startswith(">"):
+                selmaxtime = selmaxtime[1:]
+            self.MaxTime = int(selmaxtime[0:2])
+            for sra in self.ui.menuMax_Time.actions():
+                if sra.text().endswith(selmaxtime):
+                    sra.setText(f">{selmaxtime}")
+                else:
+                    if sra.text().startswith(">"):
+                        sra.setText(sra.text()[1:])
+            self.dataman.resetData(self.TSampling/1000,self.MaxTime)
+            self.ui.statusbar.clearMessage()   
 
     def setSampling(self, selsampling):
         if self.dataman.flagrodando or (not self.dataman.flagsaved):
@@ -627,7 +653,7 @@ class mainwindow(QtWidgets.QMainWindow):
                 else:
                     if sra.text().startswith(">"):
                         sra.setText(sra.text()[1:])
-            self.dataman.resetData(self.TSampling/1000)
+            self.dataman.resetData(self.TSampling/1000,self.MaxTime)
             self.ui.statusbar.clearMessage()   
 
     def populatePorts(self):

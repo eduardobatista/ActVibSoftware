@@ -166,8 +166,7 @@ class dataman (QObject):
 
 
     def resetData(self, samplingperiod=4e-3, maxtime=10):
-        """ 
-            Reset data with:
+        """ Reset data with:
               - samplingperiod in seconds
               - maxtime in minutes
         """

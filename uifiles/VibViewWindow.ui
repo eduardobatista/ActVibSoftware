@@ -804,7 +804,7 @@
      <x>0</x>
      <y>0</y>
      <width>1098</width>
-     <height>21</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuArquivo">
@@ -841,6 +841,14 @@
      <addaction name="action4_ms"/>
      <addaction name="action5_ms"/>
     </widget>
+    <widget class="QMenu" name="menuMax_Time">
+     <property name="title">
+      <string>Max Time</string>
+     </property>
+     <addaction name="action10_min"/>
+     <addaction name="action20_min"/>
+     <addaction name="action30_min"/>
+    </widget>
     <addaction name="actionSalvar_dados"/>
     <addaction name="actionUpload"/>
     <addaction name="actionPathModeling"/>
@@ -849,6 +857,7 @@
     <addaction name="actionAdditional"/>
     <addaction name="menuSelecionar_Porta"/>
     <addaction name="menuSampling_Rate"/>
+    <addaction name="menuMax_Time"/>
     <addaction name="separator"/>
     <addaction name="actionSavePlus"/>
     <addaction name="actionDefineWorkdir"/>
@@ -997,6 +1006,21 @@
   <action name="actionAutomator">
    <property name="text">
     <string>Automator...</string>
+   </property>
+  </action>
+  <action name="action10_min">
+   <property name="text">
+    <string>10 min</string>
+   </property>
+  </action>
+  <action name="action20_min">
+   <property name="text">
+    <string>20 min</string>
+   </property>
+  </action>
+  <action name="action30_min">
+   <property name="text">
+    <string>30 min</string>
    </property>
   </action>
  </widget>

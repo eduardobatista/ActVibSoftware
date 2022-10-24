@@ -1,12 +1,3 @@
-@REM pyuic5 --output=..\ActVib\VibViewWindow.py VibViewWindow.ui
-@REM pyuic5 --output=..\ActVib\PlotDialog.py PlotDialog.ui
-@REM pyuic5 --output=..\ActVib\UploadDialog.py UploadDialog.ui
-@REM pyuic5 --output=..\ActVib\WorkdirDialog.py WorkdirDialog.ui
-@REM pyuic5 --output=..\ActVib\IMUPanel.py IMUPanel.ui
-@REM pyuic5 --output=..\ActVib\GeneratorPanel.py GeneratorPanel.ui
-@REM pyuic5 --output=..\ActVib\PlotCfgPanel.py PlotCfgPanel.ui
-@REM pyuic5 --output=..\ActVib\ControlPanel.py ControlPanel.ui
-@REM pyuic5 --output=..\ActVib\ADCPanel.py ADCPanel.ui
 pyside2-uic --output=..\ActVib\VibViewWindow.py VibViewWindow.ui
 pyside2-uic --output=..\ActVib\PlotDialog.py PlotDialog.ui
 pyside2-uic --output=..\ActVib\UploadDialog.py UploadDialog.ui
