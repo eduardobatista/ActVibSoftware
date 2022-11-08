@@ -858,6 +858,7 @@
     <addaction name="menuSelecionar_Porta"/>
     <addaction name="menuSampling_Rate"/>
     <addaction name="menuMax_Time"/>
+    <addaction name="actionFirmware_Update"/>
     <addaction name="separator"/>
     <addaction name="actionSavePlus"/>
     <addaction name="actionDefineWorkdir"/>
@@ -1021,6 +1022,11 @@
   <action name="action30_min">
    <property name="text">
     <string>30 min</string>
+   </property>
+  </action>
+  <action name="actionFirmware_Update">
+   <property name="text">
+    <string>Firmware/Software Updater...</string>
    </property>
   </action>
  </widget>

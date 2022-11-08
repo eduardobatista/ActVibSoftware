@@ -17,6 +17,8 @@ from .panels import (IMUPanel,GeneratorPanel,PlotCfgPanel,ControlPanel,ADCPanel)
 
 from .automator import Automator
 
+from .firmwareupdater import FirmwareUpdater
+
 class mainwindow(QtWidgets.QMainWindow):
 
     resumeAutomator = QtCore.Signal()
@@ -72,6 +74,8 @@ class mainwindow(QtWidgets.QMainWindow):
         self.ui.actionPathModeling.triggered.connect(self.openPathModelingDialog)
         self.ui.actionDataViewer.triggered.connect(self.openDataViewer)
         self.ui.actionAdditional.triggered.connect(self.openAdditionalConfig)
+
+        self.ui.actionFirmware_Update.triggered.connect(self.firmwareUpdate)
         
         # IMU Connections:        
         self.ui.imutab1.layout().addWidget(self.imupanel[0])
@@ -153,6 +157,12 @@ class mainwindow(QtWidgets.QMainWindow):
         self.automator.actionMessage.connect(self.processActions)
         self.resumeAutomator.connect(self.automator.resume)
 
+        self.updater = FirmwareUpdater()
+        self.updater.actionMessage.connect(self.updater.printMessage) 
+
+    def firmwareUpdate(self):
+        self.updater.showUpdaterDialog(self.porta)
+        # fupd.runUpdate(self.porta)
     
     def showAutomator(self):
         self.automatorWaiting = False        
