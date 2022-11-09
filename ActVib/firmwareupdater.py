@@ -67,6 +67,10 @@ class FirmwareUpdater(QtCore.QObject):
                     fcmd = shlex.split(ff.read().replace("<SERIALPORT>",self.port))
                     self.actionMessage.emit(f'<br><strong>Running command:</strong> {(fcmd)} <br>',True)
                     self.actionMessage.emit(f'<br><span style="color: red;"><strong>WARNING: If connection fails, press and hold the "BOOT" button at the ESP32 board when trying to connect.</strong></span><br><br>',True)
+                    try:
+                        proc =  subprocess.Popen([fcmd[0],"--version"],stdout=subprocess.PIPE,cwd=flashcmd.parent)
+                    except BaseException as ex:
+                        fcmd[0] = "python"
                     proc =  subprocess.Popen(fcmd,stdout=subprocess.PIPE,cwd=flashcmd.parent)
                     while True:
                         # line = proc.stdout.readline().decode()
