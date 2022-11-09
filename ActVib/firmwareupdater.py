@@ -68,9 +68,13 @@ class FirmwareUpdater(QtCore.QObject):
                     self.actionMessage.emit(f'<br><strong>Running command:</strong> {(fcmd)} <br>',True)
                     self.actionMessage.emit(f'<br><span style="color: red;"><strong>WARNING: If connection fails, press and hold the "BOOT" button at the ESP32 board when trying to connect.</strong></span><br><br>',True)
                     try:
-                        proc =  subprocess.Popen([fcmd[0],"--version"],stdout=subprocess.PIPE,cwd=flashcmd.parent)
+                        proc =  subprocess.Popen([fcmd[0],"--version"],stdout=subprocess.PIPE,stderr=subprocess.PIPE,cwd=flashcmd.parent)
+                        if len(proc.stderr.readline()) > 0:
+                            self.actionMessage.emit("Python3 not found, attempting to use python...<br><br>",True)
+                            fcmd[0] = "python"
                     except BaseException as ex:
                         fcmd[0] = "python"
+                        self.actionMessage.emit("Python3 not found, attempting to use python....<br><br>",True)
                     proc =  subprocess.Popen(fcmd,stdout=subprocess.PIPE,cwd=flashcmd.parent)
                     while True:
                         # line = proc.stdout.readline().decode()
