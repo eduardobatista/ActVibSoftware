@@ -42,8 +42,8 @@ class driverhardware:
         self.setGeneratorConfig(id=2)
         self.setGeneratorConfig(id=3)
         self.serial = serial.Serial(port=None,
-                                    baudrate=115200,
-                                    # baudrate = 500000,
+                                    # baudrate=115200,
+                                    baudrate = 500000,
                                     parity=serial.PARITY_NONE,
                                     stopbits=serial.STOPBITS_ONE,
                                     bytesize=serial.EIGHTBITS,
