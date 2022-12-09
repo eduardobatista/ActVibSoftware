@@ -29,7 +29,7 @@ class Ui_UpdaterDialog(object):
 
         self.startSoftware = QPushButton(UpdaterDialog)
         self.startSoftware.setObjectName(u"startSoftware")
-        self.startSoftware.setEnabled(False)
+        self.startSoftware.setEnabled(True)
 
         self.gridLayout.addWidget(self.startSoftware, 1, 1, 1, 1)
 

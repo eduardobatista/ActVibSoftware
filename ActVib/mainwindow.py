@@ -17,7 +17,7 @@ from .panels import (IMUPanel,GeneratorPanel,PlotCfgPanel,ControlPanel,ADCPanel)
 
 from .automator import Automator
 
-from .firmwareupdater import FirmwareUpdater
+from .updater import Updater
 
 class mainwindow(QtWidgets.QMainWindow):
 
@@ -75,7 +75,7 @@ class mainwindow(QtWidgets.QMainWindow):
         self.ui.actionDataViewer.triggered.connect(self.openDataViewer)
         self.ui.actionAdditional.triggered.connect(self.openAdditionalConfig)
 
-        self.ui.actionFirmware_Update.triggered.connect(self.firmwareUpdate)
+        self.ui.actionFirmware_Update.triggered.connect(self.SFUpdate)
         
         # IMU Connections:        
         self.ui.imutab1.layout().addWidget(self.imupanel[0])
@@ -157,10 +157,10 @@ class mainwindow(QtWidgets.QMainWindow):
         self.automator.actionMessage.connect(self.processActions)
         self.resumeAutomator.connect(self.automator.resume)
 
-        self.updater = FirmwareUpdater()
+        self.updater = Updater()
         self.updater.actionMessage.connect(self.updater.printMessage) 
 
-    def firmwareUpdate(self):
+    def SFUpdate(self):
         self.updater.showUpdaterDialog(self.porta)
         # fupd.runUpdate(self.porta)
     
