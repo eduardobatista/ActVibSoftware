@@ -11,6 +11,7 @@ class Automator (QtCore.QObject):
     """
         Action List:
          - ConfigOutput: [Number (from 1 to 4), Enable, Type (Noise, Harmonic, ...), Ampl., Freq.]
+         - ConfigIMU: [Number (from 1 to 3), Type (Disabled, MPU6050, LSM6DS3), Addr., Bus (I2C-1, I2C-2, SPI), Accr (0 to 3), GyroR (0 to 4), Filter1 (0 to 5), Filter2 (0 to 3)]
          - SetReadingMode: []
          - ControlChannels: [Perturbation, Control, RefIMU, RefSensor, ErrIMU, ErrSensor]
          - SetControlMode: [Algorithm (by index), AlgOnTime, MemSize, StepSize, Penalization]
@@ -19,7 +20,7 @@ class Automator (QtCore.QObject):
          - Start: [stoptime]
          - Reset: []
     """
-    COMMANDS = ["ConfigOutput","SetReadingMode","ControlChannels","SetControlMode","SetPathModeling","AlgOn","Start","SaveFile"]
+    COMMANDS = ["ConfigOutput","SetReadingMode","ControlChannels","SetControlMode","SetPathModeling","AlgOn","Start","SaveFile","StartWait","ConfigIMU"]
 
     actionMessage = QtCore.Signal((str,list))
     logMessage = QtCore.Signal((int,str))
@@ -42,6 +43,8 @@ class Automator (QtCore.QObject):
         self.flagstop = False
         self.running = False
         self.pmodel = None
+        self.errorcount = 0
+        self.flagretry = False
         self.lista = [
             ["Reset",[]],
             ["ConfigOutput",[1,False]],
@@ -94,6 +97,17 @@ class Automator (QtCore.QObject):
             self.pauseevent.set()
         self.actionMessage.emit("Stopping",[])
         self.adialog.ui.bStop.setDisabled(True)
+    
+    def processerror(self,errorcode):
+        print(f"Error in Automator task: {errorcode}.")
+        self.errorcount += 1
+        if self.errorcount >= 3:
+            self.stop()
+        else:
+            self.flagretry = True
+            print(self.errorcount)
+            if self.seqthread:
+                self.pauseevent.set()
 
     def showAutomatorDialog(self):             
         self.adialog.exec_()
@@ -105,6 +119,7 @@ class Automator (QtCore.QObject):
         return (time.time() - self.starttime)
 
     def runSeq(self):
+        self.errorcount = 0
         while self.pauseevent.is_set():
             self.pauseevent.clear()
         self.seqthread = Thread(target=self.Seq,args=(self.pauseevent,0))
@@ -119,19 +134,25 @@ class Automator (QtCore.QObject):
             self.pauseevent.set()
 
     def Seq(self,pevent,val):
-        self.running = True      
-        for n,ll in enumerate(self.lista):
-            if ll[0] == "Delay":
-                time.sleep(ll[1][0])
+        self.running = True 
+        n = 0     
+        # for n,ll in enumerate(self.lista):
+        while n < len(self.lista):
+            self.flagretry = False
+            if self.lista[n][0] == "Delay":
+                time.sleep(int(self.lista[n][1][0]))
             else:
-                self.actionMessage.emit(ll[0],ll[1])
+                self.actionMessage.emit(self.lista[n][0],self.lista[n][1])
                 pevent.wait()
-                pevent.clear()
+                pevent.clear()                
             if self.flagstop:                    
                 self.flagstop = False
                 break
             if self.pmodel:
                 self.pmodel.actualrow = n
+            if not self.flagretry:
+                self.errorcount = 0
+                n += 1
         self.adialog.ui.bStart.setDisabled(False)
         self.adialog.ui.bStop.setDisabled(True)
         self.running = False

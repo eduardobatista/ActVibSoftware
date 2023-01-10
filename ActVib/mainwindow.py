@@ -3,13 +3,14 @@ from os import getenv
 import time
 
 import pandas as pd
+import numpy as np
 
 from PySide2 import QtWidgets, QtGui, QtCore
 from PySide2.QtWidgets import QMessageBox, QFileDialog, QCheckBox, QComboBox, QDoubleSpinBox, QSpinBox
 
 from .VibViewWindow import Ui_MainWindow
 
-from .figures import (MyFigQtGraph, CtrlFigQtGraph, FigOutputQtGraph)
+from .figures import (CtrlFigQtGraph, FigOutputQtGraph)
 
 from .dialogs import (WorkdirManager, MyUploadDialog, MyPathModelingDialog, MyDataViewer, MyAdditionalDialog)
 
@@ -28,8 +29,7 @@ class mainwindow(QtWidgets.QMainWindow):
         self.app = app
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        self.cw = self.ui.centralwidget
-        self.porta = "COM3"
+        self.Port = "COM3"
         self.TSampling = 4   # 4 ms is the default
         self.MaxTime = 10   # 10 min is the default
         self.workdir = Path.home()
@@ -48,9 +48,6 @@ class mainwindow(QtWidgets.QMainWindow):
         self.ui.bLimpar.clicked.connect(lambda: self.bReset(ignoreunsaved=False))
 
         self.mapper = QtCore.QSignalMapper(self)
-        # for acc in self.ui.menuSelecionar_Porta.actions():
-        #     self.mapper.setMapping(acc, acc.text())
-        #     acc.triggered.connect(self.mapper.map)
         self.mapper.mapped['QString'].connect(self.setPort)
 
         self.mapper2 = QtCore.QSignalMapper(self)
@@ -160,10 +157,12 @@ class mainwindow(QtWidgets.QMainWindow):
         self.updater = Updater()
         self.updater.actionMessage.connect(self.updater.printMessage) 
 
+
     def SFUpdate(self):
-        self.updater.showUpdaterDialog(self.porta)
+        self.updater.showUpdaterDialog(self.Port)
         # fupd.runUpdate(self.porta)
     
+
     def showAutomator(self):
         self.automatorWaiting = False        
         self.automator.showAutomatorDialog() 
@@ -182,6 +181,22 @@ class mainwindow(QtWidgets.QMainWindow):
                 self.genpanel[idxoutput].ui.checkEnable.setChecked(genenabled)
                 if genenabled:
                     self.genpanel[idxoutput].setGeneratorConfig(opts[2], float(opts[3]), float(opts[4]))
+            else: 
+                dialogmsg += f" Error: {str(ex)}"
+                self.automator.stop()
+            self.resumeAutomator.emit()
+        elif msg == "ConfigIMU":
+            dialogmsg += f" - {opts}"
+            idximu = int(opts[0]) - 1
+            if (idximu >= 0) and (idximu < 3):
+                self.imupanel[idximu].ui.comboType.setCurrentText(opts[1])
+                if opts[1] != "Disabled":
+                    self.imupanel[idximu].ui.comboAddress.setCurrentText(opts[2])
+                    self.imupanel[idximu].ui.comboBus.setCurrentText(opts[3])
+                    self.imupanel[idximu].ui.comboAccRange.setCurrentIndex(int(opts[4]))
+                    self.imupanel[idximu].ui.comboGyroRange.setCurrentIndex(int(opts[5]))
+                    self.imupanel[idximu].ui.comboFilter.setCurrentIndex(int(opts[6]))
+                    self.imupanel[idximu].ui.comboFilter2.setCurrentIndex(int(opts[7]))
             else: 
                 dialogmsg += f" Error: {str(ex)}"
                 self.automator.stop()
@@ -219,7 +234,12 @@ class mainwindow(QtWidgets.QMainWindow):
             dialogmsg += f" with stop time {opts[0]}"
             self.automatorWaiting = False
             self.bInit(stoptime=int(opts[0])) 
-            self.resumeAutomator.emit() 
+            self.resumeAutomator.emit()
+        elif msg == "StartWait":
+            dialogmsg += f" with stop time {opts[0]}"
+            self.automatorWaiting = False
+            self.bInit(stoptime=int(opts[0])) 
+            self.automatorWaiting = True
         elif msg == "AlgOn":
             self.ctrlpanel.ui.checkAlgOn.setChecked(True if (opts[0] == "True") else False)  
             self.resumeAutomator.emit() 
@@ -247,6 +267,7 @@ class mainwindow(QtWidgets.QMainWindow):
                 dialogmsg += f" Error: {str(ex)}"
                 self.automator.stop()
         self.automator.printMessage(dialogmsg + "\n") 
+
 
     def processLogMsg(self,tstamp,msg):
         if tstamp == 0:
@@ -305,7 +326,7 @@ class mainwindow(QtWidgets.QMainWindow):
     def savePlus(self):
         try:
             if self.flagsaveplus:
-                raise Exception("Dados já salvos...")
+                raise Exception("Data already saved...")
             fn = str(int(time.time() * 1000)) + '.feather'
             fname = Path(self.workdir) / fn
             ct = 0
@@ -314,7 +335,7 @@ class mainwindow(QtWidgets.QMainWindow):
                 fname = Path(self.workdir) / fn
                 ct = ct + 1
                 if ct > 10:
-                    raise Exception("10 tentativas e arquivo ainda existe.")
+                    raise Exception("10 file creation attempts and file still does not exist.")
             if self.dataman.globalctreadings > 0:
                 if self.driver.controlMode:
                     mdatafile = Path(self.workdir) / "metacontrol.feather"
@@ -353,17 +374,17 @@ class mainwindow(QtWidgets.QMainWindow):
                     except Exception as err:
                         QMessageBox.question(self.app, "Erro!", str(err), QMessageBox.Ok)
                     self.flagsaveplus = True
-                    self.ui.statusbar.showMessage("Dados salvos com sucesso...")
+                    self.ui.statusbar.showMessage("Data successfully saved.")
                 else:
                     pass
             else:
-                raise Exception("Sem dados para salvar.")
+                raise Exception("No data to save.")
         except Exception as err:
             self.ui.statusbar.showMessage(str(err))
 
 
     def defWorkdir(self):
-        fdg = QFileDialog(self, "Escolha Diretório de Trabalho (workdir)", Path.home())
+        fdg = QFileDialog(self, "Choose the working directory (workdir)", Path.home())
         fdg.setFileMode(QFileDialog.DirectoryOnly)
         if fdg.exec():
             dirnames = fdg.selectedFiles()
@@ -387,8 +408,8 @@ class mainwindow(QtWidgets.QMainWindow):
                 elif (type(w) == QtWidgets.QLineEdit):
                     w.setText(settings.value(w.objectName()))
         if (settings.value("Porta") is not None):
-            self.porta = settings.value("Porta")
-            self.setPort(self.porta)
+            self.Port = settings.value("Porta")
+            self.setPort(self.Port)
         if (settings.value("TSampling") is not None):
             self.setSampling(settings.value("TSampling"))  
         if (settings.value("MaxTime") is not None):
@@ -426,7 +447,7 @@ class mainwindow(QtWidgets.QMainWindow):
                 settings.setValue(w.objectName(), w.value())
             elif (type(w) == QtWidgets.QLineEdit):
                 settings.setValue(w.objectName(), w.text())
-        settings.setValue("Porta", self.porta)
+        settings.setValue("Porta", self.Port)
         settings.setValue("TSampling", str(self.TSampling) + " ms")
         settings.setValue("MaxTime", str(self.MaxTime) + " min")
         settings.setValue("MFig", self.mfig.getConfigString())
@@ -546,6 +567,7 @@ class mainwindow(QtWidgets.QMainWindow):
         if self.mfig is not None:
             self.mfig.adcEnableMap = self.driver.adcenablemap
 
+
     def addPlots(self):
         settings = QtCore.QSettings("VibSoftware", "VibView")
         self.ui.plotOutLayout.addWidget(self.mfig)
@@ -600,26 +622,23 @@ class mainwindow(QtWidgets.QMainWindow):
                 self.driver.setIMUConfig(k,self.imupanel[k].getIMUConfig())
             self.changeADCConfig()
 
-            # self.driver.setPort(self.porta)
             self.dataman.IniciaLeituras(stoptime=stoptime)
 
 
     def readingsStopped(self):
         for cc in self.disabledwhenrunning:
             cc.setEnabled(True)
-        print("Uepa!!")
         self.ctrlpanel.ui.checkAlgOn.setEnabled(False)
         self.ctrlpanel.ui.checkAlgOn.setChecked(False)
         if (self.dataman.errorlevel > 0) and self.automator.running:
             self.automator.stop()
         elif self.automatorWaiting:
-            print("Uepa!!!")
             self.resumeAutomator.emit()
 
 
     def bReset(self,ignoreunsaved=False):
         if self.dataman.flagrodando:
-            self.ui.statusbar.showMessage("Leituras sendo realizadas, dados não podem ser apagados.")
+            self.ui.statusbar.showMessage("Reading must be stopped before erasing data.")
             return
         if (not self.dataman.flagsaved) and (not ignoreunsaved):
             buttonReply = QMessageBox.question(self, 'Atenção!', "Dados não salvos poderão ser apagados, confirma?",
@@ -634,6 +653,7 @@ class mainwindow(QtWidgets.QMainWindow):
             self.ui.statusbar.clearMessage()
         self.ctrlpanel.setEnabled(True,isreset=True)
     
+
     def setMaxTime(self, selmaxtime):
         if self.dataman.flagrodando or (not self.dataman.flagsaved):
             self.ui.statusbar.setMessage("Not allowed when running or with unsaved data.")
@@ -649,6 +669,7 @@ class mainwindow(QtWidgets.QMainWindow):
                         sra.setText(sra.text()[1:])
             self.dataman.resetData(self.TSampling/1000,self.MaxTime)
             self.ui.statusbar.clearMessage()   
+
 
     def setSampling(self, selsampling):
         if self.dataman.flagrodando or (not self.dataman.flagsaved):
@@ -666,24 +687,26 @@ class mainwindow(QtWidgets.QMainWindow):
             self.dataman.resetData(self.TSampling/1000,self.MaxTime)
             self.ui.statusbar.clearMessage()   
 
+
     def populatePorts(self):
         self.ui.menuSelecionar_Porta.clear()
         ports = self.driver.listPorts()
         for port, desc, hwid in sorted(ports):
             # print("{}: {} [{}]".format(port, desc, hwid))
-            if port == self.porta:
+            if port == self.Port:
                 port = f">{port}"
             self.ui.menuSelecionar_Porta.addAction(port)
         for acc in self.ui.menuSelecionar_Porta.actions():
             self.mapper.setMapping(acc, acc.text())
             acc.triggered.connect(self.mapper.map)
         
+
     def setPort(self, portasel):
         # print(portasel)
         if not self.dataman.flagrodando:
             if portasel.startswith(">"):
                 portasel = portasel[1:]
-            self.porta = portasel
+            self.Port = portasel
             for acc in self.ui.menuSelecionar_Porta.actions():
                 if acc.text().endswith(portasel):
                     acc.setText(f">{portasel}")
@@ -691,36 +714,42 @@ class mainwindow(QtWidgets.QMainWindow):
                     if acc.text().startswith(">"):
                         acc.setText(acc.text()[1:])
             self.ui.statusbar.clearMessage()
-            self.driver.setPort(self.porta)
+            self.driver.setPort(self.Port)
         else: 
             self.ui.statusbar.setMessage("Not allowed when running.")
+
 
     def openWorkdirManager(self):
         if not self.dataman.flagrodando:
             self.wdman = WorkdirManager(self.workdir)
             self.wdman.showWorkdirManager()
 
+
     def openUploadDialog(self):
         if not self.dataman.flagrodando:
-            self.driver.setPort(self.porta)
+            self.driver.setPort(self.Port)
             self.upd = MyUploadDialog(self.driver,self.dataman)
             self.upd.showUploadDialog()
 
+
     def openPathModelingDialog(self):
         if not self.dataman.flagrodando:    
-            self.driver.setPort(self.porta)        
+            self.driver.setPort(self.Port)        
             self.pmd = MyPathModelingDialog(self.dataman,self.driver)
             self.pmd.showPathModelingdDialog()
     
+
     def openDataViewer(self):
         if not self.dataman.flagrodando:
             self.dvd = MyDataViewer(self.dataman)
             self.dvd.showDataViewerDialog()
 
+
     def openAdditionalConfig(self):
         if not self.dataman.flagrodando:
             self.pdd = MyAdditionalDialog(self.driver)
             self.pdd.showAdditionalDialog()
+
 
     def saveFile(self,fname=None):
         if self.dataman.flagrodando:
@@ -754,6 +783,7 @@ class mainwindow(QtWidgets.QMainWindow):
                 self.lastSavedExtension = extension
             except Exception as err:
                 QMessageBox.question(self.app, "Erro!", str(err), QMessageBox.Ok)
+
 
     def closeEvent(self, event):
         if not event:
