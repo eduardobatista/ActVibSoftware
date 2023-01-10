@@ -758,31 +758,18 @@ class mainwindow(QtWidgets.QMainWindow):
         if fname:
             filename = [fname]
         else:
-            extensionlist = 'feather (*.feather);;csv (*.csv)'
-            if self.lastSavedExtension:
-                if self.lastSavedExtension.startswith("csv"):
-                    extensionlist = 'csv (*.csv);;feather (*.feather)'
-            filename = QFileDialog.getSaveFileName(self, "Salvar Arquivo", getenv('HOME'), extensionlist)
+            filename = QFileDialog.getSaveFileName(self, "Salvar Arquivo", getenv('HOME'), 'feather (*.feather)')
         if (filename[0] != ''):
             try:
-                if filename[0].endswith(".csv"):
-                    extension = "csv"
-                elif filename[0].endswith(".feather"):
-                    extension = "feather"
-                else:
-                    extension = filename[1].split(" ")[0]
-                print(extension)
-                if not filename[0].endswith(f".{extension}"):
-                    ffname = filename[0] + f".{extension}"
-                else:
-                    ffname = filename[0]
+                print(fname)
+                print(filename)
                 notes = self.ui.notes.toPlainText()
                 if len(notes) > 0:
-                    self.loglist = [(0,notes)] + self.loglist                
-                self.dataman.salvaArquivo(ffname, True, loglist=self.loglist)
-                self.lastSavedExtension = extension
+                    self.loglist = [(0,notes)] + self.loglist
+                self.dataman.salvaArquivo(str(filename[0]), True, loglist=self.loglist)
             except Exception as err:
-                QMessageBox.question(self.app, "Erro!", str(err), QMessageBox.Ok)
+                # QMessageBox.question(self.app, "Erro!", str(err), QMessageBox.Ok)
+                print(err)
 
 
     def closeEvent(self, event):
