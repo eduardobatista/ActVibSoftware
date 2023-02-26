@@ -17,7 +17,7 @@ class Ui_PlotCfgForm(object):
     def setupUi(self, PlotCfgForm):
         if not PlotCfgForm.objectName():
             PlotCfgForm.setObjectName(u"PlotCfgForm")
-        PlotCfgForm.resize(426, 52)
+        PlotCfgForm.resize(437, 69)
         self.verticalLayout_2 = QVBoxLayout(PlotCfgForm)
         self.verticalLayout_2.setSpacing(2)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
@@ -45,6 +45,7 @@ class Ui_PlotCfgForm(object):
         self.comboPlot1.addItem("")
         self.comboPlot1.addItem("")
         self.comboPlot1.addItem("")
+        self.comboPlot1.addItem("")
         self.comboPlot1.setObjectName(u"comboPlot1")
         sizePolicy1 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         sizePolicy1.setHorizontalStretch(0)
@@ -62,6 +63,7 @@ class Ui_PlotCfgForm(object):
         self.horizontalLayout_2.addWidget(self.label_32)
 
         self.comboPlot2 = QComboBox(self.plotcfgframe)
+        self.comboPlot2.addItem("")
         self.comboPlot2.addItem("")
         self.comboPlot2.addItem("")
         self.comboPlot2.addItem("")
@@ -152,11 +154,13 @@ class Ui_PlotCfgForm(object):
         self.comboPlot1.setItemText(0, QCoreApplication.translate("PlotCfgForm", u"IMU 1: Acceleration", None))
         self.comboPlot1.setItemText(1, QCoreApplication.translate("PlotCfgForm", u"IMU 2: Acceleration", None))
         self.comboPlot1.setItemText(2, QCoreApplication.translate("PlotCfgForm", u"IMU 3: Acceleration", None))
+        self.comboPlot1.setItemText(3, QCoreApplication.translate("PlotCfgForm", u"Off", None))
 
         self.label_32.setText(QCoreApplication.translate("PlotCfgForm", u"Plot 2:", None))
         self.comboPlot2.setItemText(0, QCoreApplication.translate("PlotCfgForm", u"IMU 1: Gyro", None))
         self.comboPlot2.setItemText(1, QCoreApplication.translate("PlotCfgForm", u"IMU 2: Gyro", None))
         self.comboPlot2.setItemText(2, QCoreApplication.translate("PlotCfgForm", u"IMU 3: Gyro", None))
+        self.comboPlot2.setItemText(3, QCoreApplication.translate("PlotCfgForm", u"Off", None))
 
         self.comboPlot2.setCurrentText(QCoreApplication.translate("PlotCfgForm", u"IMU 1: Gyro", None))
         self.checkAccX.setText(QCoreApplication.translate("PlotCfgForm", u"AccX", None))

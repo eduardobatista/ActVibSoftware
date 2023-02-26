@@ -109,11 +109,11 @@ class MyFigQtGraph(BaseFigQtGraph):
             else:
                 npontos[k] = self.npontosjanela[k]
         for k in range(3):
-            if self.accEnable[k] and (npontos[0] > 0):
+            if (self.plotchoice[0] < 3) and self.accEnable[k] and (npontos[0] > 0):
                 self.lineacc[k].setData(self.vetoreixox[0][-npontos[0]:], self.dman.accdata[self.plotchoice[0]][k][limi[0]:limf[0]])
             else:
                 self.lineacc[k].setData([], [])
-            if self.gyroEnable[k] and (npontos[1] > 0):
+            if (self.plotchoice[1] < 3) and self.gyroEnable[k] and (npontos[1] > 0):
                 self.linegyr[k].setData(self.vetoreixox[1][-npontos[1]:], self.dman.gyrodata[self.plotchoice[1]][k][limi[1]:limf[1]])
             else:
                 self.linegyr[k].setData([], [])

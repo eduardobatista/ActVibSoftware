@@ -79,7 +79,7 @@ class mainwindow(QtWidgets.QMainWindow):
         self.ui.imutab2.layout().addWidget(self.imupanel[1])
         self.ui.imutab3.layout().addWidget(self.imupanel[2])
         for imupanel in self.imupanel:
-            imupanel = self.imupanel[0]
+            # imupanel = self.imupanel[0]
             for cc in imupanel.findChildren(QComboBox):
                 cc.activated.connect(self.changeMPUConfig)
 
@@ -533,6 +533,7 @@ class mainwindow(QtWidgets.QMainWindow):
                 self.mfig.show()
                 self.ctrlfig.hide()
             self.plotcfgpanel.setEnabled(True)
+            self.plotcfgpanel.setEnabledComboItens([a.isIMUEnabled() for a in self.imupanel])
 
 
     def plotOutConfig(self):
@@ -559,6 +560,8 @@ class mainwindow(QtWidgets.QMainWindow):
         if self.driver is not None:
             for id in range(3):
                 self.driver.setIMUConfig(id,self.imupanel[id].getIMUConfig())
+        self.plotcfgpanel.setEnabledComboItens([a.isIMUEnabled() for a in self.imupanel])
+        print("!")
 
 
     def changeADCConfig(self):        
