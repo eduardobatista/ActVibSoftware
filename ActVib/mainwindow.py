@@ -561,7 +561,6 @@ class mainwindow(QtWidgets.QMainWindow):
             for id in range(3):
                 self.driver.setIMUConfig(id,self.imupanel[id].getIMUConfig())
         self.plotcfgpanel.setEnabledComboItens([a.isIMUEnabled() for a in self.imupanel])
-        print("!")
 
 
     def changeADCConfig(self):        
@@ -756,16 +755,29 @@ class mainwindow(QtWidgets.QMainWindow):
 
     def saveFile(self,fname=None):
         if self.dataman.flagrodando:
-            self.ui.statusbar.showMessage("Leituras sendo realizadas, dados não podem ser salvos.")
+            self.ui.statusbar.showMessage("Readings must be stopped before saving file.")
             return
         if fname:
             filename = [fname]
         else:
-            filename = QFileDialog.getSaveFileName(self, "Salvar Arquivo", getenv('HOME'), 'feather (*.feather)')
+            txtfilter = 'Feather file (*.feather);; CSV file (*.csv)'
+            if self.lastSavedExtension == ".csv":
+                txtfilter = 'CSV file (*.csv);; Feather file (*.feather)'
+            filename = QFileDialog.getSaveFileName(self, "Salvar Arquivo", getenv('HOME'), txtfilter)
+            # print(filename)
+            if filename[0].endswith(".csv"):
+                self.lastSavedExtension = ".csv"
+            elif filename[0].endswith(".feather"):
+                self.lastSavedExtension = ".feather"
+            else:
+                if filename[1].startswith("Feather"):
+                    filename = (filename[0]+".feather",filename[1])
+                    self.lastSavedExtension = ".feather"
+                elif filename[1].startswith("CSV"):
+                    filename = (filename[0]+".csv",filename[1])
+                    self.lastSavedExtension = ".csv"
         if (filename[0] != ''):
             try:
-                print(fname)
-                print(filename)
                 notes = self.ui.notes.toPlainText()
                 if len(notes) > 0:
                     self.loglist = [(0,notes)] + self.loglist
@@ -773,6 +785,7 @@ class mainwindow(QtWidgets.QMainWindow):
             except Exception as err:
                 # QMessageBox.question(self.app, "Erro!", str(err), QMessageBox.Ok)
                 print(err)
+                self.ui.statusbar.showMessage(err)
 
 
     def closeEvent(self, event):

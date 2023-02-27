@@ -212,7 +212,7 @@ class dataman (QObject):
             if filename.endswith("feather"):
                 df.to_feather(filename)
             elif filename.endswith("csv"):
-                df.to_csv(filename)
+                df.to_csv(filename,sep="\t")
             self.statusMessage.emit(f"File {filename} saved successfully.")
 
         else:
@@ -271,7 +271,7 @@ class dataman (QObject):
             if filename.endswith("feather"):
                 df.to_feather(filename)
             elif filename.endswith("csv"):
-                df.to_csv(filename)
+                df.to_csv(filename,sep="\t")
             self.statusMessage.emit(f"File {filename} saved successfully.")
             
 
