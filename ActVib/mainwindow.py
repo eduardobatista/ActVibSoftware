@@ -32,6 +32,7 @@ class mainwindow(QtWidgets.QMainWindow):
         self.Port = "COM3"
         self.TSampling = 4   # 4 ms is the default
         self.MaxTime = 10   # 10 min is the default
+        self.BaudRate = 500000
         self.workdir = Path.home()
         self.dataman = dataman
         self.driver = driver
@@ -43,6 +44,12 @@ class mainwindow(QtWidgets.QMainWindow):
 
         self.plotcfgpanel = PlotCfgPanel()
         self.ctrlpanel = ControlPanel()
+
+        self.mfig = mainfig #MyFigQtGraph(self.dataman, self)
+        self.ctrlfig = CtrlFigQtGraph(self.dataman, self)        
+        self.ofig = FigOutputQtGraph(self.dataman, self)
+        self.addPlots()
+
         self.readConfig()        
         self.ui.bInit.clicked.connect(lambda: self.bInit(3600.0))
         self.ui.bLimpar.clicked.connect(lambda: self.bReset(ignoreunsaved=False))
@@ -61,6 +68,12 @@ class mainwindow(QtWidgets.QMainWindow):
             self.mapper3.setMapping(sra, sra.text())
             sra.triggered.connect(self.mapper3.map)
         self.mapper3.mapped['QString'].connect(self.setMaxTime)
+
+        self.mapper4 = QtCore.QSignalMapper(self)
+        for sra in self.ui.menuSerial_Baud_Rate.actions():
+            self.mapper4.setMapping(sra, sra.text())
+            sra.triggered.connect(self.mapper4.map)
+        self.mapper4.mapped['QString'].connect(self.setBaudRate)
         
         self.ui.menuSelecionar_Porta.aboutToShow.connect(self.populatePorts)
 
@@ -124,11 +137,6 @@ class mainwindow(QtWidgets.QMainWindow):
         self.dataman.stopped.connect(self.readingsStopped)
         self.dataman.logMessage.connect(self.processLogMsg)
         self.loglist = []
-
-        self.mfig = mainfig #MyFigQtGraph(self.dataman, self)
-        self.ctrlfig = CtrlFigQtGraph(self.dataman, self)        
-        self.ofig = FigOutputQtGraph(self.dataman, self)
-        self.addPlots()
 
         self.changeGeneratorConfig()
         self.changeMPUConfig()
@@ -413,7 +421,9 @@ class mainwindow(QtWidgets.QMainWindow):
         if (settings.value("TSampling") is not None):
             self.setSampling(settings.value("TSampling"))  
         if (settings.value("MaxTime") is not None):
-            self.setMaxTime(settings.value("MaxTime"))          
+            self.setMaxTime(settings.value("MaxTime"))
+        if (settings.value("BaudRate") is not None):
+            self.setBaudRate(settings.value("BaudRate"))  
         if (settings.value("WorkDir") is not None):
             self.workdir = settings.value("WorkDir")
         if (settings.value("LastDataFolder") is not None):
@@ -450,6 +460,7 @@ class mainwindow(QtWidgets.QMainWindow):
         settings.setValue("Porta", self.Port)
         settings.setValue("TSampling", str(self.TSampling) + " ms")
         settings.setValue("MaxTime", str(self.MaxTime) + " min")
+        settings.setValue("BaudRate", str(self.BaudRate))
         settings.setValue("MFig", self.mfig.getConfigString())
         settings.setValue("OFig", self.ofig.getConfigString())
         settings.setValue("CtrlFig", self.ctrlfig.getConfigString())
@@ -654,11 +665,10 @@ class mainwindow(QtWidgets.QMainWindow):
             self.dataman.resetData(self.TSampling/1000,self.MaxTime)
             self.ui.statusbar.clearMessage()
         self.ctrlpanel.setEnabled(True,isreset=True)
-    
 
     def setMaxTime(self, selmaxtime):
         if self.dataman.flagrodando or (not self.dataman.flagsaved):
-            self.ui.statusbar.setMessage("Not allowed when running or with unsaved data.")
+            self.ui.statusbar.showMessage("Not allowed when running or with unsaved data.")
         else:
             if selmaxtime.startswith(">"):
                 selmaxtime = selmaxtime[1:]
@@ -672,10 +682,26 @@ class mainwindow(QtWidgets.QMainWindow):
             self.dataman.resetData(self.TSampling/1000,self.MaxTime)
             self.ui.statusbar.clearMessage()   
 
+    def setBaudRate(self, selbaudrate):
+        if self.dataman.flagrodando or (not self.dataman.flagsaved):
+            self.ui.statusbar.showMessage("Not allowed when running or with unsaved data.")
+        else:
+            if selbaudrate.startswith(">"):
+                selbaudrate = selbaudrate[1:]
+            self.BaudRate = int(selbaudrate)
+            for sra in self.ui.menuSerial_Baud_Rate.actions():
+                if sra.text().endswith(selbaudrate):
+                    sra.setText(f">{selbaudrate}")
+                else:
+                    if sra.text().startswith(">"):
+                        sra.setText(sra.text()[1:])
+            # self.dataman.resetData(self.TSampling/1000,self.MaxTime)
+            self.driver.setBaudRate(self.BaudRate)
+            self.ui.statusbar.clearMessage()
 
     def setSampling(self, selsampling):
         if self.dataman.flagrodando or (not self.dataman.flagsaved):
-            self.ui.statusbar.setMessage("Not allowed when running or with unsaved data.")
+            self.ui.statusbar.showMessage("Not allowed when running or with unsaved data.")
         else:
             if selsampling.startswith(">"):
                 selsampling = selsampling[1:]
@@ -687,6 +713,9 @@ class mainwindow(QtWidgets.QMainWindow):
                     if sra.text().startswith(">"):
                         sra.setText(sra.text()[1:])
             self.dataman.resetData(self.TSampling/1000,self.MaxTime)
+            self.mfig.setSamplingPeriod(self.dataman.samplingperiod)
+            self.ofig.setSamplingPeriod(self.dataman.samplingperiod)
+            self.ctrlfig.setSamplingPeriod(self.dataman.samplingperiod)
             self.ui.statusbar.clearMessage()   
 
 
@@ -718,7 +747,7 @@ class mainwindow(QtWidgets.QMainWindow):
             self.ui.statusbar.clearMessage()
             self.driver.setPort(self.Port)
         else: 
-            self.ui.statusbar.setMessage("Not allowed when running.")
+            self.ui.statusbar.showMessage("Not allowed when running.")
 
 
     def openWorkdirManager(self):

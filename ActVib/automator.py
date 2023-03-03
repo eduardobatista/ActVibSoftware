@@ -69,11 +69,10 @@ class Automator (QtCore.QObject):
         for rr in text.split("\n"):
             aux = rr.split("\t")
             if len(aux) != 2:
-                print("Error parsing command list!")
+                self.printErrorMessage("Error parsing command list!")
                 return
             aux2 = [a.strip() for a in aux[1].split(",")]
             cmdlist.append([aux[0],aux2])
-        print(cmdlist)
         self.lista = cmdlist
         self.load()
 
@@ -114,6 +113,9 @@ class Automator (QtCore.QObject):
 
     def printMessage(self,msg):
         self.adialog.ui.messageArea.insertPlainText(msg)
+
+    def printErrorMessage(self,msg):
+        self.adialog.ui.messageArea.insertHtml(f'<span style="color: red; font-weight: bold;">{msg}</span><br>')
 
     def elapsedTime(self):
         return (time.time() - self.starttime)

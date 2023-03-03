@@ -59,6 +59,9 @@ class BaseFigQtGraph(GraphicsLayoutWidget):
             self.npontosjanela[k] = int(self.janelax[k] / self.samplingperiod)
             self.vetoreixox[k] = np.linspace(-self.janelax[k], 0, self.npontosjanela[k])
 
+    def setSamplingPeriod(self,newsampling):
+        self.samplingperiod = newsampling
+        self.sigXRangeChanged()
 
     def getConfigString(self):
         mvars = vars(self)

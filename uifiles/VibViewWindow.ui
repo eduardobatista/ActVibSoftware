@@ -804,7 +804,7 @@
      <x>0</x>
      <y>0</y>
      <width>1098</width>
-     <height>25</height>
+     <height>27</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuArquivo">
@@ -849,6 +849,15 @@
      <addaction name="action20_min"/>
      <addaction name="action30_min"/>
     </widget>
+    <widget class="QMenu" name="menuSerial_Baud_Rate">
+     <property name="title">
+      <string>Serial Baud Rate</string>
+     </property>
+     <addaction name="action115200"/>
+     <addaction name="action500000"/>
+     <addaction name="action921600"/>
+     <addaction name="action1000000"/>
+    </widget>
     <addaction name="actionSalvar_dados"/>
     <addaction name="actionUpload"/>
     <addaction name="actionPathModeling"/>
@@ -858,6 +867,7 @@
     <addaction name="menuSelecionar_Porta"/>
     <addaction name="menuSampling_Rate"/>
     <addaction name="menuMax_Time"/>
+    <addaction name="menuSerial_Baud_Rate"/>
     <addaction name="actionFirmware_Update"/>
     <addaction name="separator"/>
     <addaction name="actionSavePlus"/>
@@ -1027,6 +1037,26 @@
   <action name="actionFirmware_Update">
    <property name="text">
     <string>Firmware/Software Updater...</string>
+   </property>
+  </action>
+  <action name="action115200">
+   <property name="text">
+    <string>115200</string>
+   </property>
+  </action>
+  <action name="action500000">
+   <property name="text">
+    <string>500000</string>
+   </property>
+  </action>
+  <action name="action1000000">
+   <property name="text">
+    <string>1000000</string>
+   </property>
+  </action>
+  <action name="action921600">
+   <property name="text">
+    <string>921600</string>
    </property>
   </action>
  </widget>

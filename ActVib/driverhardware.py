@@ -44,6 +44,7 @@ class driverhardware:
         self.serial = serial.Serial(port=None,
                                     # baudrate=115200,
                                     baudrate = 500000,
+                                    # baudrate = 1000000,
                                     parity=serial.PARITY_NONE,
                                     stopbits=serial.STOPBITS_ONE,
                                     bytesize=serial.EIGHTBITS,
@@ -86,6 +87,8 @@ class driverhardware:
     def setPort(self,port):
         self.serial.port = port
 
+    def setBaudRate(self,newbaudrate):
+        self.serial.baudrate = newbaudrate
 
     def openSerial(self):
         self.serial.open()
@@ -194,6 +197,7 @@ class driverhardware:
     
     def writeSampling(self,TSampling: int):
         # print("writeIMU")
+        # print(TSampling)
         aux = bytearray([ord('f')] + [TSampling])
         tries = 0
         while tries < 5:
@@ -296,18 +300,46 @@ class driverhardware:
             self.adcseq = [aa[0] for aa in struct.iter_unpack("b",self.serial.read(4))] 
             if ((self.adcconfig[0] & 0x0F) == 0):
                 self.adcseq = [0,0,0,0]
-        
+    
+    def writeBaudRate(self,newbaud):
+        baudcode = 0 if newbaud == 115200 else (2 if newbaud == 921600 else (3 if newbaud == 1000000 else 1)) 
+        cmd = 'b'.encode() + bytes([baudcode])
+        self.serial.write(cmd)
+        aux = self.serial.read(2);
+        # if aux != cmd:
+        #     print(aux)
+        #     raise Exception('Error setting a new baud rate.')        
 
-    def handshake(self):
+    def handshake(self):        
         self.serial.reset_output_buffer()
         self.serial.reset_input_buffer()
-        for k in range(5):            
+        for k in range(2):            
             self.serial.write(b'h')
             if self.serial.read(1) == b'k':
+                # print("Clean handshake.")
                 return True
             self.serial.reset_output_buffer()
             self.serial.reset_input_buffer()
-            time.sleep(0.1)
+            time.sleep(0.05)        
+        baudrates = [115200,500000,921600,1000000]
+        newbaud = self.serial.baudrate
+        for bd in baudrates:
+            self.serial.baudrate = bd
+            time.sleep(0.05)
+            self.serial.write(b'h')
+            if self.serial.read(1) == b'k':
+                print(f"Found baud rate: {bd}")
+                self.serial.reset_output_buffer()
+                self.serial.reset_input_buffer()
+                self.writeBaudRate(newbaud)
+                self.serial.baudrate = newbaud
+                time.sleep(0.25)
+                self.serial.reset_output_buffer()
+                self.serial.reset_input_buffer()
+                self.serial.write(b'h')
+                if self.serial.read(1) == b'k':
+                    print("Baud adjusted and handshake ok.")
+                    return True
         raise Exception("Handshake com dispositivo falhou.")
     
 
@@ -532,9 +564,9 @@ class driverhardware:
             self.xref = struct.unpack_from("f",buf,4)[0]
             self.xerro = struct.unpack_from("f",buf,8)[0]
             # print(self.xref)
-            self.calctime[0] = (struct.unpack_from(">H",buf,13)[0] << 4) / 240 # (((self.buf[13] << 8) + self.buf[14]) << 4) / 240
-            self.calctime[1] = (struct.unpack_from(">H",buf,15)[0] << 4) / 240
-            self.calctime[2] = (struct.unpack_from(">H",buf,17)[0] << 4) / 240
+            self.calctime[0] = (struct.unpack_from(">H",buf,13)[0]) # << 4) / 240 # (((self.buf[13] << 8) + self.buf[14]) << 4) / 240
+            self.calctime[1] = (struct.unpack_from(">H",buf,15)[0]) # << 4) / 240
+            self.calctime[2] = (struct.unpack_from(">H",buf,17)[0]) # << 4) / 240
             self.errorflag = struct.unpack_from("B",buf,19)[0]
             if self.errorflag != 0:
                 print(self.errorflag)  # TODO: generate error message in UI.
@@ -563,9 +595,9 @@ class driverhardware:
                 for k in range(4):
                     self.adcin[k] = float( struct.unpack_from(">h",buf,ptr)[0] ) * self.adcmultiplier
                     ptr += 2
-            self.calctime[0] = (struct.unpack_from(">H",buf,ptr)[0] << 4) / 240
-            self.calctime[1] = (struct.unpack_from(">H",buf,ptr+2)[0] << 4) / 240
-            self.calctime[2] = (struct.unpack_from(">H",buf,ptr+4)[0] << 4) / 240
+            self.calctime[0] = (struct.unpack_from(">H",buf,ptr)[0]) #<< 4) #/ 240
+            self.calctime[1] = (struct.unpack_from(">H",buf,ptr+2)[0]) # << 4) #/ 240
+            self.calctime[2] = (struct.unpack_from(">H",buf,ptr+4)[0]) #<< 4) #/ 240
             self.errorflag = struct.unpack_from("B",buf,ptr+6)[0]
             if self.errorflag != 0:
                 print(self.errorflag)  # TODO: generate error message in UI.
