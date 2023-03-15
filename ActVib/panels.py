@@ -128,6 +128,7 @@ class ControlPanel(QtWidgets.QWidget,StateSaver):
             cmps = cmps + [self.ui.checkAlgOn,self.ui.spinTAlgOn,self.ui.passoCtrl,self.ui.normCtrl]
         if (not en) or (isreset and en):
             cmps.append(self.ui.comboCtrlTask)
+            cmps.append(self.ui.checkControle)
         for cc in cmps:
             cc.setEnabled(en)
 

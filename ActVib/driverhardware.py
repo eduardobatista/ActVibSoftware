@@ -191,7 +191,7 @@ class driverhardware:
         self.serial.flush()
         aux = self.serial.read(2)
         if aux != b'KI':
-            print(aux)
+            # print(aux)
             raise Exception(f'Error writing IMU{id+1} Config.')
 
     
@@ -205,7 +205,7 @@ class driverhardware:
             self.serial.flush() 
             aux = self.serial.read(2)
             if (aux[0] != ord('f')) or (aux[1] != TSampling):
-                print(aux)
+                # print(aux)
                 tries += 1
                 self.serial.reset_output_buffer()
                 self.serial.reset_input_buffer()
@@ -294,7 +294,7 @@ class driverhardware:
         self.serial.write(aux)
         aux = self.serial.read(2);
         if aux != b'KA':
-            print(aux)
+            # print(aux)
             raise Exception('Erro na configuração do ADC.')
         else:
             self.adcseq = [aa[0] for aa in struct.iter_unpack("b",self.serial.read(4))] 
@@ -304,8 +304,10 @@ class driverhardware:
     def writeBaudRate(self,newbaud):
         baudcode = 0 if newbaud == 115200 else (2 if newbaud == 921600 else (3 if newbaud == 1000000 else 1)) 
         cmd = 'b'.encode() + bytes([baudcode])
+        # print(cmd)
         self.serial.write(cmd)
-        aux = self.serial.read(2);
+        aux = self.serial.read(2)
+        # print(aux)
         # if aux != cmd:
         #     print(aux)
         #     raise Exception('Error setting a new baud rate.')        
@@ -322,7 +324,7 @@ class driverhardware:
             self.serial.reset_input_buffer()
             time.sleep(0.05)        
         baudrates = [115200,500000,921600,1000000]
-        newbaud = self.serial.baudrate
+        newbaud = self.serial.baudrate        
         for bd in baudrates:
             self.serial.baudrate = bd
             time.sleep(0.05)
@@ -331,6 +333,7 @@ class driverhardware:
                 print(f"Found baud rate: {bd}")
                 self.serial.reset_output_buffer()
                 self.serial.reset_input_buffer()
+                print(newbaud)
                 self.writeBaudRate(newbaud)
                 self.serial.baudrate = newbaud
                 time.sleep(0.25)
@@ -340,6 +343,7 @@ class driverhardware:
                 if self.serial.read(1) == b'k':
                     print("Baud adjusted and handshake ok.")
                     return True
+                break
         raise Exception("Handshake com dispositivo falhou.")
     
 

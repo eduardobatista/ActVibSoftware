@@ -1,11 +1,13 @@
 import json
 import numpy as np
 
-from PySide2 import QtWidgets, QtGui, QtCore
-from PySide2.QtWidgets import QMessageBox, QFileDialog, QDialog, QVBoxLayout
+from PySide2 import QtCore
+from PySide2.QtWidgets import QWidgetAction,QWidget,QMenu
 
 import pyqtgraph as pg
-from pyqtgraph import PlotWidget, PlotItem, GraphicsWidget, GraphicsLayout, GraphicsLayoutWidget
+from pyqtgraph import GraphicsLayoutWidget
+
+from .MainFigContextMenu import Ui_MainForm as MainFigContextMenu
 
 class BaseFigQtGraph(GraphicsLayoutWidget):
 
@@ -16,15 +18,18 @@ class BaseFigQtGraph(GraphicsLayoutWidget):
         self.pitens = []
         for k in range(nplots):
             self.pitens.append(self.addPlot(row=k, col=0))
-        for pi in self.pitens:
+        for k,pi in enumerate(self.pitens):
+            pi.setMenuEnabled(enableMenu=False, enableViewBoxMenu=True)
+            pi.getViewBox().menu.clear()
+            pi.getViewBox().menu = MyPersoMenu(self,k)
+            pi.getMenu().clear()
             pi.showAxis('top')
             pi.getAxis('top').setStyle(showValues=False)
             pi.showAxis('right')
             pi.getAxis('right').setStyle(showValues=False)
-            pi.hideButtons()
-            pi.setMouseEnabled(False, True)
-            pi.setMenuEnabled(True, None)
-            pi.setClipToView(True)            
+            pi.hideButtons()                     
+            pi.setClipToView(True)  
+            pi.setMouseEnabled(x=False,y=True)    
         self.samplingperiod = samplingperiod
         self.janelax, self.miny, self.maxy, self.autoy, self.vetoreixox, self.npontosjanela = [], [], [], [], [], []
         for k in range(len(self.pitens)):
@@ -38,12 +43,29 @@ class BaseFigQtGraph(GraphicsLayoutWidget):
         for pi in self.pitens:
             pi.sigXRangeChanged.connect(self.sigXRangeChanged)
             pi.sigYRangeChanged.connect(self.sigYRangeChanged)
+    
+    def getMenu(self,plotid):
+        return self.pitens[plotid].getViewBox().menu
+    
+    def resetFigure(self):
+        for k, pitem in enumerate(self.pitens):
+            self.pitens[k].setXRange(-self.janelax[k],0,padding=0.01)
+            self.pitens[k].setMouseEnabled(x=False,y=True)
 
     def sizeHint(self):
         if self.parent() is None:
             return QtCore.QSize(30, 30)
         else:
             return QtCore.QSize(self.parent().frameGeometry().width(), self.parent().frameGeometry().height())
+
+    def setTWindow(self,plotid,newwindow):
+        self.janelax[plotid] = float(newwindow)
+        self.npontosjanela[plotid] = int(self.janelax[plotid] / self.samplingperiod)
+        self.vetoreixox[plotid] = np.linspace(-self.janelax[plotid], 0, self.npontosjanela[plotid])
+        self.pitens[plotid].setXRange(-self.janelax[plotid],0,padding=0.01)
+
+    def setYRange(self,plotid,ylim1,ylim2):
+        self.pitens[plotid].setYRange(ylim1,ylim2,padding=0.01)
 
     def sigYRangeChanged(self):
         for k, pi in enumerate(self.pitens):
@@ -82,3 +104,56 @@ class BaseFigQtGraph(GraphicsLayoutWidget):
             self.pitens[k].setXRange(-self.janelax[k], 0.0, padding=0.01)
             self.pitens[k].setYRange(self.miny[k], self.maxy[k], padding=0.01)
         self.flagchangeranges = True
+
+
+
+class MyPersoMenu(QMenu):
+
+    def __init__(self,parent,plotid):
+        super().__init__(parent)
+        self.menuwidget = QWidget(self)        
+        self.menuwidget.ui = MainFigContextMenu()
+        self.menuwidget.ui.setupUi(self.menuwidget)
+        self.mwaction = QWidgetAction(self)
+        self.mwaction.setDefaultWidget(self.menuwidget)
+        self.addAction(self.mwaction)
+
+        self.plotid = plotid
+
+        self.menuwidget.ui.spinTWindow.editingFinished.connect(self.windowChanged)
+        self.menuwidget.ui.bviewall.clicked.connect(self.viewAll)
+        self.menuwidget.ui.ylim1.editingFinished.connect(self.ylimChanged)
+        self.menuwidget.ui.ylim2.editingFinished.connect(self.ylimChanged)
+
+        self.aboutToShow.connect(self.getValues)
+
+    def ylimChanged(self):
+        try:
+            ylim1 = float(self.menuwidget.ui.ylim1.text())
+            ylim2 = float(self.menuwidget.ui.ylim2.text())
+            if ylim1 > ylim2:
+                self.getValues()
+                return
+            self.parentWidget().setYRange(self.plotid,ylim1,ylim2)
+        except BaseException as ex:
+            self.getValues()
+
+    def windowChanged(self):
+        self.parentWidget().setTWindow(self.plotid,self.menuwidget.ui.spinTWindow.value())
+        self.hide()
+
+    def getValues(self):
+        self.menuwidget.ui.spinTWindow.setValue(self.parentWidget().janelax[self.plotid])
+        rgs = self.parentWidget().pitens[self.plotid].viewRange()
+        self.menuwidget.ui.ylim1.setText(f"{rgs[1][0]:.3f}")
+        self.menuwidget.ui.ylim2.setText(f"{rgs[1][1]:.3f}")
+        
+    def viewAll(self):
+        self.parentWidget().pitens[self.plotid].autoRange(padding=0.01)
+        self.hide()
+
+    def disableSensor(self):
+        elements = [self.menuwidget.ui.checkX,self.menuwidget.ui.checkY,self.menuwidget.ui.checkZ,
+                    self.menuwidget.ui.labelSensor,self.menuwidget.ui.comboSensor]
+        for el in elements:
+            el.setVisible(False)

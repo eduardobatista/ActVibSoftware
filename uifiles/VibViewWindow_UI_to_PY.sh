@@ -12,3 +12,4 @@ pyside2-uic --output="../ActVib/DataViewer.py" DataViewer.ui
 pyside2-uic --output="../ActVib/Additional.py" Additional.ui
 pyside2-uic --output="../ActVib/AutomatorDialog.py" AutomatorDialog.ui
 pyside2-uic --output="../ActVib/UpdaterDialog.py" UpdaterDialog.ui
+pyside2-uic --output="../ActVib/MainFigContextMenu.py" MainFigContextMenu.ui

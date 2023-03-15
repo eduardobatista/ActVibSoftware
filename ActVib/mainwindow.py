@@ -497,7 +497,7 @@ class mainwindow(QtWidgets.QMainWindow):
         self.ui.elapsedTime.setText('0 s')
         self.ui.controlTime.setText('0 s')
         self.ui.sampleTime.setText('0 us')
-        self.mfig.updateFig(self.driver.controlMode, [self.driver.refid, self.driver.erroid])
+        self.mfig.updateFig()
         self.ofig.updateFig()
         self.ctrlfig.updateFig()
 
@@ -553,12 +553,15 @@ class mainwindow(QtWidgets.QMainWindow):
         else: 
             self.ofig.dacenable = [aa.isGeneratorOn() for aa in self.genpanel]
         # print(self.ofig.dacenable)
+        self.ofig.resetFigure()
 
 
     def plotConfig(self):
         self.mfig.accEnable = self.plotcfgpanel.getAccEnableList()
         self.mfig.gyroEnable = self.plotcfgpanel.getGyroEnableList()
+        self.mfig.resetFigure()
         self.ctrlfig.plotSetup([self.ctrlpanel.ui.comboRef.currentIndex(), self.ctrlpanel.ui.comboErro.currentIndex()])
+        self.ctrlfig.resetFigure()
 
 
     def changeGeneratorConfig(self):
@@ -591,6 +594,7 @@ class mainwindow(QtWidgets.QMainWindow):
             self.ctrlfig.hide()
         aux = settings.value('MFig')
         if aux is not None:
+            # print(aux)
             self.mfig.parseConfigString(aux)
         aux = settings.value('CtrlFig')
         if aux is not None:
@@ -654,7 +658,7 @@ class mainwindow(QtWidgets.QMainWindow):
             self.ui.statusbar.showMessage("Reading must be stopped before erasing data.")
             return
         if (not self.dataman.flagsaved) and (not ignoreunsaved):
-            buttonReply = QMessageBox.question(self, 'Atenção!', "Dados não salvos poderão ser apagados, confirma?",
+            buttonReply = QMessageBox.question(self, 'Warning!', "Data is not saved and will be erased. Conffirm?",
                                                QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
             if buttonReply == QMessageBox.Yes:
                 self.dataman.resetData(self.TSampling/1000,self.MaxTime)
@@ -668,7 +672,8 @@ class mainwindow(QtWidgets.QMainWindow):
 
     def setMaxTime(self, selmaxtime):
         if self.dataman.flagrodando or (not self.dataman.flagsaved):
-            self.ui.statusbar.showMessage("Not allowed when running or with unsaved data.")
+            QMessageBox.critical(self, 'Error', "Operation not allowed when running or with unsaved data.")
+            # self.ui.statusbar.showMessage("Not allowed when running or with unsaved data.")
         else:
             if selmaxtime.startswith(">"):
                 selmaxtime = selmaxtime[1:]
@@ -684,7 +689,8 @@ class mainwindow(QtWidgets.QMainWindow):
 
     def setBaudRate(self, selbaudrate):
         if self.dataman.flagrodando or (not self.dataman.flagsaved):
-            self.ui.statusbar.showMessage("Not allowed when running or with unsaved data.")
+            QMessageBox.critical(self, 'Error', "Operation not allowed when running or with unsaved data.")
+            # self.ui.statusbar.showMessage("Not allowed when running or with unsaved data.")
         else:
             if selbaudrate.startswith(">"):
                 selbaudrate = selbaudrate[1:]
@@ -701,7 +707,8 @@ class mainwindow(QtWidgets.QMainWindow):
 
     def setSampling(self, selsampling):
         if self.dataman.flagrodando or (not self.dataman.flagsaved):
-            self.ui.statusbar.showMessage("Not allowed when running or with unsaved data.")
+            QMessageBox.critical(self, 'Error', "Operation not allowed when running or with unsaved data.")
+            # self.ui.statusbar.showMessage("Not allowed when running or with unsaved data.")
         else:
             if selsampling.startswith(">"):
                 selsampling = selsampling[1:]

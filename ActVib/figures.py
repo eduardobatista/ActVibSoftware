@@ -17,6 +17,8 @@ class CtrlFigQtGraph(BaseFigQtGraph):
         self.lineref = self.pitens[0].plot(np.array([]), np.array([]), pen=pens[0])
         self.lineerr = self.pitens[1].plot(np.array([]), np.array([]), pen=pens[1])
         self.plotSetup()
+        self.getMenu(0).disableSensor()
+        self.getMenu(1).disableSensor()
 
     def plotSetup(self, sensorids=[0, 6]):
         for k in range(2):
@@ -70,13 +72,21 @@ class MyFigQtGraph(BaseFigQtGraph):
         for k in range(4):
             self.lineadc.append(self.pitens[2].plot(np.array([]), np.array([]), pen=pens[k]))
         for k, pitem in enumerate(self.pitens):
-            pitem.disableAutoRange()
+            pitem.disableAutoRange(axis=pg.ViewBox.YAxis)
+            pitem.enableAutoRange(axis=pg.ViewBox.XAxis)
             pitem.setXRange(-self.janelax[k], 0, padding=0.01)
             pitem.setYRange(self.miny[k], self.maxy[k], padding=0.01)
             pitem.setLabel('bottom', 'Time (s)')
+            pitem.setMouseEnabled(x=False,y=True)
+            # for act in pitem.ctrlMenu.actions():
+            #     act.setVisible(False)
+            #     print(act)
         self.pitens[0].setLabel('left', 'Accel. (m/s²)')
         self.pitens[1].setLabel('left', 'Gyro (dg/s)')
         self.pitens[2].setLabel('left', 'ADC (Volts)')
+        self.getMenu(0).disableSensor()
+        self.getMenu(1).disableSensor()
+        self.getMenu(2).disableSensor()
         self.accEnable = [True, True, True]
         self.gyroEnable = [True, True, True]
         self.adcEnableMap = [False, False, False, False]
@@ -96,7 +106,7 @@ class MyFigQtGraph(BaseFigQtGraph):
         if self.getItem(2,0) is None:
             self.addItem(self.pitens[2],row=2,col=0)
 
-    def updateFig(self, ctrlmode=False, sensorids=[0, 6]):
+    def updateFig(self):
         limi = [0, 0, 0]
         limf = [0, 0, 0]
         npontos = [0, 0, 0]
@@ -144,6 +154,7 @@ class FigOutputQtGraph(BaseFigQtGraph):
         self.pitem.setLabel('left', 'Normalized output')
         self.oldctr = 0
         self.dacenable = [True, False, False, False]
+        self.getMenu(0).disableSensor()
 
     def updateFig(self):
 
