@@ -166,6 +166,7 @@ class driverhardware:
             self.serial.flush()
             time.sleep(0.1)
             aux = self.serial.read(3)
+            # print(aux)
             if aux == b'ok!':
                 return
             else:
@@ -191,7 +192,7 @@ class driverhardware:
         self.serial.flush()
         aux = self.serial.read(2)
         if aux != b'KI':
-            # print(aux)
+            print(aux)
             raise Exception(f'Error writing IMU{id+1} Config.')
 
     

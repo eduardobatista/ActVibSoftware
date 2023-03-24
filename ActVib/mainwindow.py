@@ -10,7 +10,7 @@ from PySide2.QtWidgets import QMessageBox, QFileDialog, QCheckBox, QComboBox, QD
 
 from .VibViewWindow import Ui_MainWindow
 
-from .figures import (CtrlFigQtGraph, FigOutputQtGraph)
+from .figures import (CtrlFigQtGraph, FigOutputQtGraph, MyFigQtGraph)
 
 from .dialogs import (WorkdirManager, MyUploadDialog, MyPathModelingDialog, MyDataViewer, MyAdditionalDialog)
 
@@ -24,7 +24,7 @@ class mainwindow(QtWidgets.QMainWindow):
 
     resumeAutomator = QtCore.Signal()
 
-    def __init__(self, app, driver, dataman, mainfig):
+    def __init__(self, app, driver, dataman, mainfig : MyFigQtGraph):
         super(mainwindow, self).__init__()
         self.app = app
         self.ui = Ui_MainWindow()
@@ -118,10 +118,10 @@ class mainwindow(QtWidgets.QMainWindow):
 
         # PlotCfg:
         self.ui.plotCfgFrame.layout().addWidget(self.plotcfgpanel)
-        self.plotcfgpanel.ui.comboPlot1.activated.connect(lambda: self.mfig.setPlotChoice(self.plotcfgpanel.ui.comboPlot1.currentIndex(),None))
-        self.plotcfgpanel.ui.comboPlot2.activated.connect(lambda: self.mfig.setPlotChoice(None,self.plotcfgpanel.ui.comboPlot2.currentIndex()))
-        for cc in self.plotcfgpanel.findChildren(QCheckBox):
-            cc.toggled.connect(self.plotConfig)
+        # self.plotcfgpanel.ui.comboPlot1.activated.connect(lambda: self.mfig.setPlotChoice(self.plotcfgpanel.ui.comboPlot1.currentIndex(),None))
+        # self.plotcfgpanel.ui.comboPlot2.activated.connect(lambda: self.mfig.setPlotChoice(None,self.plotcfgpanel.ui.comboPlot2.currentIndex()))
+        # for cc in self.plotcfgpanel.findChildren(QCheckBox):
+        #     cc.toggled.connect(self.plotConfig)
         
         # ControlPanel:
         self.ui.controlFrame.layout().addWidget(self.ctrlpanel)  
@@ -442,6 +442,13 @@ class mainwindow(QtWidgets.QMainWindow):
             imp.restoreState(settings)
         for gp in self.genpanel:
             gp.restoreState(settings)
+        if self.mfig:
+            for k in range(2):
+                auxval = settings.value(f"SensorChoice{k}")
+                if auxval is not None:
+                    self.mfig.setSensorChoice(k,auxval)
+                else:
+                    self.mfig.setSensorChoice(k,k*3+1)
         
 
     def writeConfig(self):
@@ -557,8 +564,9 @@ class mainwindow(QtWidgets.QMainWindow):
 
 
     def plotConfig(self):
-        self.mfig.accEnable = self.plotcfgpanel.getAccEnableList()
-        self.mfig.gyroEnable = self.plotcfgpanel.getGyroEnableList()
+        self.mfig.loadSensorChoices()
+        # self.mfig.accEnable = self.plotcfgpanel.getAccEnableList()
+        # self.mfig.gyroEnable = self.plotcfgpanel.getGyroEnableList()        
         self.mfig.resetFigure()
         self.ctrlfig.plotSetup([self.ctrlpanel.ui.comboRef.currentIndex(), self.ctrlpanel.ui.comboErro.currentIndex()])
         self.ctrlfig.resetFigure()
@@ -632,8 +640,6 @@ class mainwindow(QtWidgets.QMainWindow):
                 self.mfig.removeADCPlot()
             else:
                 self.mfig.addADCPlot()
-
-            self.mfig.setPlotChoice(self.plotcfgpanel.ui.comboPlot1.currentIndex(),self.plotcfgpanel.ui.comboPlot2.currentIndex())
 
             for k in range(3):
                 self.driver.setIMUConfig(k,self.imupanel[k].getIMUConfig())

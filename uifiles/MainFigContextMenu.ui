@@ -146,6 +146,11 @@
     <widget class="QComboBox" name="comboSensor">
      <item>
       <property name="text">
+       <string>Disabled</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
        <string>IMU1 Accel</string>
       </property>
      </item>
@@ -157,6 +162,21 @@
      <item>
       <property name="text">
        <string>IMU3 Accel</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>IMU1 Gyro</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>IMU2 Gyro</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>IMU3 Gyro</string>
       </property>
      </item>
     </widget>

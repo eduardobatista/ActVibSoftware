@@ -46,6 +46,15 @@ class BaseFigQtGraph(GraphicsLayoutWidget):
     
     def getMenu(self,plotid):
         return self.pitens[plotid].getViewBox().menu
+
+    def getSensorChoice(self,plotid):
+        return self.pitens[plotid].getViewBox().menu.menuwidget.ui.comboSensor.currentIndex()
+    
+    def setSensorChoice(self,plotid,choice):
+        self.pitens[plotid].getViewBox().menu.menuwidget.ui.comboSensor.setCurrentIndex(choice)
+    
+    def getComboSensor(self,plotid):
+        return self.pitens[plotid].getViewBox().menu.menuwidget.ui.comboSensor
     
     def resetFigure(self):
         for k, pitem in enumerate(self.pitens):

@@ -63,11 +63,17 @@ class MyFigQtGraph(BaseFigQtGraph):
         super().__init__(3, self.dman.samplingperiod)
         self.wsize = 60
         pens = [pg.mkPen('r', width=1), pg.mkPen('b', width=1), pg.mkPen('g', width=1), pg.mkPen('y', width=1)]
-        self.lineacc = []
-        self.linegyr = []        
+        
+        self.plotlines = []
+        # self.linesp1 = []
+        # self.linesp2 = []        
         for k in range(3):
-            self.lineacc.append(self.pitens[0].plot(np.array([]), np.array([]), pen=pens[k]))
-            self.linegyr.append(self.pitens[1].plot(np.array([]), np.array([]), pen=pens[k]))
+            self.plotlines.append(self.pitens[0].plot(np.array([]), np.array([]), pen=pens[k]))
+            # self.linesp1.append(self.pitens[0].plot(np.array([]), np.array([]), pen=pens[k]))
+            # self.linesp2.append(self.pitens[1].plot(np.array([]), np.array([]), pen=pens[k]))
+        for k in range(3):
+            self.plotlines.append(self.pitens[1].plot(np.array([]), np.array([]), pen=pens[k]))        
+
         self.lineadc = []
         for k in range(4):
             self.lineadc.append(self.pitens[2].plot(np.array([]), np.array([]), pen=pens[k]))
@@ -84,19 +90,32 @@ class MyFigQtGraph(BaseFigQtGraph):
         self.pitens[0].setLabel('left', 'Accel. (m/s²)')
         self.pitens[1].setLabel('left', 'Gyro (dg/s)')
         self.pitens[2].setLabel('left', 'ADC (Volts)')
-        self.getMenu(0).disableSensor()
-        self.getMenu(1).disableSensor()
+        # self.getMenu(0).disableSensor()
+        # self.getMenu(1).disableSensor()
         self.getMenu(2).disableSensor()
-        self.accEnable = [True, True, True]
-        self.gyroEnable = [True, True, True]
+        self.p1Enable = [True, True, True]
+        self.p2Enable = [True, True, True]
         self.adcEnableMap = [False, False, False, False]
-        self.plotchoice = [0, 0]
+        self.plotchoice = [1, 4]
+        self.getComboSensor(0).activated.connect(self.loadSensorChoices)
+        self.getComboSensor(1).activated.connect(self.loadSensorChoices)
 
     def setPlotChoice(self, idx1, idx2):
         if idx1 is not None:
             self.plotchoice[0] = idx1
         if idx2 is not None:
-            self.plotchoice[1] = idx2
+            self.plotchoice[1] = idx2        
+    
+    def loadSensorChoices(self):
+        self.plotchoice[0] = self.getSensorChoice(0)
+        self.plotchoice[1] = self.getSensorChoice(1)
+        for k in range(2):
+            if self.plotchoice[k] < 4:
+                # self.pitens[k].setTitle(f'IMU { ((self.plotchoice[0]-1) % 3) + 1 }')
+                self.pitens[k].setLabel('left', f'IMU { ((self.plotchoice[k]-1) % 3) + 1 }<br>Accel. (m/s²)')
+            else:
+                # self.pitens[k].setTitle(f'IMU { ((self.plotchoice[0]-1) % 3) + 1 }')
+                self.pitens[k].setLabel('left', f'IMU { ((self.plotchoice[k]-1) % 3) + 1 }<br>Gyro (dg/s)')
         
     def removeADCPlot(self):
         if self.getItem(2,0) is not None:
@@ -118,15 +137,46 @@ class MyFigQtGraph(BaseFigQtGraph):
                 npontos[k] = limf[k] - limi[k]
             else:
                 npontos[k] = self.npontosjanela[k]
-        for k in range(3):
-            if (self.plotchoice[0] < 3) and self.accEnable[k] and (npontos[0] > 0):
-                self.lineacc[k].setData(self.vetoreixox[0][-npontos[0]:], self.dman.accdata[self.plotchoice[0]][k][limi[0]:limf[0]])
+
+        if (self.plotchoice[0] > 0) and (npontos[0] > 0):    
+            imuidx = (self.plotchoice[0]-1) % 3
+            if self.plotchoice[0] < 4:
+                for k in range(3):
+                    if self.p1Enable[k]:
+                        self.plotlines[k].setData(self.vetoreixox[0][-npontos[0]:], self.dman.accdata[imuidx][k][limi[0]:limf[0]])
             else:
-                self.lineacc[k].setData([], [])
-            if (self.plotchoice[1] < 3) and self.gyroEnable[k] and (npontos[1] > 0):
-                self.linegyr[k].setData(self.vetoreixox[1][-npontos[1]:], self.dman.gyrodata[self.plotchoice[1]][k][limi[1]:limf[1]])
+                for k in range(3):
+                    if self.p1Enable[k]:
+                        self.plotlines[k].setData(self.vetoreixox[0][-npontos[0]:], self.dman.gyrodata[imuidx][k][limi[0]:limf[0]])
+        else: 
+            for k in range(3):
+                self.plotlines[k].setData([], [])
+        
+
+        if (self.plotchoice[1] > 0) and (npontos[1] > 0):    
+            imuidx = (self.plotchoice[1]-1) % 3
+            if self.plotchoice[1] < 4:
+                for k in range(3):
+                    if self.p2Enable[k]:
+                        self.plotlines[k+3].setData(self.vetoreixox[1][-npontos[1]:], self.dman.accdata[imuidx][k][limi[1]:limf[1]])
             else:
-                self.linegyr[k].setData([], [])
+                for k in range(3):
+                    if self.p2Enable[k]:
+                        self.plotlines[k+3].setData(self.vetoreixox[1][-npontos[1]:], self.dman.gyrodata[imuidx][k][limi[1]:limf[1]])
+        else: 
+            for k in range(3):
+                self.plotlines[k+3].setData([], [])   
+                
+        # for k in range(3):
+        #     if (self.plotchoice[0] < 3) and self.p1Enable[k] and (npontos[0] > 0):
+        #         self.linesp1[k].setData(self.vetoreixox[0][-npontos[0]:], self.dman.accdata[self.plotchoice[0]][k][limi[0]:limf[0]])
+        #     else:
+        #         self.linesp1[k].setData([], [])
+        #     if (self.plotchoice[1] < 3) and self.p2Enable[k] and (npontos[1] > 0):
+        #         self.linesp2[k].setData(self.vetoreixox[1][-npontos[1]:], self.dman.gyrodata[self.plotchoice[1]][k][limi[1]:limf[1]])
+        #     else:
+        #         self.linesp2[k].setData([], [])
+        
         for k in range(4):
             if self.adcEnableMap[k] and (npontos[2] > 0):
                 self.lineadc[k].setData(self.vetoreixox[2][-npontos[2]:],self.dman.adcdata[k][limi[2]:limf[2]])
