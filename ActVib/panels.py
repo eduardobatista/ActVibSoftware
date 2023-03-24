@@ -1,7 +1,6 @@
 from PySide2 import (QtCore, QtWidgets, QtGui)
 from .IMUPanel import Ui_IMUPanel
 from .GeneratorPanel import Ui_GeneratorPanel
-from .PlotCfgPanel import Ui_PlotCfgForm
 from .ControlPanel import Ui_ControlForm
 from .ADCPanel import Ui_ADCForm
 
@@ -281,51 +280,6 @@ class GeneratorPanel(QtWidgets.QWidget,StateSaver):
             logstring = logstring + "|" + "|".join(info)
         return logstring
 
-
-class PlotCfgPanel(QtWidgets.QWidget,StateSaver):
-    def __init__(self):
-        super().__init__()
-        self.ui = Ui_PlotCfgForm()
-        self.ui.setupUi(self)
-        self.checks = [self.ui.checkAccX,self.ui.checkAccY,self.ui.checkAccZ,
-                       self.ui.checkGyroX,self.ui.checkGyroY,self.ui.checkGyroZ]
-        self.saveprefix = 'PlotCfg'
-
-    def getAccEnableList(self):
-        return [self.ui.checkAccX.isChecked(),
-                self.ui.checkAccY.isChecked(),
-                self.ui.checkAccZ.isChecked()]
-
-    def getGyroEnableList(self):
-        return [self.ui.checkGyroX.isChecked(),
-                self.ui.checkGyroY.isChecked(),
-                self.ui.checkGyroZ.isChecked()]
-    
-    def setEnabled(self, en):
-        comps = self.checks + [self.ui.comboPlot1,self.ui.comboPlot2]
-        for cc in comps:
-            cc.setEnabled(en)
-    
-    '''
-        Basically informs which IMUs are enabled.
-        enmap: a list with three booleans
-    '''
-    def setEnabledComboItens(self, enmap):
-        firstenabled = -1
-        flagdisabledselected = [False,False]
-        for k,val in enumerate(enmap):
-            if val and (firstenabled == -1):
-                firstenabled = k
-            if (not val) and (self.ui.comboPlot1.currentIndex() == k):
-                flagdisabledselected[0] = True
-            if (not val) and (self.ui.comboPlot2.currentIndex() == k):
-                flagdisabledselected[1] = True
-            self.ui.comboPlot1.model().item(k).setEnabled(val)
-            self.ui.comboPlot2.model().item(k).setEnabled(val)
-        if flagdisabledselected[0]:
-            self.ui.comboPlot1.setCurrentIndex(firstenabled if (firstenabled != -1) else 3)
-        if flagdisabledselected[1]:
-            self.ui.comboPlot2.setCurrentIndex(firstenabled if (firstenabled != -1) else 3)
 
 class IMUPanel(QtWidgets.QWidget,StateSaver):
 

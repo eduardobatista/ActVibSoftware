@@ -14,7 +14,7 @@ from .figures import (CtrlFigQtGraph, FigOutputQtGraph, MyFigQtGraph)
 
 from .dialogs import (WorkdirManager, MyUploadDialog, MyPathModelingDialog, MyDataViewer, MyAdditionalDialog)
 
-from .panels import (IMUPanel,GeneratorPanel,PlotCfgPanel,ControlPanel,ADCPanel)
+from .panels import (IMUPanel,GeneratorPanel,ControlPanel,ADCPanel)
 
 from .automator import Automator
 
@@ -42,7 +42,6 @@ class mainwindow(QtWidgets.QMainWindow):
         self.genpanel = [GeneratorPanel(idd) for idd in range(4)]
         self.adcpanel = ADCPanel()
 
-        self.plotcfgpanel = PlotCfgPanel()
         self.ctrlpanel = ControlPanel()
 
         self.mfig = mainfig #MyFigQtGraph(self.dataman, self)
@@ -115,13 +114,6 @@ class mainwindow(QtWidgets.QMainWindow):
         for cc in self.ui.tabWidget.findChildren(QCheckBox, QtCore.QRegExp("checkEnable.*")):
             cc.toggled.connect(self.plotOutConfig)
             cc.toggled.connect(self.changeGeneratorConfig)
-
-        # PlotCfg:
-        self.ui.plotCfgFrame.layout().addWidget(self.plotcfgpanel)
-        # self.plotcfgpanel.ui.comboPlot1.activated.connect(lambda: self.mfig.setPlotChoice(self.plotcfgpanel.ui.comboPlot1.currentIndex(),None))
-        # self.plotcfgpanel.ui.comboPlot2.activated.connect(lambda: self.mfig.setPlotChoice(None,self.plotcfgpanel.ui.comboPlot2.currentIndex()))
-        # for cc in self.plotcfgpanel.findChildren(QCheckBox):
-        #     cc.toggled.connect(self.plotConfig)
         
         # ControlPanel:
         self.ui.controlFrame.layout().addWidget(self.ctrlpanel)  
@@ -445,10 +437,10 @@ class mainwindow(QtWidgets.QMainWindow):
         if self.mfig:
             for k in range(2):
                 auxval = settings.value(f"SensorChoice{k}")
-                if auxval is not None:
-                    self.mfig.setSensorChoice(k,auxval)
-                else:
-                    self.mfig.setSensorChoice(k,k*3+1)
+                self.mfig.setSensorChoice(k,int(auxval) if auxval is not None else k*3+1)
+                auxval2 = settings.value(f"XYZmap{k}")                
+                self.mfig.setXYZCheckMap(k,auxval2 if auxval2 is not None else [True,True,True])
+            self.mfig.loadSensorChoices()
         
 
     def writeConfig(self):
@@ -480,7 +472,9 @@ class mainwindow(QtWidgets.QMainWindow):
             imp.saveState(settings)
         for gp in self.genpanel:
             gp.saveState(settings)
-
+        for k in range(2):
+            settings.setValue(f"SensorChoice{k}",self.mfig.plotchoice[k])
+            settings.setValue(f"XYZmap{k}",self.mfig.getXYZCheckMap(k))
 
     def statusMessage(self, msg):
         if msg is None:
@@ -541,7 +535,6 @@ class mainwindow(QtWidgets.QMainWindow):
             if (self.mfig is not None):
                 self.ctrlfig.show()
                 self.mfig.hide()
-            self.plotcfgpanel.setEnabled(False)
         else:
             for k,gg in enumerate(self.genpanel):
                 self.ui.tabWidget.setTabText(k,f"Output {k+1}")
@@ -550,8 +543,6 @@ class mainwindow(QtWidgets.QMainWindow):
             if (self.ctrlfig is not None):
                 self.mfig.show()
                 self.ctrlfig.hide()
-            self.plotcfgpanel.setEnabled(True)
-            self.plotcfgpanel.setEnabledComboItens([a.isIMUEnabled() for a in self.imupanel])
 
 
     def plotOutConfig(self):
@@ -582,7 +573,6 @@ class mainwindow(QtWidgets.QMainWindow):
         if self.driver is not None:
             for id in range(3):
                 self.driver.setIMUConfig(id,self.imupanel[id].getIMUConfig())
-        self.plotcfgpanel.setEnabledComboItens([a.isIMUEnabled() for a in self.imupanel])
 
 
     def changeADCConfig(self):        

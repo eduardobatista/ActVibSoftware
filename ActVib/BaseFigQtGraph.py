@@ -46,6 +46,24 @@ class BaseFigQtGraph(GraphicsLayoutWidget):
     
     def getMenu(self,plotid):
         return self.pitens[plotid].getViewBox().menu
+    
+    def getXYZChecks(self,plotid):
+        return [self.pitens[plotid].getViewBox().menu.menuwidget.ui.checkX,
+                self.pitens[plotid].getViewBox().menu.menuwidget.ui.checkY,
+                self.pitens[plotid].getViewBox().menu.menuwidget.ui.checkZ]
+    
+    def getXYZCheckMap(self,plotid):
+        return [self.pitens[plotid].getViewBox().menu.menuwidget.ui.checkX.isChecked(),
+                self.pitens[plotid].getViewBox().menu.menuwidget.ui.checkY.isChecked(),
+                self.pitens[plotid].getViewBox().menu.menuwidget.ui.checkZ.isChecked()]
+    
+    def setXYZCheckMap(self,plotid,newmap):
+        for k in range(3):
+            if isinstance(newmap[k],str):
+                newmap[k] = False if newmap[k].lower() == 'false' else True
+        self.pitens[plotid].getViewBox().menu.menuwidget.ui.checkX.setChecked(newmap[0])
+        self.pitens[plotid].getViewBox().menu.menuwidget.ui.checkY.setChecked(newmap[1])
+        self.pitens[plotid].getViewBox().menu.menuwidget.ui.checkZ.setChecked(newmap[2])
 
     def getSensorChoice(self,plotid):
         return self.pitens[plotid].getViewBox().menu.menuwidget.ui.comboSensor.currentIndex()

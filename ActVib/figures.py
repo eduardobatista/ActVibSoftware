@@ -96,10 +96,21 @@ class MyFigQtGraph(BaseFigQtGraph):
         self.p1Enable = [True, True, True]
         self.p2Enable = [True, True, True]
         self.adcEnableMap = [False, False, False, False]
-        self.plotchoice = [1, 4]
+        self.plotchoice = [0, 0]
         self.getComboSensor(0).activated.connect(self.loadSensorChoices)
-        self.getComboSensor(1).activated.connect(self.loadSensorChoices)
+        self.getComboSensor(1).activated.connect(self.loadSensorChoices)        
+        ffs = [lambda: self.toggleXYZSignal(0),lambda: self.toggleXYZSignal(1)]
+        for k in range(2):            
+            for chk in self.getXYZChecks(k):
+                chk.toggled.connect(ffs[k])
 
+    def toggleXYZSignal(self,plotid):
+        if plotid == 0:
+            self.p1Enable = self.getXYZCheckMap(plotid)
+        else:
+            self.p2Enable = self.getXYZCheckMap(plotid)
+        # self.getMenu(plotid).hide()
+        
     def setPlotChoice(self, idx1, idx2):
         if idx1 is not None:
             self.plotchoice[0] = idx1
@@ -107,15 +118,19 @@ class MyFigQtGraph(BaseFigQtGraph):
             self.plotchoice[1] = idx2        
     
     def loadSensorChoices(self):
-        self.plotchoice[0] = self.getSensorChoice(0)
-        self.plotchoice[1] = self.getSensorChoice(1)
         for k in range(2):
-            if self.plotchoice[k] < 4:
-                # self.pitens[k].setTitle(f'IMU { ((self.plotchoice[0]-1) % 3) + 1 }')
-                self.pitens[k].setLabel('left', f'IMU { ((self.plotchoice[k]-1) % 3) + 1 }<br>Accel. (m/s²)')
-            else:
-                # self.pitens[k].setTitle(f'IMU { ((self.plotchoice[0]-1) % 3) + 1 }')
-                self.pitens[k].setLabel('left', f'IMU { ((self.plotchoice[k]-1) % 3) + 1 }<br>Gyro (dg/s)')
+            self.getMenu(k).hide()
+            newchoicek = self.getSensorChoice(k)
+            if newchoicek != self.plotchoice[k]:                
+                self.plotchoice[k] = newchoicek                
+                if self.plotchoice[k] == 0:
+                    self.pitens[k].setLabel('left', f'Accel. (m/s²)')
+                elif self.plotchoice[k] < 4:
+                    # self.pitens[k].setTitle(f'IMU { ((self.plotchoice[0]-1) % 3) + 1 }')
+                    self.pitens[k].setLabel('left', f'IMU { ((self.plotchoice[k]-1) % 3) + 1 }<br>Accel. (m/s²)')
+                else:
+                    # self.pitens[k].setTitle(f'IMU { ((self.plotchoice[0]-1) % 3) + 1 }')
+                    self.pitens[k].setLabel('left', f'IMU { ((self.plotchoice[k]-1) % 3) + 1 }<br>Gyro (dg/s)')
         
     def removeADCPlot(self):
         if self.getItem(2,0) is not None:
@@ -144,10 +159,14 @@ class MyFigQtGraph(BaseFigQtGraph):
                 for k in range(3):
                     if self.p1Enable[k]:
                         self.plotlines[k].setData(self.vetoreixox[0][-npontos[0]:], self.dman.accdata[imuidx][k][limi[0]:limf[0]])
+                    else:
+                        self.plotlines[k].setData([], [])
             else:
                 for k in range(3):
                     if self.p1Enable[k]:
                         self.plotlines[k].setData(self.vetoreixox[0][-npontos[0]:], self.dman.gyrodata[imuidx][k][limi[0]:limf[0]])
+                    else: 
+                        self.plotlines[k].setData([], [])
         else: 
             for k in range(3):
                 self.plotlines[k].setData([], [])
@@ -159,10 +178,14 @@ class MyFigQtGraph(BaseFigQtGraph):
                 for k in range(3):
                     if self.p2Enable[k]:
                         self.plotlines[k+3].setData(self.vetoreixox[1][-npontos[1]:], self.dman.accdata[imuidx][k][limi[1]:limf[1]])
+                    else:
+                        self.plotlines[k+3].setData([], [])
             else:
                 for k in range(3):
                     if self.p2Enable[k]:
                         self.plotlines[k+3].setData(self.vetoreixox[1][-npontos[1]:], self.dman.gyrodata[imuidx][k][limi[1]:limf[1]])
+                    else: 
+                        self.plotlines[k+3].setData([], [])
         else: 
             for k in range(3):
                 self.plotlines[k+3].setData([], [])   

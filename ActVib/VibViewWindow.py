@@ -375,19 +375,6 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_3.addWidget(self.tabSensors)
 
-        self.plotCfgFrame = QFrame(self.frame_2)
-        self.plotCfgFrame.setObjectName(u"plotCfgFrame")
-        sizePolicy4.setHeightForWidth(self.plotCfgFrame.sizePolicy().hasHeightForWidth())
-        self.plotCfgFrame.setSizePolicy(sizePolicy4)
-        self.plotCfgFrame.setFrameShape(QFrame.Box)
-        self.plotCfgFrame.setFrameShadow(QFrame.Sunken)
-        self.horizontalLayout_13 = QHBoxLayout(self.plotCfgFrame)
-        self.horizontalLayout_13.setSpacing(5)
-        self.horizontalLayout_13.setObjectName(u"horizontalLayout_13")
-        self.horizontalLayout_13.setContentsMargins(10, 3, 10, 4)
-
-        self.verticalLayout_3.addWidget(self.plotCfgFrame)
-
         self.plotFrameOut = QFrame(self.frame_2)
         self.plotFrameOut.setObjectName(u"plotFrameOut")
         sizePolicy6.setHeightForWidth(self.plotFrameOut.sizePolicy().hasHeightForWidth())
