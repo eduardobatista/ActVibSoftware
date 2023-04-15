@@ -305,46 +305,47 @@ class driverhardware:
     def writeBaudRate(self,newbaud):
         baudcode = 0 if newbaud == 115200 else (2 if newbaud == 921600 else (3 if newbaud == 1000000 else 1)) 
         cmd = 'b'.encode() + bytes([baudcode])
-        # print(cmd)
         self.serial.write(cmd)
         aux = self.serial.read(2)
-        # print(aux)
-        # if aux != cmd:
-        #     print(aux)
-        #     raise Exception('Error setting a new baud rate.')        
+        if aux != ('k'.encode() + bytes([baudcode])):
+            raise Exception('Error setting a new baud rate.')        
 
     def handshake(self):        
         self.serial.reset_output_buffer()
         self.serial.reset_input_buffer()
+        # Try to perform handshake twice:
         for k in range(2):            
             self.serial.write(b'h')
             if self.serial.read(1) == b'k':
                 # print("Clean handshake.")
-                return True
+                return True  # In case of success, return.
             self.serial.reset_output_buffer()
             self.serial.reset_input_buffer()
-            time.sleep(0.05)        
+            time.sleep(0.1)
+        # If handshake fails, try to adjust the baud rate:
+        newbaud = self.serial.baudrate
         baudrates = [115200,500000,921600,1000000]
-        newbaud = self.serial.baudrate        
         for bd in baudrates:
             self.serial.baudrate = bd
             time.sleep(0.05)
             self.serial.write(b'h')
             if self.serial.read(1) == b'k':
-                print(f"Found baud rate: {bd}")
+                print(f"Found baud rate: {bd}, adjusting to {newbaud}.")
                 self.serial.reset_output_buffer()
                 self.serial.reset_input_buffer()
-                print(newbaud)
                 self.writeBaudRate(newbaud)
                 self.serial.baudrate = newbaud
-                time.sleep(0.25)
-                self.serial.reset_output_buffer()
-                self.serial.reset_input_buffer()
-                self.serial.write(b'h')
-                if self.serial.read(1) == b'k':
-                    print("Baud adjusted and handshake ok.")
-                    return True
-                break
+                time.sleep(0.15)
+                for k in range(2):
+                    time.sleep(0.1)                
+                    self.serial.reset_output_buffer()
+                    self.serial.reset_input_buffer()
+                    self.serial.write(b'h')
+                    if self.serial.read(1) == b'k':
+                        print("Baud adjusted and handshake ok.")
+                        return True
+                    break
+        self.serial.baudrate = newbaud
         raise Exception("Handshake com dispositivo falhou.")
     
 
