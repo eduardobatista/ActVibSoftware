@@ -226,7 +226,7 @@ class dataman (QObject):
             }
             if (self.driver.adcconfig[0] & 0x0F) > 0:
                 for k in range(4):
-                    thedict[f"adc{k+1}.{self.driver.adcseq[k]+1}"] = self.adcdata[k][0:limf]
+                    thedict[f"adc{k+1}.{self.driver.adcsel+1}"] = self.adcdata[k][0:limf]
             for k in range(3):
                 if self.driver.IMUEnableFlags[k]:
                     thedict[f"imu{k+1}accx"] = self.accdata[k][0][0:limf]

@@ -35,7 +35,8 @@ class driverhardware:
         self.adcenablemap = [False, False, False, False]
         self.adcin = [0.0,0.0,0.0,0.0]
         self.adcmultiplier = 0
-        self.adcseq = [0,0,0,0]
+        # self.adcseq = [0,0,0,0]
+        self.adcsel = 0
         self.adcturbo = 4
         self.setGeneratorConfig(id=0)
         self.setGeneratorConfig(id=1)
@@ -293,14 +294,17 @@ class driverhardware:
     def writeADCConfig(self):
         aux = 'd'.encode() + bytes(self.adcconfig)
         self.serial.write(aux)
-        aux = self.serial.read(2);
+        aux = self.serial.read(2)
         if aux != b'KA':
             # print(aux)
             raise Exception('Erro na configuração do ADC.')
         else:
-            self.adcseq = [aa[0] for aa in struct.iter_unpack("b",self.serial.read(4))] 
+            # self.adcseq = [aa[0] for aa in struct.iter_unpack("b",self.serial.read(4))] 
+            auxx = [aa[0] for aa in struct.iter_unpack("b",self.serial.read(4))] 
+            self.adcsel = auxx[0]
             if ((self.adcconfig[0] & 0x0F) == 0):
-                self.adcseq = [0,0,0,0]
+                # self.adcseq = [0,0,0,0]
+                self.adcsel = 0
     
     def writeBaudRate(self,newbaud):
         baudcode = 0 if newbaud == 115200 else (2 if newbaud == 921600 else (3 if newbaud == 1000000 else 1)) 

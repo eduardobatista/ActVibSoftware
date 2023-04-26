@@ -74,9 +74,10 @@ class MyFigQtGraph(BaseFigQtGraph):
         for k in range(3):
             self.plotlines.append(self.pitens[1].plot(np.array([]), np.array([]), pen=pens[k]))        
 
-        self.lineadc = []
-        for k in range(4):
-            self.lineadc.append(self.pitens[2].plot(np.array([]), np.array([]), pen=pens[k]))
+        # self.lineadc = []
+        # for k in range(4):
+        #     self.lineadc.append(self.pitens[2].plot(np.array([]), np.array([]), pen=pens[k]))
+        self.lineadc = self.pitens[2].plot(np.array([]), np.array([]), pen=pens[0])
         for k, pitem in enumerate(self.pitens):
             pitem.disableAutoRange(axis=pg.ViewBox.YAxis)
             pitem.enableAutoRange(axis=pg.ViewBox.XAxis)
@@ -95,7 +96,8 @@ class MyFigQtGraph(BaseFigQtGraph):
         self.getMenu(2).disableSensor()
         self.p1Enable = [True, True, True]
         self.p2Enable = [True, True, True]
-        self.adcEnableMap = [False, False, False, False]
+        # self.adcEnableMap = [False, False, False, False]
+        self.adcenable = False
         self.plotchoice = [0, 0]
         self.getComboSensor(0).activated.connect(self.loadSensorChoices)
         self.getComboSensor(1).activated.connect(self.loadSensorChoices)        
@@ -190,21 +192,11 @@ class MyFigQtGraph(BaseFigQtGraph):
             for k in range(3):
                 self.plotlines[k+3].setData([], [])   
                 
-        # for k in range(3):
-        #     if (self.plotchoice[0] < 3) and self.p1Enable[k] and (npontos[0] > 0):
-        #         self.linesp1[k].setData(self.vetoreixox[0][-npontos[0]:], self.dman.accdata[self.plotchoice[0]][k][limi[0]:limf[0]])
-        #     else:
-        #         self.linesp1[k].setData([], [])
-        #     if (self.plotchoice[1] < 3) and self.p2Enable[k] and (npontos[1] > 0):
-        #         self.linesp2[k].setData(self.vetoreixox[1][-npontos[1]:], self.dman.gyrodata[self.plotchoice[1]][k][limi[1]:limf[1]])
-        #     else:
-        #         self.linesp2[k].setData([], [])
-        
-        for k in range(4):
-            if self.adcEnableMap[k] and (npontos[2] > 0):
-                self.lineadc[k].setData(self.vetoreixox[2][-npontos[2]:],self.dman.adcdata[k][limi[2]:limf[2]])
+        if self.adcenable:
+            if (npontos[2] > 0):
+                self.lineadc.setData(self.vetoreixox[2][-npontos[2]:],self.dman.adcdata[0][limi[2]:limf[2]])
             else:
-                self.lineadc[k].setData([], [])
+                self.lineadc.setData([],[])
             
 
 

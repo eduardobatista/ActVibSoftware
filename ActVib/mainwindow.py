@@ -36,7 +36,7 @@ class mainwindow(QtWidgets.QMainWindow):
         self.workdir = Path.home()
         self.dataman = dataman
         self.driver = driver
-        self.saveconfigtypes = [QtWidgets.QCheckBox, QtWidgets.QComboBox,
+        self.saveconfigtypes = [QtWidgets.QCheckBox, QtWidgets.QComboBox, QtWidgets.QRadioButton,
                                 QtWidgets.QDoubleSpinBox, QtWidgets.QSpinBox, QtWidgets.QLineEdit]
         self.imupanel = [IMUPanel(idd) for idd in range(3)]
         self.genpanel = [GeneratorPanel(idd) for idd in range(4)]
@@ -97,10 +97,6 @@ class mainwindow(QtWidgets.QMainWindow):
 
         # ADC Connections
         self.ui.adctab.layout().addWidget(self.adcpanel)
-        # self.ui.checkADCOn.toggled.connect(self.changeADCConfig)
-        # adcpanel = self.ui.adcframe.findChildren(QComboBox)
-        # for cc in adcpanel:
-        #     cc.activated.connect(self.changeADCConfig)
 
         # Signal Generator Connections:
         self.ui.canal1.layout().addWidget(self.genpanel[0])
@@ -397,8 +393,8 @@ class mainwindow(QtWidgets.QMainWindow):
         settings = QtCore.QSettings("VibSoftware", "VibView")
         for w in self.app.allWidgets():
             if ((type(w) in self.saveconfigtypes) and (settings.value(w.objectName()) is not None)):
-                if (type(w) == QtWidgets.QCheckBox):
-                    w.setChecked(settings.value(w.objectName()) == 'True')
+                if (type(w) in [QtWidgets.QCheckBox,QtWidgets.QRadioButton]):
+                    w.setChecked(settings.value(w.objectName()) == 'True')                    
                 elif (type(w) == QtWidgets.QComboBox):
                     w.setCurrentIndex(int(settings.value(w.objectName())))
                 elif (type(w) == QtWidgets.QDoubleSpinBox):
@@ -446,7 +442,7 @@ class mainwindow(QtWidgets.QMainWindow):
     def writeConfig(self):
         settings = QtCore.QSettings("VibSoftware", "VibView")
         for w in self.app.allWidgets():            
-            if (type(w) == QtWidgets.QCheckBox):
+            if (type(w) in [QtWidgets.QCheckBox,QtWidgets.QRadioButton]):
                 settings.setValue(w.objectName(), str(w.isChecked()))
             elif (type(w) == QtWidgets.QComboBox):
                 settings.setValue(w.objectName(), w.currentIndex())
@@ -579,7 +575,8 @@ class mainwindow(QtWidgets.QMainWindow):
         if self.driver is not None:
             self.driver.setADCConfig(self.adcpanel.getADCConfig())
         if self.mfig is not None:
-            self.mfig.adcEnableMap = self.driver.adcenablemap
+            self.mfig.adcenable = (True in self.driver.adcenablemap)
+            # self.mfig.adcEnableMap = self.driver.adcenablemap
 
 
     def addPlots(self):
