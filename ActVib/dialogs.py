@@ -114,6 +114,7 @@ class MyAdditionalDialog(QDialog):
             # print(self.driver.predistenablemap)
             # print(self.driver.fusionweights)
             self.driver.openSerial()
+            self.driver.handshake()
             for k in range(4):
                 self.driver.writePredistConfig(id=k)
             self.driver.writeFusionConfig()
