@@ -49,7 +49,8 @@ class driverhardware:
                                     parity=serial.PARITY_NONE,
                                     stopbits=serial.STOPBITS_ONE,
                                     bytesize=serial.EIGHTBITS,
-                                    timeout=1)
+                                    timeout=1,
+                                    rtscts=False)
         if self.serial.isOpen():
             self.serial.close()
         self.controlMode = False
@@ -91,9 +92,22 @@ class driverhardware:
     def setBaudRate(self,newbaudrate):
         self.serial.baudrate = newbaudrate
 
-    def openSerial(self):
-        self.serial.open()
+    def closeSerial(self):
+        self.serial.close()
 
+    def openSerial(self):        
+        if not self.serial.isOpen():
+            # self.serial.dtr = True
+            self.serial.open()
+            # Forcing device bootup:
+            self.serial.rts = False
+            self.serial.dtr = False
+            time.sleep(0.1)
+            self.serial.rts = True
+            self.serial.dtr = True
+            time.sleep(0.2)        
+            aux = self.serial.read(2048)
+            print(len(aux))
     
     def setControlMode(self,mode=False,task=0,debugmode=False):
         self.controlMode = mode
@@ -189,6 +203,7 @@ class driverhardware:
     def writeIMUConfig(self,id: int):
         # print("writeIMU")
         aux = bytearray([ord('I')] + [id] + self.imuconfigdata[id])
+        # print(aux)
         self.serial.write(aux)
         self.serial.flush()
         aux = self.serial.read(2)
@@ -203,11 +218,12 @@ class driverhardware:
         aux = bytearray([ord('f')] + [TSampling])
         tries = 0
         while tries < 5:
+            # print(aux)
             self.serial.write(aux)
             self.serial.flush() 
             aux = self.serial.read(2)
             if (aux[0] != ord('f')) or (aux[1] != TSampling):
-                # print(aux)
+                print(aux)
                 tries += 1
                 self.serial.reset_output_buffer()
                 self.serial.reset_input_buffer()
@@ -314,7 +330,9 @@ class driverhardware:
         if aux != ('k'.encode() + bytes([baudcode])):
             raise Exception('Error setting a new baud rate.')        
 
-    def handshake(self):        
+    def handshake(self):
+        if not self.serial.is_open:
+            self.openSerial()
         self.serial.reset_output_buffer()
         self.serial.reset_input_buffer()
         # Try to perform handshake twice:
@@ -328,8 +346,10 @@ class driverhardware:
             time.sleep(0.1)
         # If handshake fails, try to adjust the baud rate:
         newbaud = self.serial.baudrate
-        baudrates = [115200,500000,921600,1000000]
+        baudrates = [500000,921600,1000000,115200] 
         for bd in baudrates:
+            if bd == newbaud:
+                continue
             self.serial.baudrate = bd
             time.sleep(0.05)
             self.serial.write(b'h')
@@ -350,6 +370,7 @@ class driverhardware:
                         return True
                     break
         self.serial.baudrate = newbaud
+        self.serial.close()
         raise Exception("Handshake com dispositivo falhou.")
     
 
@@ -436,8 +457,18 @@ class driverhardware:
 
     def stopReadings(self):
         self.serial.write(b't')
-        self.serial.flush()
-        self.serial.close()
+        while True:
+            aux = self.serial.read(1000)
+            if aux and len(aux) > 0:
+                pass
+                # print(aux)
+                # print(len(aux))
+            else:
+                break
+            time.sleep(0.05)
+        # self.serial.flush()
+        # self.serial.rts = True
+        # self.serial.close()
 
     def gravaFlash(self):
         self.serial.write(b'P')

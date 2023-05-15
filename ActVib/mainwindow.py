@@ -123,6 +123,7 @@ class mainwindow(QtWidgets.QMainWindow):
         self.dataman.reset.connect(self.dataReset)
         self.dataman.statusMessage.connect(self.statusMessage)
         self.dataman.stopped.connect(self.readingsStopped)
+        self.dataman.started.connect(self.readingsStarted)
         self.dataman.logMessage.connect(self.processLogMsg)
         self.loglist = []
 
@@ -308,7 +309,7 @@ class mainwindow(QtWidgets.QMainWindow):
     def kSpace(self):
         if not self.dataman.flagrodando:
             self.bInit()
-        elif not self.ctrlpanel.isAlgOn():
+        elif self.driver.controlMode and (not self.ctrlpanel.isAlgOn()):
             self.ctrlpanel.ui.checkAlgOn.setChecked(True)
         else:
             self.bInit()
@@ -604,7 +605,8 @@ class mainwindow(QtWidgets.QMainWindow):
         
     
     def bInit(self,stoptime=3600.0):
-        if self.dataman.flagrodando:
+        self.ui.bInit.setEnabled(False)        
+        if self.dataman.flagrodando:            
             self.dataman.ParaLeituras()
         else:
             self.expLog = []
@@ -615,6 +617,7 @@ class mainwindow(QtWidgets.QMainWindow):
             self.changeADCConfig()
             self.plotConfig()
             self.plotOutConfig()
+            self.ui.bLimpar.setEnabled(False)
 
             self.disabledwhenrunning = self.imupanel + [self.ctrlpanel,self.adcpanel]
             for cc in self.disabledwhenrunning: 
@@ -634,6 +637,8 @@ class mainwindow(QtWidgets.QMainWindow):
 
             self.dataman.IniciaLeituras(stoptime=stoptime)
 
+    def readingsStarted(self):
+        self.ui.bInit.setEnabled(True)
 
     def readingsStopped(self):
         for cc in self.disabledwhenrunning:
@@ -644,6 +649,8 @@ class mainwindow(QtWidgets.QMainWindow):
             self.automator.stop()
         elif self.automatorWaiting:
             self.resumeAutomator.emit()
+        self.ui.bInit.setEnabled(True)
+        self.ui.bLimpar.setEnabled(True)
 
 
     def bReset(self,ignoreunsaved=False):
@@ -651,7 +658,7 @@ class mainwindow(QtWidgets.QMainWindow):
             self.ui.statusbar.showMessage("Reading must be stopped before erasing data.")
             return
         if (not self.dataman.flagsaved) and (not ignoreunsaved):
-            buttonReply = QMessageBox.question(self, 'Warning!', "Data is not saved and will be erased. Conffirm?",
+            buttonReply = QMessageBox.question(self, 'Warning!', "Data is not saved and will be erased. Confirm?",
                                                QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
             if buttonReply == QMessageBox.Yes:
                 self.dataman.resetData(self.TSampling/1000,self.MaxTime)

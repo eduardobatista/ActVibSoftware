@@ -14,6 +14,7 @@ class dataman (QObject):
     reset = Signal()
     statusMessage = Signal(str)
     stopped = Signal()
+    started = Signal()
     logMessage = Signal((int,str))
 
     def __init__(self, driver):
@@ -50,7 +51,7 @@ class dataman (QObject):
 
     def ParaLeituras(self):
         self.flagparar = True
-        self.statusMessage.emit(None)
+        self.statusMessage.emit("Stopping readings...")
 
     def IniciaLeituras(self,stoptime=3600.0):
         self.statusMessage.emit(None)      
@@ -70,8 +71,11 @@ class dataman (QObject):
             if self.debugmode:
                 self.driver.debugSetup()
             self.flagrodando = True
+            self.statusMessage.emit("Opening port...")
             self.driver.openSerial()
+            self.statusMessage.emit("Handshaking...")
             self.driver.handshake()
+            self.statusMessage.emit("Writing configs...")
             self.driver.writeSampling(int(self.samplingperiod*1000))            
             for k in range(3):
                 self.driver.writeIMUConfig(k)
@@ -89,6 +93,8 @@ class dataman (QObject):
                 self.driver.startControl()
             else:
                 self.driver.startReadings()
+            self.statusMessage.emit(None)
+            self.started.emit()
             self.flagsaved = False
             self.ctreadings = 0
             self.starttime = round(time.time() * 1000) / 1000

@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+import time
 
 from PySide2 import (QtCore, QtWidgets)
 from PySide2.QtWidgets import (QDialog, QFileDialog, QWidget)
@@ -113,14 +114,13 @@ class MyAdditionalDialog(QDialog):
             # print(self.driver.predistcoefs)
             # print(self.driver.predistenablemap)
             # print(self.driver.fusionweights)
-            self.driver.openSerial()
+            # self.driver.openSerial()
             self.driver.handshake()
             for k in range(4):
                 self.driver.writePredistConfig(id=k)
             self.driver.writeFusionConfig()
             self.driver.recordAdditionalConfigs()
-            self.driver.serial.close()
-            self.ui.statusLabel.setText("Coefficients checked, salved and written to device.")
+            self.ui.statusLabel.setText("Coefficients checked, saved and written to device.")
         except BaseException as ex:
             self.ui.statusLabel.setText(f"Error: {ex}")
 
@@ -277,7 +277,7 @@ class MyPathModelingDialog():
     def checkPaths(self):        
         try:
             self.pdialog.ui.statusLabel.setText("Wait... May take some time...")
-            self.driver.openSerial()
+            # self.driver.openSerial()
             self.driver.handshake()
             wsec,wfbk = self.driver.readPaths()
             self.driver.stopReadings()
@@ -342,6 +342,8 @@ class MyPathModelingDialog():
                 datasize = self.dataman.secpath.shape[0]
             else:
                 raise Exception("Path data not found in memory.")
+            self.driver.closeSerial()
+            time.sleep(0.2)
             self.driver.openSerial()
             self.driver.handshake()
             self.driver.gravaCaminho('s', self.dataman.secpath, self.pdialog.ui.progressBar)
@@ -454,7 +456,7 @@ class MyUploadDialog():
     def gravaFlash(self):
         try:
             self.uploaddialog.ui.status.setText("")
-            self.driver.openSerial()
+            # self.driver.openSerial()
             self.driver.handshake()
             self.driver.gravaFlash()
             self.uploaddialog.ui.status.setText("Successfully written in flash!")
@@ -485,7 +487,7 @@ class MyUploadDialog():
                         datasize = wsec.shape[0]
                     else:
                         raise Exception("Path data not found in memory.")
-                self.driver.openSerial()
+                # self.driver.openSerial()
                 self.driver.handshake()
                 self.driver.gravaCaminho('s', wsec, self.uploaddialog.ui.progressBar)
                 self.driver.handshake()
@@ -504,7 +506,7 @@ class MyUploadDialog():
                     tipo = 'f'
                 else:
                     raise Exception("Incorrect combination between column title and data.")
-                self.driver.openSerial()
+                # self.driver.openSerial()
                 self.driver.handshake()
                 self.driver.gravaCaminho(tipo, dataf.values.reshape((1, -1))[0], self.uploaddialog.ui.progressBar)
                 self.uploaddialog.ui.status.setText("Upload finished!")
