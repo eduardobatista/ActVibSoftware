@@ -153,6 +153,12 @@ class ControlPanel(QtWidgets.QWidget,StateSaver):
     def getPerturbChannel(self):
         return self.ui.comboPerturbChannel.currentIndex()
 
+    def getErrorIMU(self):
+        return self.ui.comboIMUError.currentIndex()
+    
+    def getRefIMU(self):
+        return self.ui.comboIMURef.currentIndex()
+
     def getControlConfiguration(self):
         try:
             fifloat = float(self.ui.normCtrl.text())            

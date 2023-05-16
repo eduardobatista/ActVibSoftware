@@ -51,7 +51,7 @@ class dataman (QObject):
 
     def ParaLeituras(self):
         self.flagparar = True
-        self.statusMessage.emit("Stopping readings...")
+        self.statusMessage.emit("Stopping...")
 
     def IniciaLeituras(self,stoptime=3600.0):
         self.statusMessage.emit(None)      

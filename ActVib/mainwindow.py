@@ -602,13 +602,29 @@ class mainwindow(QtWidgets.QMainWindow):
         if aux is not None:
             self.ofig.parseConfigString(aux)
         self.ui.plotLayout2.addWidget(self.ofig)
-        
+
+
+    def initChecks(self):
+        if self.ctrlpanel.isControlOn():
+            errimuidx = self.ctrlpanel.getErrorIMU()           
+            if not self.imupanel[errimuidx].isIMUEnabled():
+                raise BaseException("Error IMU is disabled.")
+            refimuidx = self.ctrlpanel.getRefIMU()           
+            if not self.imupanel[refimuidx].isIMUEnabled():
+                raise BaseException("Reference IMU is disabled.")
+
     
     def bInit(self,stoptime=3600.0):
         self.ui.bInit.setEnabled(False)        
         if self.dataman.flagrodando:            
             self.dataman.ParaLeituras()
         else:
+            try: 
+                self.initChecks()
+            except BaseException as ex:
+                self.statusMessage(f"Error: {ex}")                
+                self.ui.bInit.setEnabled(True)
+                return
             self.expLog = []
             self.flagsaveplus = False
             self.configControl()
