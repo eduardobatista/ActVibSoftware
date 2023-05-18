@@ -333,8 +333,12 @@ class driverhardware:
     def handshake(self):
         if not self.serial.is_open:
             self.openSerial()
-        self.serial.reset_output_buffer()
-        self.serial.reset_input_buffer()
+        try:
+            self.serial.reset_output_buffer()
+            self.serial.reset_input_buffer()
+        except BaseException:
+            self.closeSerial()
+            self.openSerial()
         # Try to perform handshake twice:
         for k in range(2):            
             self.serial.write(b'h')
@@ -445,6 +449,8 @@ class driverhardware:
         self.serial.write(b's')
         if (len(self.serial.read(10)) < 10):
             raise Exception('Sem resposta nas leituras.')
+        # if self.serial.read != b'k':
+        #     raise Exception('Failed starting readings.')
         self.buf = [0] * self.readsize
 
     def startControl(self):
@@ -592,8 +598,8 @@ class driverhardware:
             ctaux = ctaux + 1
         if ctaux == 64:
             raise Exception('Falha na leitura de pacote: cabeçalho não encontrado.')
-        if ctaux > 3:
-            print(f"wtf:{ctaux}!")
+        # if ctaux > 3:
+        #     print(f"wtf:{ctaux}!")
         if self.controlMode: # and self.taskIsControl:
             buf = self.serial.read(20)            
             self.dacout[0] = float(struct.unpack_from(">h",buf,0)[0]) * self.iampscaler[self.perturbChannel]          

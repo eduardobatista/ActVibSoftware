@@ -453,12 +453,16 @@ class ADCPanel(QtWidgets.QWidget,StateSaver):
                    self.ui.radioADC3,self.ui.radioADC4,
                    self.ui.comboADCModel,self.ui.comboADCRange,self.ui.comboRate1115,self.ui.comboRate1015]:
             cc.setEnabled(en)
-        self.modelChanged()
+        self.modelChanged(not en)
     
-    def modelChanged(self):
+    def modelChanged(self,disableall=False):
         isADC1115 = (self.ui.comboADCModel.currentIndex() == 0)
-        self.ui.comboRate1115.setEnabled(isADC1115)
-        self.ui.comboRate1015.setEnabled(not isADC1115)
+        if disableall:
+            self.ui.comboRate1115.setEnabled(False)
+            self.ui.comboRate1015.setEnabled(False)
+        else:            
+            self.ui.comboRate1115.setEnabled(isADC1115)
+            self.ui.comboRate1015.setEnabled(not isADC1115)
     
     def getLogString(self):
         logstring = self.ui.comboADCModel.currentText()
