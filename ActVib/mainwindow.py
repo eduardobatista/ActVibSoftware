@@ -198,6 +198,24 @@ class mainwindow(QtWidgets.QMainWindow):
                 dialogmsg += f" Error: {str(ex)}"
                 self.automator.stop()
             self.resumeAutomator.emit()
+        elif msg == "ConfigADC":
+            dialogmsg += f" - {opts}"
+            self.adcpanel.ui.comboADCModel.setCurrentText(opts[0])
+            auxdict = { "Off":self.adcpanel.ui.radioOff, 
+                "1":self.adcpanel.ui.radioADC1, 
+                "2":self.adcpanel.ui.radioADC2, 
+                "3":self.adcpanel.ui.radioADC3, 
+                "4":self.adcpanel.ui.radioADC4}
+            auxdict[opts[1]].setChecked(True)            
+            self.adcpanel.ui.comboADCRange.setCurrentText(f"±{opts[2]} V")
+            if opts[0] == "ADS1115":
+                self.adcpanel.ui.comboRate1115.setCurrentText(f"{opts[3]} SPS")
+            elif opts[0] == "ADS1015":
+                self.adcpanel.ui.comboRate1015.setCurrentText(f"{opts[3]} SPS")
+            else: 
+                dialogmsg += f" Error: Invalid ADC Model"
+                self.automator.stop()
+            self.resumeAutomator.emit()
         elif msg == "ControlChannels":
             dialogmsg += f" - {opts}"
             self.ctrlpanel.ui.comboPerturbChannel.setCurrentText(opts[0])
@@ -220,6 +238,9 @@ class mainwindow(QtWidgets.QMainWindow):
         elif msg == "SetPathModeling":            
             self.ctrlpanel.ui.checkControle.setChecked(True)
             self.ctrlpanel.ui.comboCtrlTask.setCurrentIndex(1)            
+            self.resumeAutomator.emit() 
+        elif msg == "SetReadingMode":            
+            self.ctrlpanel.ui.checkControle.setChecked(False)         
             self.resumeAutomator.emit() 
         elif msg == "Wait":            
             if not self.dataman.flagrodando:

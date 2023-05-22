@@ -171,12 +171,12 @@ class Ui_ADCForm(object):
 
     def retranslateUi(self, ADCForm):
         ADCForm.setWindowTitle(QCoreApplication.translate("ADCForm", u"Form", None))
-        self.comboADCRange.setItemText(0, QCoreApplication.translate("ADCForm", u"\u00b16,144 V", None))
-        self.comboADCRange.setItemText(1, QCoreApplication.translate("ADCForm", u"\u00b14,096 V", None))
-        self.comboADCRange.setItemText(2, QCoreApplication.translate("ADCForm", u"\u00b12,048 V", None))
-        self.comboADCRange.setItemText(3, QCoreApplication.translate("ADCForm", u"\u00b11,024 V", None))
-        self.comboADCRange.setItemText(4, QCoreApplication.translate("ADCForm", u"\u00b10,512 V", None))
-        self.comboADCRange.setItemText(5, QCoreApplication.translate("ADCForm", u"\u00b10,256 V", None))
+        self.comboADCRange.setItemText(0, QCoreApplication.translate("ADCForm", u"\u00b16.144 V", None))
+        self.comboADCRange.setItemText(1, QCoreApplication.translate("ADCForm", u"\u00b14.096 V", None))
+        self.comboADCRange.setItemText(2, QCoreApplication.translate("ADCForm", u"\u00b12.048 V", None))
+        self.comboADCRange.setItemText(3, QCoreApplication.translate("ADCForm", u"\u00b11.024 V", None))
+        self.comboADCRange.setItemText(4, QCoreApplication.translate("ADCForm", u"\u00b10.512 V", None))
+        self.comboADCRange.setItemText(5, QCoreApplication.translate("ADCForm", u"\u00b10.256 V", None))
 
         self.comboRate1115.setItemText(0, QCoreApplication.translate("ADCForm", u"8 SPS", None))
         self.comboRate1115.setItemText(1, QCoreApplication.translate("ADCForm", u"16 SPS", None))
@@ -187,7 +187,7 @@ class Ui_ADCForm(object):
         self.comboRate1115.setItemText(6, QCoreApplication.translate("ADCForm", u"475 SPS", None))
         self.comboRate1115.setItemText(7, QCoreApplication.translate("ADCForm", u"860 SPS", None))
 
-        self.comboRate1115.setCurrentText(QCoreApplication.translate("ADCForm", u"8 SPS", None))
+        self.comboRate1115.setCurrentText(QCoreApplication.translate("ADCForm", u"860 SPS", None))
         self.comboRate1015.setItemText(0, QCoreApplication.translate("ADCForm", u"128 SPS", None))
         self.comboRate1015.setItemText(1, QCoreApplication.translate("ADCForm", u"250 SPS", None))
         self.comboRate1015.setItemText(2, QCoreApplication.translate("ADCForm", u"490 SPS", None))
@@ -196,7 +196,7 @@ class Ui_ADCForm(object):
         self.comboRate1015.setItemText(5, QCoreApplication.translate("ADCForm", u"2400 SPS", None))
         self.comboRate1015.setItemText(6, QCoreApplication.translate("ADCForm", u"3300 SPS", None))
 
-        self.comboRate1015.setCurrentText(QCoreApplication.translate("ADCForm", u"128 SPS", None))
+        self.comboRate1015.setCurrentText(QCoreApplication.translate("ADCForm", u"1600 SPS", None))
         self.radioADC4.setText(QCoreApplication.translate("ADCForm", u"Channel 4", None))
         self.label.setText(QCoreApplication.translate("ADCForm", u"Model:", None))
         self.comboADCModel.setItemText(0, QCoreApplication.translate("ADCForm", u"ADS1115", None))

@@ -429,7 +429,7 @@ class ADCPanel(QtWidgets.QWidget,StateSaver):
         self.ui = Ui_ADCForm()
         self.ui.setupUi(self)
         self.saveprefix = f'ADC'
-        self.ui.comboADCModel.currentIndexChanged.connect(self.modelChanged)
+        self.ui.comboADCModel.currentIndexChanged.connect(lambda: self.modelChanged(False))
 
     #
     # adcconfig[0]: less significant bits = channel enablers
@@ -460,7 +460,7 @@ class ADCPanel(QtWidgets.QWidget,StateSaver):
         if disableall:
             self.ui.comboRate1115.setEnabled(False)
             self.ui.comboRate1015.setEnabled(False)
-        else:            
+        else: 
             self.ui.comboRate1115.setEnabled(isADC1115)
             self.ui.comboRate1015.setEnabled(not isADC1115)
     

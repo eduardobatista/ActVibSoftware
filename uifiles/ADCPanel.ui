@@ -63,32 +63,32 @@
         </property>
         <item>
          <property name="text">
-          <string>±6,144 V</string>
+          <string>±6.144 V</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>±4,096 V</string>
+          <string>±4.096 V</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>±2,048 V</string>
+          <string>±2.048 V</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>±1,024 V</string>
+          <string>±1.024 V</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>±0,512 V</string>
+          <string>±0.512 V</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>±0,256 V</string>
+          <string>±0.256 V</string>
          </property>
         </item>
        </widget>
@@ -105,7 +105,7 @@
          </sizepolicy>
         </property>
         <property name="currentText">
-         <string>8 SPS</string>
+         <string>860 SPS</string>
         </property>
         <item>
          <property name="text">
@@ -161,7 +161,7 @@
          </sizepolicy>
         </property>
         <property name="currentText">
-         <string>128 SPS</string>
+         <string>1600 SPS</string>
         </property>
         <item>
          <property name="text">
