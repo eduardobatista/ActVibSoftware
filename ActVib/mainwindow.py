@@ -148,6 +148,7 @@ class mainwindow(QtWidgets.QMainWindow):
 
         self.automator = Automator(self.app)
         self.automatorWaiting = False
+        self.automatorWaitingStart = False
         self.automator.actionMessage.connect(self.processActions)
         self.resumeAutomator.connect(self.automator.resume)
 
@@ -168,7 +169,9 @@ class mainwindow(QtWidgets.QMainWindow):
         dialogmsg = f"{self.automator.elapsedTime():.0f}: {msg}"
         if msg == "Reset":
             self.bReset(ignoreunsaved=True)
-            self.resumeAutomator.emit()            
+            self.resumeAutomator.emit()
+        elif msg == "Delay":
+            dialogmsg += f" - {opts}"            
         elif msg == "ConfigOutput":
             dialogmsg += f" - {opts}"
             idxoutput = int(opts[0]) - 1
@@ -178,6 +181,7 @@ class mainwindow(QtWidgets.QMainWindow):
                 self.genpanel[idxoutput].ui.checkEnable.setChecked(genenabled)
                 if genenabled:
                     self.genpanel[idxoutput].setGeneratorConfig(opts[2], float(opts[3]), float(opts[4]))
+                self.changeGeneratorConfig(idxoutput)
             else: 
                 dialogmsg += f" Error: {str(ex)}"
                 self.automator.stop()
@@ -253,11 +257,20 @@ class mainwindow(QtWidgets.QMainWindow):
             self.automatorWaiting = False
             self.bInit(stoptime=int(opts[0])) 
             self.resumeAutomator.emit()
+        elif msg == "Stop":
+            # dialogmsg += f" with stop time {opts[0]}"
+            self.automatorWaiting = True
+            self.bInit()
         elif msg == "StartWait":
-            dialogmsg += f" with stop time {opts[0]}"
+            dialogmsg += f" with stop time {opts[0]} - waiting end of experiment."
             self.automatorWaiting = False
             self.bInit(stoptime=int(opts[0])) 
             self.automatorWaiting = True
+        elif msg == "StartNotify":
+            dialogmsg += f" - waiting notification of start of experiment."
+            self.automatorWaitingStart = False
+            self.bInit(stoptime=int(opts[0])) 
+            self.automatorWaitingStart = True
         elif msg == "AlgOn":
             self.ctrlpanel.ui.checkAlgOn.setChecked(True if (opts[0] == "True") else False)  
             self.resumeAutomator.emit() 
@@ -581,10 +594,14 @@ class mainwindow(QtWidgets.QMainWindow):
         self.ctrlfig.resetFigure()
 
 
-    def changeGeneratorConfig(self):
-        for k in range(4):
-            generatorconfig = self.genpanel[k].getGeneratorConfig()
-            self.driver.setGeneratorConfig(k, **generatorconfig)
+    def changeGeneratorConfig(self,idx=None):
+        if idx:
+            generatorconfig = self.genpanel[idx].getGeneratorConfig()
+            self.driver.setGeneratorConfig(idx, **generatorconfig)
+        else:
+            for k in range(4):
+                generatorconfig = self.genpanel[k].getGeneratorConfig()
+                self.driver.setGeneratorConfig(k, **generatorconfig)
 
 
     def changeMPUConfig(self):
@@ -659,7 +676,7 @@ class mainwindow(QtWidgets.QMainWindow):
             self.disabledwhenrunning = self.imupanel + [self.ctrlpanel,self.adcpanel]
             for cc in self.disabledwhenrunning: 
                 cc.setEnabled(False)
-
+            
             if self.ctrlpanel.isControlOn() and self.ctrlpanel.isTaskControl():
                 self.ctrlpanel.ui.checkAlgOn.setEnabled(True)
 
@@ -675,7 +692,13 @@ class mainwindow(QtWidgets.QMainWindow):
             self.dataman.IniciaLeituras(stoptime=stoptime)
 
     def readingsStarted(self):
-        self.ui.bInit.setEnabled(True)
+        if self.automator.running:
+            self.ui.bInit.setEnabled(False)
+        else:
+            self.ui.bInit.setEnabled(True)
+        if self.automatorWaitingStart:
+            self.resumeAutomator.emit()
+            self.automatorWaitingStart = False
 
     def readingsStopped(self):
         for cc in self.disabledwhenrunning:

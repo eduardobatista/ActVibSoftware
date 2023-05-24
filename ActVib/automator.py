@@ -109,13 +109,16 @@ class Automator (QtCore.QObject):
                 self.pauseevent.set()
 
     def showAutomatorDialog(self):             
-        self.adialog.exec_()
+        # self.adialog.exec_()
+        self.adialog.show()
 
     def printMessage(self,msg):
         self.adialog.ui.messageArea.insertPlainText(msg)
+        self.adialog.ui.messageArea.moveCursor(QtGui.QTextCursor.End)
 
     def printErrorMessage(self,msg):
         self.adialog.ui.messageArea.insertHtml(f'<span style="color: red; font-weight: bold;">{msg}</span><br>')
+        self.adialog.ui.messageArea.moveCursor(QtGui.QTextCursor.End)
 
     def elapsedTime(self):
         return (time.time() - self.starttime)
@@ -142,11 +145,18 @@ class Automator (QtCore.QObject):
         while n < len(self.lista):
             self.flagretry = False
             if self.lista[n][0] == "Delay":
-                time.sleep(int(self.lista[n][1][0]))
+                self.actionMessage.emit(self.lista[n][0],self.lista[n][1])
+                remtime = int(self.lista[n][1][0])
+                delayend = time.time() + remtime
+                while (remtime > 0):
+                    time.sleep(5 if (remtime > 5) else remtime)
+                    remtime = delayend - time.time()
+                    if self.flagstop:
+                        break
             else:
                 self.actionMessage.emit(self.lista[n][0],self.lista[n][1])
                 pevent.wait()
-                pevent.clear()                
+                pevent.clear()             
             if self.flagstop:                    
                 self.flagstop = False
                 break
@@ -157,6 +167,7 @@ class Automator (QtCore.QObject):
                 n += 1
         self.adialog.ui.bStart.setDisabled(False)
         self.adialog.ui.bStop.setDisabled(True)
+        self.actionMessage.emit("Finished!",[''])
         self.running = False
 
 
