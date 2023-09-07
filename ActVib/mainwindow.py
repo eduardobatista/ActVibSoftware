@@ -30,7 +30,8 @@ class mainwindow(QtWidgets.QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.Port = "COM3"
-        self.TSampling = 4   # 4 ms is the default
+        self.TSampling = 4000   # 4000 us is the default
+        self.FSampling = 250  # 250 Hz is the default
         self.MaxTime = 10   # 10 min is the default
         self.BaudRate = 500000
         self.workdir = Path.home()
@@ -441,8 +442,8 @@ class mainwindow(QtWidgets.QMainWindow):
         if (settings.value("Porta") is not None):
             self.Port = settings.value("Porta")
             self.setPort(self.Port)
-        if (settings.value("TSampling") is not None):
-            self.setSampling(settings.value("TSampling"))  
+        if (settings.value("FSampling") is not None):
+            self.setSampling(settings.value("FSampling"))  
         if (settings.value("MaxTime") is not None):
             self.setMaxTime(settings.value("MaxTime"))
         if (settings.value("BaudRate") is not None):
@@ -488,7 +489,7 @@ class mainwindow(QtWidgets.QMainWindow):
             elif (type(w) == QtWidgets.QLineEdit):
                 settings.setValue(w.objectName(), w.text())
         settings.setValue("Porta", self.Port)
-        settings.setValue("TSampling", str(self.TSampling) + " ms")
+        settings.setValue("FSampling", str(self.FSampling) + " Hz")
         settings.setValue("MaxTime", str(self.MaxTime) + " min")
         settings.setValue("BaudRate", str(self.BaudRate))
         settings.setValue("MFig", self.mfig.getConfigString())
@@ -721,12 +722,12 @@ class mainwindow(QtWidgets.QMainWindow):
             buttonReply = QMessageBox.question(self, 'Warning!', "Data is not saved and will be erased. Confirm?",
                                                QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
             if buttonReply == QMessageBox.Yes:
-                self.dataman.resetData(self.TSampling/1000,self.MaxTime)
+                self.dataman.resetData(self.TSampling/1e6,self.MaxTime)
                 self.ui.statusbar.clearMessage()
             else:
                 self.ui.statusbar.showMessage("Cancelado...")
         else:
-            self.dataman.resetData(self.TSampling/1000,self.MaxTime)
+            self.dataman.resetData(self.TSampling/1e6,self.MaxTime)
             self.ui.statusbar.clearMessage()
         self.ctrlpanel.setEnabled(True,isreset=True)
 
@@ -744,7 +745,7 @@ class mainwindow(QtWidgets.QMainWindow):
                 else:
                     if sra.text().startswith(">"):
                         sra.setText(sra.text()[1:])
-            self.dataman.resetData(self.TSampling/1000,self.MaxTime)
+            self.dataman.resetData(self.TSampling/1e6,self.MaxTime)
             self.ui.statusbar.clearMessage()   
 
     def setBaudRate(self, selbaudrate):
@@ -761,7 +762,7 @@ class mainwindow(QtWidgets.QMainWindow):
                 else:
                     if sra.text().startswith(">"):
                         sra.setText(sra.text()[1:])
-            # self.dataman.resetData(self.TSampling/1000,self.MaxTime)
+            # self.dataman.resetData(self.TSampling/1e6,self.MaxTime)
             self.driver.setBaudRate(self.BaudRate)
             self.ui.statusbar.clearMessage()
 
@@ -770,16 +771,20 @@ class mainwindow(QtWidgets.QMainWindow):
             QMessageBox.critical(self, 'Error', "Operation not allowed when running or with unsaved data.")
             # self.ui.statusbar.showMessage("Not allowed when running or with unsaved data.")
         else:
+            if selsampling.endswith("ms"):
+                selsampling = f"{(1 / (np.round(float(selsampling[:-2]) * 1e-3))):.0f} Hz" 
             if selsampling.startswith(">"):
                 selsampling = selsampling[1:]
-            self.TSampling = int(selsampling[0])
+            # self.TSampling = int(selsampling[0])
+            self.FSampling = int(selsampling[0:-2])
             for sra in self.ui.menuSampling_Rate.actions():
                 if sra.text().endswith(selsampling):
                     sra.setText(f">{selsampling}")
                 else:
                     if sra.text().startswith(">"):
                         sra.setText(sra.text()[1:])
-            self.dataman.resetData(self.TSampling/1000,self.MaxTime)
+            self.TSampling = int(np.round(1e6/self.FSampling))
+            self.dataman.resetData(self.TSampling/1e6,self.MaxTime)
             self.mfig.setSamplingPeriod(self.dataman.samplingperiod)
             self.ofig.setSamplingPeriod(self.dataman.samplingperiod)
             self.ctrlfig.setSamplingPeriod(self.dataman.samplingperiod)

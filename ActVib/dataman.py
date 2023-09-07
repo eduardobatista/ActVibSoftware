@@ -6,6 +6,8 @@ import time
 import numpy as np
 import pandas as pd
 
+from .driverhardware import driverhardware
+
 from PySide2.QtCore import Signal,QObject
 
 class dataman (QObject):
@@ -17,10 +19,10 @@ class dataman (QObject):
     started = Signal()
     logMessage = Signal((int,str))
 
-    def __init__(self, driver):
+    def __init__(self, driver : driverhardware):
         super().__init__()
         self.plotupdatesec = 1
-        self.samplingperiod = 4e-3
+        self.samplingperiod = 4e-3  # In seconds
         self.wsize = 200000
         self.driver = driver
         self.timereads = np.zeros(self.wsize)
@@ -76,7 +78,7 @@ class dataman (QObject):
             self.statusMessage.emit("Handshaking...")
             self.driver.handshake()
             self.statusMessage.emit("Writing configs...")
-            self.driver.writeSampling(int(self.samplingperiod*1000))            
+            self.driver.writeSamplingMicros(int(self.samplingperiod*1e6))            
             for k in range(3):
                 self.driver.writeIMUConfig(k)
                 if self.driver.IMUEnableFlags[k]:
@@ -181,6 +183,7 @@ class dataman (QObject):
         self.wsize = int(self.maxtime/self.samplingperiod)
         self.flagsaved = True
         self.globalctreadings = 0
+        self.timereads = np.zeros(self.wsize)
         self.accdata = [[np.zeros(self.wsize), np.zeros(self.wsize), np.zeros(self.wsize)],
                         [np.zeros(self.wsize), np.zeros(self.wsize), np.zeros(self.wsize)],
                         [np.zeros(self.wsize), np.zeros(self.wsize), np.zeros(self.wsize)]]

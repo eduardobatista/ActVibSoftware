@@ -17,7 +17,7 @@ class Ui_IMUPanel(object):
     def setupUi(self, IMUPanel):
         if not IMUPanel.objectName():
             IMUPanel.setObjectName(u"IMUPanel")
-        IMUPanel.resize(585, 49)
+        IMUPanel.resize(585, 53)
         self.verticalLayout = QVBoxLayout(IMUPanel)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
@@ -150,6 +150,7 @@ class Ui_IMUPanel(object):
         self.comboFilter2.addItem("")
         self.comboFilter2.addItem("")
         self.comboFilter2.addItem("")
+        self.comboFilter2.addItem("")
         self.comboFilter2.setObjectName(u"comboFilter2")
         sizePolicy.setHeightForWidth(self.comboFilter2.sizePolicy().hasHeightForWidth())
         self.comboFilter2.setSizePolicy(sizePolicy)
@@ -223,10 +224,11 @@ class Ui_IMUPanel(object):
         self.comboGyroRange.setItemText(3, QCoreApplication.translate("IMUPanel", u"\u00b11000\u00ba/s", None))
         self.comboGyroRange.setItemText(4, QCoreApplication.translate("IMUPanel", u"\u00b12000\u00ba/s", None))
 
-        self.comboFilter2.setItemText(0, QCoreApplication.translate("IMUPanel", u"400Hz", None))
-        self.comboFilter2.setItemText(1, QCoreApplication.translate("IMUPanel", u"200Hz", None))
-        self.comboFilter2.setItemText(2, QCoreApplication.translate("IMUPanel", u"100Hz", None))
-        self.comboFilter2.setItemText(3, QCoreApplication.translate("IMUPanel", u"50Hz", None))
+        self.comboFilter2.setItemText(0, QCoreApplication.translate("IMUPanel", u"Auto", None))
+        self.comboFilter2.setItemText(1, QCoreApplication.translate("IMUPanel", u"400Hz", None))
+        self.comboFilter2.setItemText(2, QCoreApplication.translate("IMUPanel", u"200Hz", None))
+        self.comboFilter2.setItemText(3, QCoreApplication.translate("IMUPanel", u"100Hz", None))
+        self.comboFilter2.setItemText(4, QCoreApplication.translate("IMUPanel", u"50Hz", None))
 
         self.comboBus.setItemText(0, QCoreApplication.translate("IMUPanel", u"I2C-1", None))
         self.comboBus.setItemText(1, QCoreApplication.translate("IMUPanel", u"I2C-2", None))

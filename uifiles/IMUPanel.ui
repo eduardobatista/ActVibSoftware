@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>585</width>
-    <height>49</height>
+    <height>53</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -320,6 +320,11 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <item>
+         <property name="text">
+          <string>Auto</string>
+         </property>
+        </item>
         <item>
          <property name="text">
           <string>400Hz</string>

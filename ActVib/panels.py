@@ -314,7 +314,9 @@ class IMUPanel(QtWidgets.QWidget,StateSaver):
     def getIMUConfig(self):
         configbytes = []        
         # Byte 0:
-        configbytes.append( (self.ui.comboBus.currentIndex()<<2) + (int(self.ui.comboType.currentIndex() == 2) << 1) +  int(self.ui.comboType.currentIndex() > 0)  )
+        imutype = int(self.ui.comboType.currentIndex() == 2)
+        imuenabled = int(self.ui.comboType.currentIndex() > 0)
+        configbytes.append( (self.ui.comboBus.currentIndex()<<2) + (imutype << 1) +  imuenabled  )
         # Byte 1:
         if self.ui.comboBus.currentIndex() < 2:
             configbytes.append( int(str(self.ui.comboAddress.currentText())[2:],16) )
@@ -323,7 +325,7 @@ class IMUPanel(QtWidgets.QWidget,StateSaver):
                 self.ui.comboAddress.setCurrentIndex(4)
             configbytes.append( int(str(self.ui.comboAddress.currentText())[2:],10) )
         # Byte 2:
-        configbytes.append( (self.getMPUFilter()<<5) + (self.getGyroRange()<<2) + self.getAccRange() )
+        configbytes.append( ((self.getMPUFilter() if (imutype == 0) else self.getLSMFilter()) << 5) + (self.getGyroRange()<<2) + self.getAccRange() )
         return configbytes
 
     def getMPUAddress(self):

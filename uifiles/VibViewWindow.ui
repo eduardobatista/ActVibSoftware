@@ -800,6 +800,11 @@
      <addaction name="action2_ms"/>
      <addaction name="action3_ms"/>
      <addaction name="action4_ms"/>
+     <addaction name="separator"/>
+     <addaction name="action104"/>
+     <addaction name="action208_Hz"/>
+     <addaction name="action416_Hz"/>
+     <addaction name="action832_Hz"/>
     </widget>
     <widget class="QMenu" name="menuMax_Time">
      <property name="title">
@@ -936,22 +941,22 @@
   </action>
   <action name="action1_ms">
    <property name="text">
-    <string>1 ms</string>
+    <string>250 Hz</string>
    </property>
   </action>
   <action name="action2_ms">
    <property name="text">
-    <string>2 ms</string>
+    <string>333 Hz</string>
    </property>
   </action>
   <action name="action3_ms">
    <property name="text">
-    <string>3 ms</string>
+    <string>500 Hz</string>
    </property>
   </action>
   <action name="action4_ms">
    <property name="text">
-    <string>4 ms</string>
+    <string>1 kHz</string>
    </property>
   </action>
   <action name="action5_ms">
@@ -1017,6 +1022,26 @@
   <action name="action921600">
    <property name="text">
     <string>921600</string>
+   </property>
+  </action>
+  <action name="action208_Hz">
+   <property name="text">
+    <string>208 Hz</string>
+   </property>
+  </action>
+  <action name="action416_Hz">
+   <property name="text">
+    <string>416 Hz</string>
+   </property>
+  </action>
+  <action name="action832_Hz">
+   <property name="text">
+    <string>832 Hz</string>
+   </property>
+  </action>
+  <action name="action104">
+   <property name="text">
+    <string>104 Hz</string>
    </property>
   </action>
  </widget>

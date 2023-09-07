@@ -210,7 +210,48 @@ class driverhardware:
         if aux != b'KI':
             print(aux)
             raise Exception(f'Error writing IMU{id+1} Config.')
+        
 
+    def writeSamplingMicros(self,TSamplingMicros: int):
+        # print("writeIMU")
+        print(TSamplingMicros)
+        if TSamplingMicros in [1000,2000,3000,3003,4000]:
+            TSampling = int(TSamplingMicros / 1000)
+            aux = bytearray([ord('f')] + [TSampling])
+            tries = 0
+            while tries < 5:
+                # print(aux)
+                self.serial.write(aux)
+                self.serial.flush() 
+                aux = self.serial.read(2)
+                if (aux[0] != ord('f')) or (aux[1] != TSampling):
+                    print(aux)
+                    tries += 1
+                    self.serial.reset_output_buffer()
+                    self.serial.reset_input_buffer()
+                    # time.sleep(0.1)
+                else: 
+                    return True
+            raise Exception(f'Error writing sampling rate.')
+        else:
+            aux = bytearray([ord('m')] + [(TSamplingMicros >> 8) & 0xFF,TSamplingMicros & 0xFF])
+            tries = 0
+            while tries < 5:
+                # print(aux)
+                self.serial.write(aux)
+                self.serial.flush() 
+                aux = self.serial.read(3)
+                if (aux[0] != ord('m')) or (aux[1] != ((TSamplingMicros >> 8) & 0xFF)) or (aux[2] != (TSamplingMicros & 0xFF)):
+                    print(aux)
+                    tries += 1
+                    self.serial.reset_output_buffer()
+                    self.serial.reset_input_buffer()
+                    # time.sleep(0.1)
+                else: 
+                    return True
+            raise Exception(f'Error writing sampling rate (micros).')
+        
+    
     
     def writeSampling(self,TSampling: int):
         # print("writeIMU")
