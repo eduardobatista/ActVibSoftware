@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>585</width>
+    <width>566</width>
     <height>53</height>
    </rect>
   </property>
@@ -188,51 +188,6 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="7">
-       <widget class="QComboBox" name="comboFilter">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <item>
-         <property name="text">
-          <string>260Hz</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>184Hz</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>94Hz</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>44Hz</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>21Hz</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>10Hz</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>6Hz</string>
-         </property>
-        </item>
-       </widget>
-      </item>
       <item row="1" column="2" rowspan="4">
        <widget class="Line" name="line_2">
         <property name="orientation">
@@ -277,76 +232,6 @@
         </item>
        </widget>
       </item>
-      <item row="1" column="7" colspan="2">
-       <widget class="QComboBox" name="comboGyroRange">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <item>
-         <property name="text">
-          <string>±125º/s</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>±250º/s</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>±500º/s</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>±1000º/s</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>±2000º/s</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-      <item row="3" column="8">
-       <widget class="QComboBox" name="comboFilter2">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <item>
-         <property name="text">
-          <string>Auto</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>400Hz</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>200Hz</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>100Hz</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>50Hz</string>
-         </property>
-        </item>
-       </widget>
-      </item>
       <item row="1" column="4">
        <widget class="QComboBox" name="comboBus">
         <property name="sizePolicy">
@@ -385,6 +270,76 @@
         </property>
        </widget>
       </item>
+      <item row="1" column="7">
+       <widget class="QComboBox" name="comboGyroRange">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <item>
+         <property name="text">
+          <string>±125º/s</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>±250º/s</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>±500º/s</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>±1000º/s</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>±2000º/s</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="3" column="7">
+       <widget class="QComboBox" name="comboFilter2">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <item>
+         <property name="text">
+          <string>Auto</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>400Hz</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>200Hz</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>100Hz</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>50Hz</string>
+         </property>
+        </item>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
@@ -396,8 +351,6 @@
   <tabstop>comboBus</tabstop>
   <tabstop>comboAccRange</tabstop>
   <tabstop>comboGyroRange</tabstop>
-  <tabstop>comboFilter</tabstop>
-  <tabstop>comboFilter2</tabstop>
  </tabstops>
  <resources/>
  <connections/>

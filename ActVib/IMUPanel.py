@@ -17,7 +17,7 @@ class Ui_IMUPanel(object):
     def setupUi(self, IMUPanel):
         if not IMUPanel.objectName():
             IMUPanel.setObjectName(u"IMUPanel")
-        IMUPanel.resize(585, 53)
+        IMUPanel.resize(566, 53)
         self.verticalLayout = QVBoxLayout(IMUPanel)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
@@ -94,20 +94,6 @@ class Ui_IMUPanel(object):
 
         self.gridLayout.addWidget(self.label_13, 3, 3, 1, 1)
 
-        self.comboFilter = QComboBox(self.imuframe)
-        self.comboFilter.addItem("")
-        self.comboFilter.addItem("")
-        self.comboFilter.addItem("")
-        self.comboFilter.addItem("")
-        self.comboFilter.addItem("")
-        self.comboFilter.addItem("")
-        self.comboFilter.addItem("")
-        self.comboFilter.setObjectName(u"comboFilter")
-        sizePolicy.setHeightForWidth(self.comboFilter.sizePolicy().hasHeightForWidth())
-        self.comboFilter.setSizePolicy(sizePolicy)
-
-        self.gridLayout.addWidget(self.comboFilter, 3, 7, 1, 1)
-
         self.line_2 = QFrame(self.imuframe)
         self.line_2.setObjectName(u"line_2")
         self.line_2.setFrameShape(QFrame.VLine)
@@ -133,30 +119,6 @@ class Ui_IMUPanel(object):
 
         self.gridLayout.addWidget(self.comboAccRange, 3, 4, 1, 1)
 
-        self.comboGyroRange = QComboBox(self.imuframe)
-        self.comboGyroRange.addItem("")
-        self.comboGyroRange.addItem("")
-        self.comboGyroRange.addItem("")
-        self.comboGyroRange.addItem("")
-        self.comboGyroRange.addItem("")
-        self.comboGyroRange.setObjectName(u"comboGyroRange")
-        sizePolicy.setHeightForWidth(self.comboGyroRange.sizePolicy().hasHeightForWidth())
-        self.comboGyroRange.setSizePolicy(sizePolicy)
-
-        self.gridLayout.addWidget(self.comboGyroRange, 1, 7, 1, 2)
-
-        self.comboFilter2 = QComboBox(self.imuframe)
-        self.comboFilter2.addItem("")
-        self.comboFilter2.addItem("")
-        self.comboFilter2.addItem("")
-        self.comboFilter2.addItem("")
-        self.comboFilter2.addItem("")
-        self.comboFilter2.setObjectName(u"comboFilter2")
-        sizePolicy.setHeightForWidth(self.comboFilter2.sizePolicy().hasHeightForWidth())
-        self.comboFilter2.setSizePolicy(sizePolicy)
-
-        self.gridLayout.addWidget(self.comboFilter2, 3, 8, 1, 1)
-
         self.comboBus = QComboBox(self.imuframe)
         self.comboBus.addItem("")
         self.comboBus.addItem("")
@@ -173,6 +135,30 @@ class Ui_IMUPanel(object):
 
         self.gridLayout.addWidget(self.label_2, 1, 3, 1, 1)
 
+        self.comboGyroRange = QComboBox(self.imuframe)
+        self.comboGyroRange.addItem("")
+        self.comboGyroRange.addItem("")
+        self.comboGyroRange.addItem("")
+        self.comboGyroRange.addItem("")
+        self.comboGyroRange.addItem("")
+        self.comboGyroRange.setObjectName(u"comboGyroRange")
+        sizePolicy.setHeightForWidth(self.comboGyroRange.sizePolicy().hasHeightForWidth())
+        self.comboGyroRange.setSizePolicy(sizePolicy)
+
+        self.gridLayout.addWidget(self.comboGyroRange, 1, 7, 1, 1)
+
+        self.comboFilter2 = QComboBox(self.imuframe)
+        self.comboFilter2.addItem("")
+        self.comboFilter2.addItem("")
+        self.comboFilter2.addItem("")
+        self.comboFilter2.addItem("")
+        self.comboFilter2.addItem("")
+        self.comboFilter2.setObjectName(u"comboFilter2")
+        sizePolicy.setHeightForWidth(self.comboFilter2.sizePolicy().hasHeightForWidth())
+        self.comboFilter2.setSizePolicy(sizePolicy)
+
+        self.gridLayout.addWidget(self.comboFilter2, 3, 7, 1, 1)
+
 
         self.verticalLayout.addWidget(self.imuframe)
 
@@ -180,8 +166,6 @@ class Ui_IMUPanel(object):
         QWidget.setTabOrder(self.comboAddress, self.comboBus)
         QWidget.setTabOrder(self.comboBus, self.comboAccRange)
         QWidget.setTabOrder(self.comboAccRange, self.comboGyroRange)
-        QWidget.setTabOrder(self.comboGyroRange, self.comboFilter)
-        QWidget.setTabOrder(self.comboFilter, self.comboFilter2)
 
         self.retranslateUi(IMUPanel)
 
@@ -205,19 +189,16 @@ class Ui_IMUPanel(object):
 
         self.label_15.setText(QCoreApplication.translate("IMUPanel", u"Filter:", None))
         self.label_13.setText(QCoreApplication.translate("IMUPanel", u"AccR:", None))
-        self.comboFilter.setItemText(0, QCoreApplication.translate("IMUPanel", u"260Hz", None))
-        self.comboFilter.setItemText(1, QCoreApplication.translate("IMUPanel", u"184Hz", None))
-        self.comboFilter.setItemText(2, QCoreApplication.translate("IMUPanel", u"94Hz", None))
-        self.comboFilter.setItemText(3, QCoreApplication.translate("IMUPanel", u"44Hz", None))
-        self.comboFilter.setItemText(4, QCoreApplication.translate("IMUPanel", u"21Hz", None))
-        self.comboFilter.setItemText(5, QCoreApplication.translate("IMUPanel", u"10Hz", None))
-        self.comboFilter.setItemText(6, QCoreApplication.translate("IMUPanel", u"6Hz", None))
-
         self.comboAccRange.setItemText(0, QCoreApplication.translate("IMUPanel", u"\u00b12g (\u00b119,6m/s\u00b2)", None))
         self.comboAccRange.setItemText(1, QCoreApplication.translate("IMUPanel", u"\u00b14g (\u00b139,2m/s\u00b2)", None))
         self.comboAccRange.setItemText(2, QCoreApplication.translate("IMUPanel", u"\u00b18g (\u00b178,4m/s\u00b2)", None))
         self.comboAccRange.setItemText(3, QCoreApplication.translate("IMUPanel", u"\u00b116g (\u00b1156,9m/s\u00b2)", None))
 
+        self.comboBus.setItemText(0, QCoreApplication.translate("IMUPanel", u"I2C-1", None))
+        self.comboBus.setItemText(1, QCoreApplication.translate("IMUPanel", u"I2C-2", None))
+        self.comboBus.setItemText(2, QCoreApplication.translate("IMUPanel", u"VSPI", None))
+
+        self.label_2.setText(QCoreApplication.translate("IMUPanel", u"Bus:", None))
         self.comboGyroRange.setItemText(0, QCoreApplication.translate("IMUPanel", u"\u00b1125\u00ba/s", None))
         self.comboGyroRange.setItemText(1, QCoreApplication.translate("IMUPanel", u"\u00b1250\u00ba/s", None))
         self.comboGyroRange.setItemText(2, QCoreApplication.translate("IMUPanel", u"\u00b1500\u00ba/s", None))
@@ -230,10 +211,5 @@ class Ui_IMUPanel(object):
         self.comboFilter2.setItemText(3, QCoreApplication.translate("IMUPanel", u"100Hz", None))
         self.comboFilter2.setItemText(4, QCoreApplication.translate("IMUPanel", u"50Hz", None))
 
-        self.comboBus.setItemText(0, QCoreApplication.translate("IMUPanel", u"I2C-1", None))
-        self.comboBus.setItemText(1, QCoreApplication.translate("IMUPanel", u"I2C-2", None))
-        self.comboBus.setItemText(2, QCoreApplication.translate("IMUPanel", u"VSPI", None))
-
-        self.label_2.setText(QCoreApplication.translate("IMUPanel", u"Bus:", None))
     # retranslateUi
 

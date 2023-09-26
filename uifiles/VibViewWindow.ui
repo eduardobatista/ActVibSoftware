@@ -40,17 +40,54 @@
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_3">
        <property name="leftMargin">
-        <number>0</number>
+        <number>6</number>
        </property>
        <property name="topMargin">
         <number>0</number>
        </property>
        <property name="rightMargin">
-        <number>0</number>
+        <number>3</number>
        </property>
        <property name="bottomMargin">
         <number>0</number>
        </property>
+       <item>
+        <widget class="QLabel" name="label_2">
+         <property name="font">
+          <font>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Mode:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="comboMode">
+         <property name="minimumSize">
+          <size>
+           <width>110</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <bold>true</bold>
+          </font>
+         </property>
+         <item>
+          <property name="text">
+           <string>Measurement</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Control</string>
+          </property>
+         </item>
+        </widget>
+       </item>
        <item>
         <spacer name="horizontalSpacer_3">
          <property name="orientation">
@@ -86,7 +123,7 @@
          </property>
          <property name="minimumSize">
           <size>
-           <width>200</width>
+           <width>120</width>
            <height>0</height>
           </size>
          </property>
@@ -145,7 +182,7 @@
          </property>
          <property name="minimumSize">
           <size>
-           <width>200</width>
+           <width>120</width>
            <height>0</height>
           </size>
          </property>
@@ -956,7 +993,7 @@
   </action>
   <action name="action4_ms">
    <property name="text">
-    <string>1 kHz</string>
+    <string>1000 Hz</string>
    </property>
   </action>
   <action name="action5_ms">

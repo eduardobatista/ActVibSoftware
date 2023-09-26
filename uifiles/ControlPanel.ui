@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>469</width>
-    <height>107</height>
+    <width>499</width>
+    <height>115</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -391,15 +391,14 @@
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QCheckBox" name="checkControle">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
+          <widget class="QLabel" name="label">
+           <property name="font">
+            <font>
+             <bold>false</bold>
+            </font>
            </property>
            <property name="text">
-            <string>Enable</string>
+            <string> Task:</string>
            </property>
           </widget>
          </item>

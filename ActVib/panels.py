@@ -75,7 +75,8 @@ class ControlPanel(QtWidgets.QWidget,StateSaver):
         self.ui = Ui_ControlForm()
         self.ui.setupUi(self)
         self.saveprefix = 'CTRL'
-        self.ui.checkControle.toggled.connect(self.controlChanged)
+        # self.ui.checkControle.toggled.connect(self.controlChanged)
+        self.controlenabled = False
         self.ui.checkAlgOn.setChecked(False)
         # self.ui.checkAlgOn.setEnabled(False)
         self.ui.checkAlgOn.toggled.connect(self.controlChanged)
@@ -103,8 +104,13 @@ class ControlPanel(QtWidgets.QWidget,StateSaver):
     def connectControlChanged(self,controlchangefunc):
         self.controlChangeFunc = controlchangefunc
     
+    def setActive(self, active : bool):
+        self.controlenabled = active
+        self.setEnabled(active,True)
+
     def isControlOn(self):
-        return self.ui.checkControle.isChecked()
+        # return self.ui.checkControle.isChecked()
+        return self.controlenabled
 
     def isTaskControl(self):
         return True if (self.ui.comboCtrlTask.currentIndex() == 0) else False
@@ -119,6 +125,8 @@ class ControlPanel(QtWidgets.QWidget,StateSaver):
         return self.ui.checkAlgOn.isChecked()
     
     def setEnabled(self,en,isreset=False):
+        if not self.controlenabled:
+            en = False
         cmps = [self.ui.comboRef,
                 self.ui.comboErro,self.ui.comboAlgoritmo,self.ui.spinMemCtrl,
                 self.ui.comboIMUError,self.ui.comboIMURef,
@@ -127,7 +135,7 @@ class ControlPanel(QtWidgets.QWidget,StateSaver):
             cmps = cmps + [self.ui.checkAlgOn,self.ui.spinTAlgOn,self.ui.passoCtrl,self.ui.normCtrl]
         if (not en) or (isreset and en):
             cmps.append(self.ui.comboCtrlTask)
-            cmps.append(self.ui.checkControle)
+            # cmps.append(self.ui.checkControle)
         for cc in cmps:
             cc.setEnabled(en)
 
@@ -184,7 +192,7 @@ class ControlPanel(QtWidgets.QWidget,StateSaver):
         return data
 
     def getLogString(self):
-        logstring = "Enabled" if self.ui.checkControle.isChecked() else "Disabled"
+        logstring = "Enabled" if self.controlenabled else "Disabled"
         if logstring == "Enabled":
             info = [self.ui.comboCtrlTask.currentText(), self.ui.comboPerturbChannel.currentText(), self.ui.comboControlChannel.currentText(),
                     self.ui.comboIMURef.currentText(),self.ui.comboRef.currentText(),self.ui.comboIMUError.currentText(),self.ui.comboErro.currentText(),
@@ -325,16 +333,13 @@ class IMUPanel(QtWidgets.QWidget,StateSaver):
                 self.ui.comboAddress.setCurrentIndex(4)
             configbytes.append( int(str(self.ui.comboAddress.currentText())[2:],10) )
         # Byte 2:
-        configbytes.append( ((self.getMPUFilter() if (imutype == 0) else self.getLSMFilter()) << 5) + (self.getGyroRange()<<2) + self.getAccRange() )
+        configbytes.append( (self.getFilter() << 5) + (self.getGyroRange()<<2) + self.getAccRange() )
         return configbytes
 
     def getMPUAddress(self):
         return self.ui.comboAddress.currentIndex()
     
-    def getMPUFilter(self):
-        return self.ui.comboFilter.currentIndex()
-    
-    def getLSMFilter(self):
+    def getFilter(self):
         return self.ui.comboFilter2.currentIndex()
 
     def getAccRange(self):
@@ -354,8 +359,8 @@ class IMUPanel(QtWidgets.QWidget,StateSaver):
     
     def setEnabled(self,en):
         if self.ui.comboType.currentIndex() > 0:
-            cmps = [self.ui.comboAddress,self.ui.comboAccRange,self.ui.comboGyroRange,
-                    self.ui.comboFilter,self.ui.comboBus,self.ui.comboType,self.ui.comboFilter2]
+            cmps = [self.ui.comboAddress,self.ui.comboAccRange,self.ui.comboGyroRange,#self.ui.comboFilter,
+                    self.ui.comboBus,self.ui.comboType,self.ui.comboFilter2]
             for cc in cmps:
                 cc.setEnabled(en)
         else:
@@ -378,8 +383,10 @@ class IMUPanel(QtWidgets.QWidget,StateSaver):
                 self.ui.comboGyroRange.setCurrentIndex(1)
             if self.ui.comboAddress.currentIndex() > 1:
                 self.ui.comboAddress.setCurrentIndex(0)
-            self.ui.comboFilter.setEnabled(True)
-            self.ui.comboFilter2.setEnabled(False)
+            # self.ui.comboFilter.setEnabled(True)
+            # self.ui.comboFilter2.setEnabled(False)
+            self.ui.comboFilter2.clear()
+            self.ui.comboFilter2.addItems(["260 Hz","184 Hz","94 Hz","44 Hz","21 Hz","10 Hz","5 Hz"])
         elif self.ui.comboType.currentIndex() == 2:
             self.ui.comboAddress.model().item(0).setEnabled(False)
             self.ui.comboAddress.model().item(1).setEnabled(False)
@@ -401,11 +408,13 @@ class IMUPanel(QtWidgets.QWidget,StateSaver):
             self.ui.comboBus.model().item(2).setEnabled(True)
             if self.ui.comboAddress.currentIndex() < 2:
                 self.ui.comboAddress.setCurrentIndex(2)
-            self.ui.comboFilter.setEnabled(False)
-            self.ui.comboFilter2.setEnabled(True)
+            self.ui.comboFilter2.clear()
+            self.ui.comboFilter2.addItems(["Auto","400 Hz","200 Hz","100 Hz","50 Hz"])
+            # self.ui.comboFilter.setEnabled(False)
+            # self.ui.comboFilter2.setEnabled(True)
 
     def typechanged(self):
-        cmps = [self.ui.comboAddress,self.ui.comboAccRange,self.ui.comboGyroRange,self.ui.comboFilter,self.ui.comboBus]
+        cmps = [self.ui.comboAddress,self.ui.comboAccRange,self.ui.comboGyroRange,self.ui.comboFilter2,self.ui.comboBus]
         if self.ui.comboType.currentIndex() == 0:
             enabled = False
         else:
@@ -419,7 +428,7 @@ class IMUPanel(QtWidgets.QWidget,StateSaver):
         if logstring != "Disabled":
             info = [self.ui.comboAddress.currentText(),self.ui.comboBus.currentText(),self.ui.comboAccRange.currentText(),
                     self.ui.comboGyroRange.currentText(), 
-                    (self.ui.comboFilter.currentText() if (logstring == "MPU6050") else self.ui.comboFilter2.currentText()) ]
+                    self.ui.comboFilter2.currentText() ]
             logstring = logstring + "|" + "|".join(info)
         return logstring
         

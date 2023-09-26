@@ -44,6 +44,7 @@ class mainwindow(QtWidgets.QMainWindow):
         self.adcpanel = ADCPanel()
 
         self.ctrlpanel = ControlPanel()
+        self.ui.comboMode.currentIndexChanged.connect(self.configControl)
 
         self.mfig = mainfig #MyFigQtGraph(self.dataman, self)
         self.ctrlfig = CtrlFigQtGraph(self.dataman, self)        
@@ -114,7 +115,7 @@ class mainwindow(QtWidgets.QMainWindow):
         
         # ControlPanel:
         self.ui.controlFrame.layout().addWidget(self.ctrlpanel)  
-        self.ctrlpanel.connectControlChanged(self.configControl)      
+        self.ctrlpanel.connectControlChanged(self.configControl)
         self.ctrlpanel.ui.checkAlgOn.toggled.connect(self.configAlgOn)
 
         self.ui.notes.textChanged.connect(self.txtInputChanged)
@@ -232,7 +233,8 @@ class mainwindow(QtWidgets.QMainWindow):
             self.resumeAutomator.emit()
         elif msg == "SetControlMode": 
             dialogmsg += f" - {opts}"
-            self.ctrlpanel.ui.checkControle.setChecked(True)
+            # self.ctrlpanel.ui.checkControle.setChecked(True)
+            self.ui.comboMode.setCurrentIndex(1)
             self.ctrlpanel.ui.comboCtrlTask.setCurrentIndex(0)
             self.ctrlpanel.ui.comboAlgoritmo.setCurrentText(opts[0])
             self.ctrlpanel.ui.spinTAlgOn.setValue(int(opts[1]))
@@ -241,11 +243,13 @@ class mainwindow(QtWidgets.QMainWindow):
             self.ctrlpanel.ui.normCtrl.setText(opts[4]) 
             self.resumeAutomator.emit()
         elif msg == "SetPathModeling":            
-            self.ctrlpanel.ui.checkControle.setChecked(True)
+            # self.ctrlpanel.ui.checkControle.setChecked(True)
+            self.ui.comboMode.setCurrentIndex(1)
             self.ctrlpanel.ui.comboCtrlTask.setCurrentIndex(1)            
             self.resumeAutomator.emit() 
         elif msg == "SetReadingMode":            
-            self.ctrlpanel.ui.checkControle.setChecked(False)         
+            # self.ctrlpanel.ui.checkControle.setChecked(False)
+            self.ui.comboMode.setCurrentIndex(0) 
             self.resumeAutomator.emit() 
         elif msg == "Wait":            
             if not self.dataman.flagrodando:
@@ -464,6 +468,7 @@ class mainwindow(QtWidgets.QMainWindow):
             self.driver.fusionweights = [float(x) for x in settings.value("FusionWeights")]
         for imp in self.imupanel:
             imp.restoreState(settings)
+            imp.typechanged()
         for gp in self.genpanel:
             gp.restoreState(settings)
         if self.mfig:
@@ -548,6 +553,7 @@ class mainwindow(QtWidgets.QMainWindow):
 
 
     def configControl(self):   
+        self.ctrlpanel.setActive(self.ui.comboMode.currentIndex() == 1)
         self.driver.setControlMode(self.ctrlpanel.isControlOn(),self.ctrlpanel.getControlTask())
         if self.driver.controlMode:
             self.driver.controlChannel = self.ctrlpanel.getControlChannel()
@@ -690,6 +696,8 @@ class mainwindow(QtWidgets.QMainWindow):
                 self.driver.setIMUConfig(k,self.imupanel[k].getIMUConfig())
             self.changeADCConfig()
 
+            self.ui.comboMode.setEnabled(False)
+
             self.dataman.IniciaLeituras(stoptime=stoptime)
 
     def readingsStarted(self):
@@ -730,6 +738,7 @@ class mainwindow(QtWidgets.QMainWindow):
             self.dataman.resetData(self.TSampling/1e6,self.MaxTime)
             self.ui.statusbar.clearMessage()
         self.ctrlpanel.setEnabled(True,isreset=True)
+        self.ui.comboMode.setEnabled(True)
 
     def setMaxTime(self, selmaxtime):
         if self.dataman.flagrodando or (not self.dataman.flagsaved):

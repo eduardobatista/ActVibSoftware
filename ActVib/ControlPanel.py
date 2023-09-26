@@ -17,7 +17,7 @@ class Ui_ControlForm(object):
     def setupUi(self, ControlForm):
         if not ControlForm.objectName():
             ControlForm.setObjectName(u"ControlForm")
-        ControlForm.resize(469, 107)
+        ControlForm.resize(499, 115)
         self.horizontalLayout = QHBoxLayout(ControlForm)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
@@ -175,15 +175,13 @@ class Ui_ControlForm(object):
 
         self.gridLayout.addWidget(self.comboCtrlTask, 1, 1, 1, 1)
 
-        self.checkControle = QCheckBox(self.frame)
-        self.checkControle.setObjectName(u"checkControle")
-        sizePolicy3 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Minimum)
-        sizePolicy3.setHorizontalStretch(0)
-        sizePolicy3.setVerticalStretch(0)
-        sizePolicy3.setHeightForWidth(self.checkControle.sizePolicy().hasHeightForWidth())
-        self.checkControle.setSizePolicy(sizePolicy3)
+        self.label = QLabel(self.frame)
+        self.label.setObjectName(u"label")
+        font = QFont()
+        font.setBold(False)
+        self.label.setFont(font)
 
-        self.gridLayout.addWidget(self.checkControle, 0, 1, 1, 1)
+        self.gridLayout.addWidget(self.label, 0, 1, 1, 1)
 
 
         self.verticalLayout.addWidget(self.frame)
@@ -200,11 +198,11 @@ class Ui_ControlForm(object):
         self.horizontalLayout_3.setContentsMargins(3, 1, 5, 1)
         self.label_8 = QLabel(self.frame_7)
         self.label_8.setObjectName(u"label_8")
-        sizePolicy4 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
-        sizePolicy4.setHorizontalStretch(0)
-        sizePolicy4.setVerticalStretch(0)
-        sizePolicy4.setHeightForWidth(self.label_8.sizePolicy().hasHeightForWidth())
-        self.label_8.setSizePolicy(sizePolicy4)
+        sizePolicy3 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sizePolicy3.setHorizontalStretch(0)
+        sizePolicy3.setVerticalStretch(0)
+        sizePolicy3.setHeightForWidth(self.label_8.sizePolicy().hasHeightForWidth())
+        self.label_8.setSizePolicy(sizePolicy3)
         self.label_8.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
         self.label_8.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
 
@@ -227,11 +225,11 @@ class Ui_ControlForm(object):
         self.comboAlgoritmo.addItem("")
         self.comboAlgoritmo.addItem("")
         self.comboAlgoritmo.setObjectName(u"comboAlgoritmo")
-        sizePolicy5 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        sizePolicy5.setHorizontalStretch(0)
-        sizePolicy5.setVerticalStretch(0)
-        sizePolicy5.setHeightForWidth(self.comboAlgoritmo.sizePolicy().hasHeightForWidth())
-        self.comboAlgoritmo.setSizePolicy(sizePolicy5)
+        sizePolicy4 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        sizePolicy4.setHorizontalStretch(0)
+        sizePolicy4.setVerticalStretch(0)
+        sizePolicy4.setHeightForWidth(self.comboAlgoritmo.sizePolicy().hasHeightForWidth())
+        self.comboAlgoritmo.setSizePolicy(sizePolicy4)
 
         self.horizontalLayout_3.addWidget(self.comboAlgoritmo)
 
@@ -261,11 +259,11 @@ class Ui_ControlForm(object):
 
         self.label_9 = QLabel(self.frame_2)
         self.label_9.setObjectName(u"label_9")
-        sizePolicy6 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)
-        sizePolicy6.setHorizontalStretch(0)
-        sizePolicy6.setVerticalStretch(0)
-        sizePolicy6.setHeightForWidth(self.label_9.sizePolicy().hasHeightForWidth())
-        self.label_9.setSizePolicy(sizePolicy6)
+        sizePolicy5 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)
+        sizePolicy5.setHorizontalStretch(0)
+        sizePolicy5.setVerticalStretch(0)
+        sizePolicy5.setHeightForWidth(self.label_9.sizePolicy().hasHeightForWidth())
+        self.label_9.setSizePolicy(sizePolicy5)
 
         self.horizontalLayout_2.addWidget(self.label_9)
 
@@ -340,7 +338,7 @@ class Ui_ControlForm(object):
         self.comboCtrlTask.setItemText(0, QCoreApplication.translate("ControlForm", u"Control", None))
         self.comboCtrlTask.setItemText(1, QCoreApplication.translate("ControlForm", u"Path Modelling", None))
 
-        self.checkControle.setText(QCoreApplication.translate("ControlForm", u"Enable", None))
+        self.label.setText(QCoreApplication.translate("ControlForm", u" Task:", None))
         self.label_8.setText(QCoreApplication.translate("ControlForm", u"Algorithm:", None))
         self.checkAlgOn.setText(QCoreApplication.translate("ControlForm", u"On \u2265", None))
         self.comboAlgoritmo.setItemText(0, QCoreApplication.translate("ControlForm", u"FxNLMS", None))

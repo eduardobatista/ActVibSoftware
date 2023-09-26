@@ -27,6 +27,7 @@ class driverhardware:
         self.dclevel = [1668,1668,104,104]
         self.iampscaler = [1/float(self.dclevel[0]),1/float(self.dclevel[1]),1/float(self.dclevel[2]),1/float(self.dclevel[3])]
         self.chirpconf = [[0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]]
+        self.pwmduty = [0,0,0,0]
         self.imuconfigdata = [[0, 0, 0, 0],[0, 0, 0, 0],[0, 0, 0, 0]]
         self.IMUEnableFlags = [False,False,False]
         self.IMUTypes = [False,False,False]
@@ -122,11 +123,11 @@ class driverhardware:
                 self.taskIsControl = False
 
 
-    def setGeneratorConfig(self, id=0, tipo=0, amp=0.0, freq=10.0, dclevel=128, chirpconf=[0, 0, 0, 0, 0]):
-        if tipo != 2:
-            if (self.gentipo[id] != tipo) or (self.genamp[id] != amp) or (self.genfreq[id] != freq) or (self.dclevel[id] != dclevel):
-                self.genConfigWritten[id] = False
-        else:
+    def setGeneratorConfig(self, id=0, tipo=0, amp=0.0, freq=10.0, dclevel=128, chirpconf=[0, 0, 0, 0, 0], pwmduty=0.0):
+        # if tipo != 2:
+        if (self.gentipo[id] != tipo) or (self.genamp[id] != amp) or (self.genfreq[id] != freq) or (self.dclevel[id] != dclevel):
+            self.genConfigWritten[id] = False
+        if tipo == 2:
             if chirpconf[4] > 1.0:
                 chirpconf[4] = 1.0
             if id <= 2:  # MCP4725
@@ -135,6 +136,12 @@ class driverhardware:
                 ampaux = int(chirpconf[4] * 127)
             self.chirpconf[id] = [int(chirpconf[0]), int(10 * chirpconf[1]),
                                   int(chirpconf[2]), int(10 * chirpconf[3]), (ampaux >> 8) & 0xFF, ampaux & 0xFF]
+            self.genConfigWritten[id] = False
+        elif tipo == 4:
+            dutyaux = int(np.round(pwmduty * 100 * 2))
+            if self.pwmduty[id] != dutyaux:
+                self.pwmduty[id] = dutyaux 
+                self.genConfigWritten[id] = False
         self.gentipo[id] = tipo
         self.genamp[id] = amp
         self.genfreq[id] = freq
@@ -341,6 +348,8 @@ class driverhardware:
         aux = aux.encode() + bytes([id, self.gentipo[id], (ampaux >> 8) & 0xFF, ampaux & 0xFF] + freqaux + [dcl >> 8, dcl & 0xFF])
         if self.gentipo[id] == 2:  # Chirp, manda mais 4 bytes [tinicio,deltai,tfim,deltaf]
             aux = aux + bytes(self.chirpconf[id])
+        if self.gentipo[id] == 4:
+            aux = aux + bytes([self.pwmduty[id]])
         self.serial.write(aux)
         self.genConfigWritten[id] = True
         # aux = self.serial.read(2);
