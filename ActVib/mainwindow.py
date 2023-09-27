@@ -44,7 +44,7 @@ class mainwindow(QtWidgets.QMainWindow):
         self.adcpanel = ADCPanel()
 
         self.ctrlpanel = ControlPanel()
-        self.ui.comboMode.currentIndexChanged.connect(self.configControl)
+        self.ui.comboMode.currentIndexChanged.connect(self.mainConfigControl)
 
         self.mfig = mainfig #MyFigQtGraph(self.dataman, self)
         self.ctrlfig = CtrlFigQtGraph(self.dataman, self)        
@@ -117,6 +117,7 @@ class mainwindow(QtWidgets.QMainWindow):
         self.ui.controlFrame.layout().addWidget(self.ctrlpanel)  
         self.ctrlpanel.connectControlChanged(self.configControl)
         self.ctrlpanel.ui.checkAlgOn.toggled.connect(self.configAlgOn)
+        self.ctrlpanel.setActive(self.ui.comboMode.currentIndex() == 1)
 
         self.ui.notes.textChanged.connect(self.txtInputChanged)
         self.maxNoteLength = 1000
@@ -551,9 +552,10 @@ class mainwindow(QtWidgets.QMainWindow):
         self.ctrlpanel.ui.passoCtrl.setEnabled(not algon)
         self.ctrlpanel.ui.spinTAlgOn.setEnabled(not algon)
 
+    def mainConfigControl(self):
+        self.ctrlpanel.setActive(self.ui.comboMode.currentIndex() == 1)
 
     def configControl(self):   
-        self.ctrlpanel.setActive(self.ui.comboMode.currentIndex() == 1)
         self.driver.setControlMode(self.ctrlpanel.isControlOn(),self.ctrlpanel.getControlTask())
         if self.driver.controlMode:
             self.driver.controlChannel = self.ctrlpanel.getControlChannel()

@@ -137,6 +137,13 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_3.addWidget(self.comboMode)
 
+        self.line = QFrame(self.frame_3)
+        self.line.setObjectName(u"line")
+        self.line.setFrameShape(QFrame.VLine)
+        self.line.setFrameShadow(QFrame.Sunken)
+
+        self.horizontalLayout_3.addWidget(self.line)
+
         self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
         self.horizontalLayout_3.addItem(self.horizontalSpacer_3)
@@ -210,6 +217,13 @@ class Ui_MainWindow(object):
         self.horizontalSpacer_4 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
         self.horizontalLayout_3.addItem(self.horizontalSpacer_4)
+
+        self.line_2 = QFrame(self.frame_3)
+        self.line_2.setObjectName(u"line_2")
+        self.line_2.setFrameShape(QFrame.VLine)
+        self.line_2.setFrameShadow(QFrame.Sunken)
+
+        self.horizontalLayout_3.addWidget(self.line_2)
 
 
         self.verticalLayout.addWidget(self.frame_3)

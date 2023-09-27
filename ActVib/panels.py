@@ -89,7 +89,12 @@ class ControlPanel(QtWidgets.QWidget,StateSaver):
         self.oldctrlpsi = float(self.ui.normCtrl.text())
         self.ui.comboControlChannel.activated.connect(self.controlChannelChanged)
         self.ui.comboPerturbChannel.activated.connect(self.perturbChannelChanged)
-        self.ui.comboCtrlTask.activated.connect(self.controlChanged)
+        self.ui.comboCtrlTask.activated.connect(self.taskChanged)
+        self.cmps = [self.ui.comboRef,self.ui.comboErro,
+                self.ui.comboIMUError,self.ui.comboIMURef,
+                self.ui.comboPerturbChannel,self.ui.comboControlChannel]
+        self.cmpscontrolon = [self.ui.comboAlgoritmo,self.ui.spinMemCtrl]
+        self.cmpscontrolalwayson = [self.ui.checkAlgOn,self.ui.spinTAlgOn,self.ui.passoCtrl,self.ui.normCtrl]
     
     def controlChannelChanged(self):
         if self.ui.comboControlChannel.currentIndex() == self.ui.comboPerturbChannel.currentIndex():
@@ -112,6 +117,9 @@ class ControlPanel(QtWidgets.QWidget,StateSaver):
         # return self.ui.checkControle.isChecked()
         return self.controlenabled
 
+    def taskChanged(self):
+        self.setEnabled(True,True)
+
     def isTaskControl(self):
         return True if (self.ui.comboCtrlTask.currentIndex() == 0) else False
 
@@ -126,18 +134,22 @@ class ControlPanel(QtWidgets.QWidget,StateSaver):
     
     def setEnabled(self,en,isreset=False):
         if not self.controlenabled:
-            en = False
-        cmps = [self.ui.comboRef,
-                self.ui.comboErro,self.ui.comboAlgoritmo,self.ui.spinMemCtrl,
-                self.ui.comboIMUError,self.ui.comboIMURef,
-                self.ui.comboPerturbChannel,self.ui.comboControlChannel]
-        if not self.isTaskControl():
-            cmps = cmps + [self.ui.checkAlgOn,self.ui.spinTAlgOn,self.ui.passoCtrl,self.ui.normCtrl]
-        if (not en) or (isreset and en):
-            cmps.append(self.ui.comboCtrlTask)
-            # cmps.append(self.ui.checkControle)
-        for cc in cmps:
-            cc.setEnabled(en)
+            for cc in (self.cmps + self.cmpscontrolon + self.cmpscontrolalwayson):
+                cc.setEnabled(False)  
+            self.ui.comboCtrlTask.setEnabled(False)
+        else:
+            if self.isTaskControl():
+                for cc in self.cmpscontrolon:
+                    cc.setEnabled(en)
+                for cc in self.cmpscontrolalwayson:
+                    cc.setEnabled(True)                
+            else: 
+                for cc in (self.cmpscontrolon + self.cmpscontrolalwayson):
+                    cc.setEnabled(False)        
+            for cc in self.cmps:
+                cc.setEnabled(en)
+            if (not en) or (isreset and en):
+                self.ui.comboCtrlTask.setEnabled(True)
 
     def controlChanged(self):
         if self.controlChangeFunc is not None:
