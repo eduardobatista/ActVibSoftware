@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1098</width>
+    <width>1209</width>
     <height>732</height>
    </rect>
   </property>
@@ -76,6 +76,9 @@
            <bold>true</bold>
           </font>
          </property>
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
          <item>
           <property name="text">
            <string>Measurement</string>
@@ -86,13 +89,6 @@
            <string>Control</string>
           </property>
          </item>
-        </widget>
-       </item>
-       <item>
-        <widget class="Line" name="line">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
         </widget>
        </item>
        <item>
@@ -280,9 +276,41 @@
         </spacer>
        </item>
        <item>
-        <widget class="Line" name="line_2">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
+        <widget class="QLabel" name="label_3">
+         <property name="font">
+          <font>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Error Flag:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="errorLabel">
+         <property name="minimumSize">
+          <size>
+           <width>50</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="text">
+          <string>0</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
          </property>
         </widget>
        </item>
@@ -815,7 +843,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1098</width>
+     <width>1209</width>
      <height>21</height>
     </rect>
    </property>

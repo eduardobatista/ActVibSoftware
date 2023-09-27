@@ -665,8 +665,8 @@ class driverhardware:
             self.calctime[1] = (struct.unpack_from(">H",buf,15)[0]) # << 4) / 240
             self.calctime[2] = (struct.unpack_from(">H",buf,17)[0]) # << 4) / 240
             self.errorflag = struct.unpack_from("B",buf,19)[0]
-            if self.errorflag != 0:
-                print(self.errorflag)  # TODO: generate error message in UI.
+            # if self.errorflag != 0:
+            #     print(self.errorflag)  # TODO: generate error message in UI.
         else:
             buf = self.serial.read(self.readsize)
             for j in range(3):
@@ -696,6 +696,6 @@ class driverhardware:
             self.calctime[1] = (struct.unpack_from(">H",buf,ptr+2)[0]) # << 4) #/ 240
             self.calctime[2] = (struct.unpack_from(">H",buf,ptr+4)[0]) #<< 4) #/ 240
             self.errorflag = struct.unpack_from("B",buf,ptr+6)[0]
-            if self.errorflag != 0:
-                print(self.errorflag)  # TODO: generate error message in UI.
+            # if self.errorflag != 0:
+            #     print(self.errorflag)  # TODO: generate error message in UI.
             # print(self.calctime)

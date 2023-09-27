@@ -17,7 +17,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(1098, 732)
+        MainWindow.resize(1209, 732)
         sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -134,15 +134,9 @@ class Ui_MainWindow(object):
         self.comboMode.setObjectName(u"comboMode")
         self.comboMode.setMinimumSize(QSize(110, 0))
         self.comboMode.setFont(font)
+        self.comboMode.setStyleSheet(u"")
 
         self.horizontalLayout_3.addWidget(self.comboMode)
-
-        self.line = QFrame(self.frame_3)
-        self.line.setObjectName(u"line")
-        self.line.setFrameShape(QFrame.VLine)
-        self.line.setFrameShadow(QFrame.Sunken)
-
-        self.horizontalLayout_3.addWidget(self.line)
 
         self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
@@ -218,12 +212,21 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_3.addItem(self.horizontalSpacer_4)
 
-        self.line_2 = QFrame(self.frame_3)
-        self.line_2.setObjectName(u"line_2")
-        self.line_2.setFrameShape(QFrame.VLine)
-        self.line_2.setFrameShadow(QFrame.Sunken)
+        self.label_3 = QLabel(self.frame_3)
+        self.label_3.setObjectName(u"label_3")
+        self.label_3.setFont(font)
 
-        self.horizontalLayout_3.addWidget(self.line_2)
+        self.horizontalLayout_3.addWidget(self.label_3)
+
+        self.errorLabel = QLabel(self.frame_3)
+        self.errorLabel.setObjectName(u"errorLabel")
+        self.errorLabel.setMinimumSize(QSize(50, 0))
+        self.errorLabel.setFont(font)
+        self.errorLabel.setStyleSheet(u"")
+        self.errorLabel.setFrameShape(QFrame.StyledPanel)
+        self.errorLabel.setAlignment(Qt.AlignCenter)
+
+        self.horizontalLayout_3.addWidget(self.errorLabel)
 
 
         self.verticalLayout.addWidget(self.frame_3)
@@ -450,7 +453,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 1098, 21))
+        self.menubar.setGeometry(QRect(0, 0, 1209, 21))
         self.menuArquivo = QMenu(self.menubar)
         self.menuArquivo.setObjectName(u"menuArquivo")
         self.menuArquivo.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
@@ -575,6 +578,8 @@ class Ui_MainWindow(object):
         self.controlTime.setText(QCoreApplication.translate("MainWindow", u"0 s", None))
         self.label_6.setText(QCoreApplication.translate("MainWindow", u"Sample Time:", None))
         self.sampleTime.setText(QCoreApplication.translate("MainWindow", u"0 us", None))
+        self.label_3.setText(QCoreApplication.translate("MainWindow", u"Error Flag:", None))
+        self.errorLabel.setText(QCoreApplication.translate("MainWindow", u"0", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.canal1), QCoreApplication.translate("MainWindow", u"Output 1", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.canal2), QCoreApplication.translate("MainWindow", u"Output 2", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.canal3), QCoreApplication.translate("MainWindow", u"Output 3", None))

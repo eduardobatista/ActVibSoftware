@@ -525,6 +525,12 @@ class mainwindow(QtWidgets.QMainWindow):
         self.ui.elapsedTime.setText(f'{int(self.dataman.readtime)} s / {self.dataman.maxtime} s')
         self.ui.controlTime.setText(f'{self.dataman.realtime:.3f} s')
         self.ui.sampleTime.setText(f'{self.driver.calctime[0]:.0f}/{self.driver.calctime[1]:.0f}/{self.driver.calctime[2]:.0f} us')
+        aux = self.driver.errorflag
+        self.ui.errorLabel.setText(f'{aux:x}')
+        if aux > 0:
+            self.ui.errorLabel.setStyleSheet("background-color:rgb(255,150,150)")
+        else:
+            self.ui.errorLabel.setStyleSheet("")
         if self.driver.controlMode:
             self.ctrlfig.updateFig()
         else:
