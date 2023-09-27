@@ -554,6 +554,7 @@ class mainwindow(QtWidgets.QMainWindow):
 
     def mainConfigControl(self):
         self.ctrlpanel.setActive(self.ui.comboMode.currentIndex() == 1)
+        self.configControl()
 
     def configControl(self):   
         self.driver.setControlMode(self.ctrlpanel.isControlOn(),self.ctrlpanel.getControlTask())
