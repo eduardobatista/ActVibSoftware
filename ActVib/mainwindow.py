@@ -20,11 +20,13 @@ from .automator import Automator
 
 from .updater import Updater
 
+from .driverhardware import driverhardware
+
 class mainwindow(QtWidgets.QMainWindow):
 
     resumeAutomator = QtCore.Signal()
 
-    def __init__(self, app, driver, dataman, mainfig : MyFigQtGraph):
+    def __init__(self, app, driver : driverhardware, dataman, mainfig : MyFigQtGraph):
         super(mainwindow, self).__init__()
         self.app = app
         self.ui = Ui_MainWindow()
