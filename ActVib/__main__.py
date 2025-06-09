@@ -1,28 +1,24 @@
 import sys
 
 from PySide6 import QtWidgets
+from PySide6.QtGui import QFont
 
 from .mainwindow import mainwindow
 from .driverhardware import driverhardware
 from .dataman import dataman
-from .figures import MyFigQtGraph
 import qdarktheme
-
 
 app = QtWidgets.QApplication([])
 
-palette = qdarktheme.load_palette(theme="light")
-stylesheet = qdarktheme.load_stylesheet(theme="dark")
-app.setPalette(palette)
+qdarktheme.setup_theme("light")
 
-# qdarktheme.setup_theme("light")
+font = QFont("Fira Sans", 10)
+app.setFont(font)
 
-# app.setStyleSheet(qdarktheme.load_stylesheet("light"))
-
+print(app.font())
 
 drv = driverhardware()
 dman = dataman(drv)
-# mfig = MyFigQtGraph(dman, font=self.mainfont)
 
 mwindow = mainwindow(app, drv, dman)
 

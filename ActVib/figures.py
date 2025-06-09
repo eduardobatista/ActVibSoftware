@@ -105,7 +105,7 @@ class MyFigQtGraph(BaseFigQtGraph):
         for k in range(2):            
             for chk in self.getXYZChecks(k):
                 chk.toggled.connect(ffs[k])
-
+        
     def toggleXYZSignal(self,plotid):
         if plotid == 0:
             self.p1Enable = self.getXYZCheckMap(plotid)
@@ -197,6 +197,8 @@ class MyFigQtGraph(BaseFigQtGraph):
                 self.lineadc.setData(self.vetoreixox[2][-npontos[2]:],self.dman.adcdata[0][limi[2]:limf[2]])
             else:
                 self.lineadc.setData([],[])
+    
+    
             
 
 
