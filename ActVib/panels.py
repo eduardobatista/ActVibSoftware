@@ -1,4 +1,4 @@
-from PySide2 import (QtCore, QtWidgets, QtGui)
+from PySide6 import (QtCore, QtWidgets, QtGui)
 from .IMUPanel import Ui_IMUPanel
 from .GeneratorPanel import Ui_GeneratorPanel
 from .ControlPanel import Ui_ControlForm
@@ -32,7 +32,7 @@ class StateSaver:
         if self.saveprefix is None:
             self.saveprefix = ""
 
-        wdgs = self.findChildren(QtWidgets.QComboBox,QtCore.QRegExp("combo.*")) 
+        wdgs = self.findChildren(QtWidgets.QComboBox,QtCore.QRegularExpression("combo.*")) 
         for ww in wdgs:
             keyval = f'{self.saveprefix}{ww.objectName()}'
             if settings.value(keyval) is not None:
@@ -40,7 +40,7 @@ class StateSaver:
             if settings.value(f'EN{keyval}') is not None:
                 ww.setEnabled(settings.value(f'EN{keyval}') == 'True')
 
-        wdgs = self.findChildren(QtWidgets.QCheckBox,QtCore.QRegExp("check.*"))
+        wdgs = self.findChildren(QtWidgets.QCheckBox,QtCore.QRegularExpression("check.*"))
         for ww in wdgs:
             keyval = f'{self.saveprefix}{ww.objectName()}'
             if settings.value(keyval) is not None:

@@ -9,10 +9,10 @@ from .BaseFigQtGraph import BaseFigQtGraph
 
 class CtrlFigQtGraph(BaseFigQtGraph):
 
-    def __init__(self, dman, app):
+    def __init__(self, dman, app, font=None):
         self.dman = dman
         self.app = app
-        super().__init__(2, self.dman.samplingperiod)
+        super().__init__(2, self.dman.samplingperiod,font=font)
         pens = [pg.mkPen('r', width=1), pg.mkPen('b', width=1)]
         self.lineref = self.pitens[0].plot(np.array([]), np.array([]), pen=pens[0])
         self.lineerr = self.pitens[1].plot(np.array([]), np.array([]), pen=pens[1])
@@ -57,10 +57,10 @@ class CtrlFigQtGraph(BaseFigQtGraph):
 
 class MyFigQtGraph(BaseFigQtGraph):
 
-    def __init__(self, dman): # , app):
+    def __init__(self, dman, font=None): # , app):
         self.dman = dman
         # self.app = app
-        super().__init__(3, self.dman.samplingperiod)
+        super().__init__(3, self.dman.samplingperiod, font=font)
         self.wsize = 60
         pens = [pg.mkPen('r', width=1), pg.mkPen('b', width=1), pg.mkPen('g', width=1), pg.mkPen('y', width=1)]
         
@@ -202,10 +202,10 @@ class MyFigQtGraph(BaseFigQtGraph):
 
 class FigOutputQtGraph(BaseFigQtGraph):
 
-    def __init__(self, dman, app):
+    def __init__(self, dman, app, font=None):
         self.dman = dman
         self.app = app
-        super().__init__(1, self.dman.samplingperiod)
+        super().__init__(1, self.dman.samplingperiod, font=font)
         self.pitem = self.pitens[0]
         pens = [pg.mkPen('r', width=1), pg.mkPen('b', width=1), pg.mkPen('g', width=1), pg.mkPen('y', width=1)]
         self.lines = []

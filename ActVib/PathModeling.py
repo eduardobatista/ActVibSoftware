@@ -3,15 +3,22 @@
 ################################################################################
 ## Form generated from reading UI file 'PathModeling.ui'
 ##
-## Created by: Qt User Interface Compiler version 5.15.2
+## Created by: Qt User Interface Compiler version 6.7.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide2.QtCore import *
-from PySide2.QtGui import *
-from PySide2.QtWidgets import *
-
+from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
+    QMetaObject, QObject, QPoint, QRect,
+    QSize, QTime, QUrl, Qt)
+from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
+    QFont, QFontDatabase, QGradient, QIcon,
+    QImage, QKeySequence, QLinearGradient, QPainter,
+    QPalette, QPixmap, QRadialGradient, QTransform)
+from PySide6.QtWidgets import (QApplication, QComboBox, QDialog, QDoubleSpinBox,
+    QFrame, QGridLayout, QHBoxLayout, QLabel,
+    QLineEdit, QProgressBar, QPushButton, QSizePolicy,
+    QSpinBox, QVBoxLayout, QWidget)
 
 class Ui_PathModelingDialog(object):
     def setupUi(self, PathModelingDialog):
@@ -30,7 +37,7 @@ class Ui_PathModelingDialog(object):
         self.horizontalLayout.setContentsMargins(3, 3, 3, 3)
         self.label_7 = QLabel(self.widget_3)
         self.label_7.setObjectName(u"label_7")
-        sizePolicy = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Preferred)
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.label_7.sizePolicy().hasHeightForWidth())
@@ -42,7 +49,7 @@ class Ui_PathModelingDialog(object):
         self.comboSource.addItem("")
         self.comboSource.addItem("")
         self.comboSource.setObjectName(u"comboSource")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         sizePolicy1.setHorizontalStretch(1)
         sizePolicy1.setVerticalStretch(0)
         sizePolicy1.setHeightForWidth(self.comboSource.sizePolicy().hasHeightForWidth())
@@ -52,8 +59,8 @@ class Ui_PathModelingDialog(object):
 
         self.line_3 = QFrame(self.widget_3)
         self.line_3.setObjectName(u"line_3")
-        self.line_3.setFrameShape(QFrame.VLine)
-        self.line_3.setFrameShadow(QFrame.Sunken)
+        self.line_3.setFrameShape(QFrame.Shape.VLine)
+        self.line_3.setFrameShadow(QFrame.Shadow.Sunken)
 
         self.horizontalLayout.addWidget(self.line_3)
 
@@ -64,7 +71,7 @@ class Ui_PathModelingDialog(object):
 
         self.fileName = QLineEdit(self.widget_3)
         self.fileName.setObjectName(u"fileName")
-        sizePolicy2 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         sizePolicy2.setHorizontalStretch(2)
         sizePolicy2.setVerticalStretch(0)
         sizePolicy2.setHeightForWidth(self.fileName.sizePolicy().hasHeightForWidth())
@@ -82,7 +89,7 @@ class Ui_PathModelingDialog(object):
 
         self.widget = QWidget(PathModelingDialog)
         self.widget.setObjectName(u"widget")
-        sizePolicy3 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
+        sizePolicy3 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
         sizePolicy3.setHorizontalStretch(0)
         sizePolicy3.setVerticalStretch(0)
         sizePolicy3.setHeightForWidth(self.widget.sizePolicy().hasHeightForWidth())
@@ -96,7 +103,7 @@ class Ui_PathModelingDialog(object):
 
         self.widget_2 = QWidget(PathModelingDialog)
         self.widget_2.setObjectName(u"widget_2")
-        sizePolicy4 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
+        sizePolicy4 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
         sizePolicy4.setHorizontalStretch(0)
         sizePolicy4.setVerticalStretch(0)
         sizePolicy4.setHeightForWidth(self.widget_2.sizePolicy().hasHeightForWidth())
@@ -107,7 +114,7 @@ class Ui_PathModelingDialog(object):
         self.gridLayout.setContentsMargins(3, 3, 3, 3)
         self.label = QLabel(self.widget_2)
         self.label.setObjectName(u"label")
-        sizePolicy5 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Minimum)
+        sizePolicy5 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Minimum)
         sizePolicy5.setHorizontalStretch(0)
         sizePolicy5.setVerticalStretch(0)
         sizePolicy5.setHeightForWidth(self.label.sizePolicy().hasHeightForWidth())
@@ -125,8 +132,8 @@ class Ui_PathModelingDialog(object):
 
         self.line = QFrame(self.widget_2)
         self.line.setObjectName(u"line")
-        self.line.setFrameShape(QFrame.VLine)
-        self.line.setFrameShadow(QFrame.Sunken)
+        self.line.setFrameShape(QFrame.Shape.VLine)
+        self.line.setFrameShadow(QFrame.Shadow.Sunken)
 
         self.gridLayout.addWidget(self.line, 0, 2, 2, 1)
 
@@ -185,8 +192,8 @@ class Ui_PathModelingDialog(object):
 
         self.line_2 = QFrame(self.widget_2)
         self.line_2.setObjectName(u"line_2")
-        self.line_2.setFrameShape(QFrame.VLine)
-        self.line_2.setFrameShadow(QFrame.Sunken)
+        self.line_2.setFrameShape(QFrame.Shape.VLine)
+        self.line_2.setFrameShadow(QFrame.Shadow.Sunken)
 
         self.gridLayout.addWidget(self.line_2, 0, 6, 2, 1)
 
@@ -218,7 +225,7 @@ class Ui_PathModelingDialog(object):
 
         self.progressBar = QProgressBar(self.widget_4)
         self.progressBar.setObjectName(u"progressBar")
-        sizePolicy6 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        sizePolicy6 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         sizePolicy6.setHorizontalStretch(1)
         sizePolicy6.setVerticalStretch(0)
         sizePolicy6.setHeightForWidth(self.progressBar.sizePolicy().hasHeightForWidth())

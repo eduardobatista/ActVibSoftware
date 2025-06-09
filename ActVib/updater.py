@@ -6,8 +6,8 @@ import shlex
 import shutil
 from threading import Thread
 
-from PySide2 import QtCore
-from PySide2.QtWidgets import QDialog
+from PySide6 import QtCore
+from PySide6.QtWidgets import QDialog
 
 from .UpdaterDialog import Ui_UpdaterDialog as UpdaterDialog
 

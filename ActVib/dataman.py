@@ -8,7 +8,7 @@ import pandas as pd
 
 from .driverhardware import driverhardware
 
-from PySide2.QtCore import Signal,QObject
+from PySide6.QtCore import Signal,QObject
 
 class dataman (QObject):
 

@@ -2,8 +2,8 @@
 from threading import Thread,Event
 import time
 import pandas as pd
-from PySide2 import QtCore,QtGui,QtWidgets
-from PySide2.QtWidgets import QDialog
+from PySide6 import QtCore,QtGui,QtWidgets
+from PySide6.QtWidgets import QDialog
 from .AutomatorDialog import Ui_AutomatorDialog as AutomatorDialog
 
 class Automator (QtCore.QObject):
@@ -33,7 +33,7 @@ class Automator (QtCore.QObject):
         self.starttime = 0
         self.adialog = QDialog()
         self.adialog.ui = AutomatorDialog()
-        self.pasteshortcut = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+V"), self.adialog, self.catchPaste)
+        self.pasteshortcut = QtGui.QShortcut(QtGui.QKeySequence("Ctrl+V"), self.adialog, self.catchPaste)
         self.adialog.ui.setupUi(self.adialog)  
         self.adialog.ui.bStop.clicked.connect(self.stop)
         self.adialog.ui.bStop.setDisabled(True)

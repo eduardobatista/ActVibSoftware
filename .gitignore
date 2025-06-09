@@ -2,3 +2,4 @@
 ActVib/__pycache__
 .pylintrc
 installer
+.venv

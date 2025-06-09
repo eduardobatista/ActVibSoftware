@@ -3,15 +3,21 @@
 ################################################################################
 ## Form generated from reading UI file 'GeneratorPanel.ui'
 ##
-## Created by: Qt User Interface Compiler version 5.15.2
+## Created by: Qt User Interface Compiler version 6.7.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide2.QtCore import *
-from PySide2.QtGui import *
-from PySide2.QtWidgets import *
-
+from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
+    QMetaObject, QObject, QPoint, QRect,
+    QSize, QTime, QUrl, Qt)
+from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
+    QFont, QFontDatabase, QGradient, QIcon,
+    QImage, QKeySequence, QLinearGradient, QPainter,
+    QPalette, QPixmap, QRadialGradient, QTransform)
+from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDoubleSpinBox,
+    QFrame, QHBoxLayout, QLabel, QSizePolicy,
+    QSpinBox, QVBoxLayout, QWidget)
 
 class Ui_GeneratorPanel(object):
     def setupUi(self, GeneratorPanel):
@@ -24,7 +30,7 @@ class Ui_GeneratorPanel(object):
         self.verticalLayout.setContentsMargins(1, 1, 1, 1)
         self.frame_4 = QFrame(GeneratorPanel)
         self.frame_4.setObjectName(u"frame_4")
-        sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.frame_4.sizePolicy().hasHeightForWidth())
@@ -38,7 +44,7 @@ class Ui_GeneratorPanel(object):
         self.horizontalLayout_6.setContentsMargins(2, 2, 2, 2)
         self.checkEnable = QCheckBox(self.frame_4)
         self.checkEnable.setObjectName(u"checkEnable")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         sizePolicy1.setHorizontalStretch(0)
         sizePolicy1.setVerticalStretch(0)
         sizePolicy1.setHeightForWidth(self.checkEnable.sizePolicy().hasHeightForWidth())
@@ -55,7 +61,7 @@ class Ui_GeneratorPanel(object):
         self.comboType.addItem("")
         self.comboType.addItem("")
         self.comboType.setObjectName(u"comboType")
-        sizePolicy2 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         sizePolicy2.setHorizontalStretch(0)
         sizePolicy2.setVerticalStretch(0)
         sizePolicy2.setHeightForWidth(self.comboType.sizePolicy().hasHeightForWidth())
@@ -65,7 +71,7 @@ class Ui_GeneratorPanel(object):
 
         self.label_2 = QLabel(self.frame_4)
         self.label_2.setObjectName(u"label_2")
-        sizePolicy3 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)
+        sizePolicy3 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Preferred)
         sizePolicy3.setHorizontalStretch(0)
         sizePolicy3.setVerticalStretch(0)
         sizePolicy3.setHeightForWidth(self.label_2.sizePolicy().hasHeightForWidth())
@@ -75,7 +81,7 @@ class Ui_GeneratorPanel(object):
 
         self.spinAmpl = QDoubleSpinBox(self.frame_4)
         self.spinAmpl.setObjectName(u"spinAmpl")
-        sizePolicy4 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+        sizePolicy4 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         sizePolicy4.setHorizontalStretch(0)
         sizePolicy4.setVerticalStretch(0)
         sizePolicy4.setHeightForWidth(self.spinAmpl.sizePolicy().hasHeightForWidth())
@@ -136,7 +142,7 @@ class Ui_GeneratorPanel(object):
         self.horizontalLayout_2.setContentsMargins(2, 1, 0, 1)
         self.label_26 = QLabel(self.extrasCanal1)
         self.label_26.setObjectName(u"label_26")
-        sizePolicy5 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Minimum)
+        sizePolicy5 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
         sizePolicy5.setHorizontalStretch(0)
         sizePolicy5.setVerticalStretch(0)
         sizePolicy5.setHeightForWidth(self.label_26.sizePolicy().hasHeightForWidth())

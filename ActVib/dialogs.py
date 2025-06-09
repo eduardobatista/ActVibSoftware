@@ -2,8 +2,8 @@ import os
 from pathlib import Path
 import time
 
-from PySide2 import (QtCore, QtWidgets)
-from PySide2.QtWidgets import (QDialog, QFileDialog, QWidget)
+from PySide6 import (QtCore, QtWidgets)
+from PySide6.QtWidgets import (QDialog, QFileDialog)
 
 import numpy as np
 import pandas as pd

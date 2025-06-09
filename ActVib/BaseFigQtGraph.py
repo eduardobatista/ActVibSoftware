@@ -1,8 +1,9 @@
 import json
 import numpy as np
+import copy
 
-from PySide2 import QtCore
-from PySide2.QtWidgets import QWidgetAction,QWidget,QMenu
+from PySide6 import QtCore
+from PySide6.QtWidgets import QWidgetAction,QWidget,QMenu
 
 import pyqtgraph as pg
 from pyqtgraph import GraphicsLayoutWidget
@@ -11,7 +12,7 @@ from .MainFigContextMenu import Ui_MainForm as MainFigContextMenu
 
 class BaseFigQtGraph(GraphicsLayoutWidget):
 
-    def __init__(self, nplots=1, samplingperiod=1):
+    def __init__(self, nplots=1, samplingperiod=1, font=None):
         pg.setConfigOption("background", "w")
         pg.setConfigOption("foreground", "k")
         super().__init__()
@@ -21,15 +22,22 @@ class BaseFigQtGraph(GraphicsLayoutWidget):
         for k,pi in enumerate(self.pitens):
             pi.setMenuEnabled(enableMenu=False, enableViewBoxMenu=True)
             pi.getViewBox().menu.clear()
-            pi.getViewBox().menu = MyPersoMenu(self,k)
+            pi.getViewBox().menu = MyPersoMenu(self,k,font=font)
             pi.getMenu().clear()
             pi.showAxis('top')
             pi.getAxis('top').setStyle(showValues=False)
             pi.showAxis('right')
-            pi.getAxis('right').setStyle(showValues=False)
+            pi.getAxis('right').setStyle(showValues=False) 
             pi.hideButtons()                     
             pi.setClipToView(True)  
-            pi.setMouseEnabled(x=False,y=True)    
+            pi.setMouseEnabled(x=False,y=True)   
+            if font: 
+                smfont = copy.copy(font)
+                smfont.setPointSize(8)
+                pi.getAxis('left').setTickFont(smfont)
+                pi.getAxis('left').label.setFont(font)
+                pi.getAxis('bottom').setTickFont(smfont)
+                pi.getAxis('bottom').label.setFont(font)
         self.samplingperiod = samplingperiod
         self.janelax, self.miny, self.maxy, self.autoy, self.vetoreixox, self.npontosjanela = [], [], [], [], [], []
         for k in range(len(self.pitens)):
@@ -136,11 +144,13 @@ class BaseFigQtGraph(GraphicsLayoutWidget):
 
 class MyPersoMenu(QMenu):
 
-    def __init__(self,parent,plotid):
+    def __init__(self,parent,plotid,font=None):
         super().__init__(parent)
         self.menuwidget = QWidget(self)        
         self.menuwidget.ui = MainFigContextMenu()
         self.menuwidget.ui.setupUi(self.menuwidget)
+        if font:
+            self.menuwidget.setFont(font)
         self.mwaction = QWidgetAction(self)
         self.mwaction.setDefaultWidget(self.menuwidget)
         self.addAction(self.mwaction)

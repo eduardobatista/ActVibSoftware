@@ -3,26 +3,36 @@
 ################################################################################
 ## Form generated from reading UI file 'MainFigContextMenu.ui'
 ##
-## Created by: Qt User Interface Compiler version 5.15.2
+## Created by: Qt User Interface Compiler version 6.7.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide2.QtCore import *
-from PySide2.QtGui import *
-from PySide2.QtWidgets import *
-
+from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
+    QMetaObject, QObject, QPoint, QRect,
+    QSize, QTime, QUrl, Qt)
+from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
+    QFont, QFontDatabase, QGradient, QIcon,
+    QImage, QKeySequence, QLinearGradient, QPainter,
+    QPalette, QPixmap, QRadialGradient, QTransform)
+from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QFrame,
+    QGridLayout, QHBoxLayout, QLabel, QLineEdit,
+    QPushButton, QSizePolicy, QSpinBox, QWidget)
 
 class Ui_MainForm(object):
     def setupUi(self, MainForm):
         if not MainForm.objectName():
             MainForm.setObjectName(u"MainForm")
-        MainForm.resize(369, 170)
-        sizePolicy = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
+        MainForm.resize(411, 170)
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(MainForm.sizePolicy().hasHeightForWidth())
         MainForm.setSizePolicy(sizePolicy)
+        font = QFont()
+        font.setFamilies([u"Fira Sans"])
+        font.setPointSize(10)
+        MainForm.setFont(font)
         self.gridLayout = QGridLayout(MainForm)
         self.gridLayout.setSpacing(3)
         self.gridLayout.setObjectName(u"gridLayout")
@@ -39,15 +49,15 @@ class Ui_MainForm(object):
 
         self.frame = QFrame(MainForm)
         self.frame.setObjectName(u"frame")
-        self.frame.setFrameShape(QFrame.NoFrame)
-        self.frame.setFrameShadow(QFrame.Raised)
+        self.frame.setFrameShape(QFrame.Shape.NoFrame)
+        self.frame.setFrameShadow(QFrame.Shadow.Raised)
         self.horizontalLayout = QHBoxLayout(self.frame)
         self.horizontalLayout.setSpacing(1)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.horizontalLayout.setContentsMargins(1, 0, 1, 0)
         self.ylim1 = QLineEdit(self.frame)
         self.ylim1.setObjectName(u"ylim1")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         sizePolicy1.setHorizontalStretch(0)
         sizePolicy1.setVerticalStretch(0)
         sizePolicy1.setHeightForWidth(self.ylim1.sizePolicy().hasHeightForWidth())
@@ -59,19 +69,19 @@ class Ui_MainForm(object):
 
         self.label_4 = QLabel(self.frame)
         self.label_4.setObjectName(u"label_4")
-        sizePolicy2 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)
+        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Preferred)
         sizePolicy2.setHorizontalStretch(0)
         sizePolicy2.setVerticalStretch(0)
         sizePolicy2.setHeightForWidth(self.label_4.sizePolicy().hasHeightForWidth())
         self.label_4.setSizePolicy(sizePolicy2)
         self.label_4.setMinimumSize(QSize(0, 0))
-        self.label_4.setAlignment(Qt.AlignCenter)
+        self.label_4.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.horizontalLayout.addWidget(self.label_4)
 
         self.ylim2 = QLineEdit(self.frame)
         self.ylim2.setObjectName(u"ylim2")
-        sizePolicy3 = QSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed)
+        sizePolicy3 = QSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Fixed)
         sizePolicy3.setHorizontalStretch(0)
         sizePolicy3.setVerticalStretch(0)
         sizePolicy3.setHeightForWidth(self.ylim2.sizePolicy().hasHeightForWidth())

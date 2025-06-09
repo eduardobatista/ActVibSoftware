@@ -5,8 +5,8 @@ import time
 import pandas as pd
 import numpy as np
 
-from PySide2 import QtWidgets, QtGui, QtCore
-from PySide2.QtWidgets import QMessageBox, QFileDialog, QCheckBox, QComboBox, QDoubleSpinBox, QSpinBox
+from PySide6 import QtWidgets, QtGui, QtCore
+from PySide6.QtWidgets import QMessageBox, QFileDialog, QCheckBox, QComboBox, QDoubleSpinBox, QSpinBox
 
 from .VibViewWindow import Ui_MainWindow
 
@@ -26,11 +26,12 @@ class mainwindow(QtWidgets.QMainWindow):
 
     resumeAutomator = QtCore.Signal()
 
-    def __init__(self, app, driver : driverhardware, dataman, mainfig : MyFigQtGraph):
+    def __init__(self, app, driver : driverhardware, dataman):
         super(mainwindow, self).__init__()
         self.app = app
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        self.mainfont = self.ui.centralwidget.font()
         self.Port = "COM3"
         self.TSampling = 4000   # 4000 us is the default
         self.FSampling = 250  # 250 Hz is the default
@@ -48,9 +49,9 @@ class mainwindow(QtWidgets.QMainWindow):
         self.ctrlpanel = ControlPanel()
         self.ui.comboMode.currentIndexChanged.connect(self.mainConfigControl)
 
-        self.mfig = mainfig #MyFigQtGraph(self.dataman, self)
-        self.ctrlfig = CtrlFigQtGraph(self.dataman, self)        
-        self.ofig = FigOutputQtGraph(self.dataman, self)
+        self.mfig = MyFigQtGraph(self.dataman, font=self.mainfont)
+        self.ctrlfig = CtrlFigQtGraph(self.dataman, self, font=self.mainfont)        
+        self.ofig = FigOutputQtGraph(self.dataman, self, font=self.mainfont)
         self.addPlots()
 
         self.readConfig()        
@@ -58,25 +59,25 @@ class mainwindow(QtWidgets.QMainWindow):
         self.ui.bLimpar.clicked.connect(lambda: self.bReset(ignoreunsaved=False))
 
         self.mapper = QtCore.QSignalMapper(self)
-        self.mapper.mapped['QString'].connect(self.setPort)
+        self.mapper.mappedString.connect(self.setPort)
 
         self.mapper2 = QtCore.QSignalMapper(self)
         for sra in self.ui.menuSampling_Rate.actions():
             self.mapper2.setMapping(sra, sra.text())
             sra.triggered.connect(self.mapper2.map)
-        self.mapper2.mapped['QString'].connect(self.setSampling)
+        self.mapper2.mappedString.connect(self.setSampling)
 
         self.mapper3 = QtCore.QSignalMapper(self)
         for sra in self.ui.menuMax_Time.actions():
             self.mapper3.setMapping(sra, sra.text())
             sra.triggered.connect(self.mapper3.map)
-        self.mapper3.mapped['QString'].connect(self.setMaxTime)
+        self.mapper3.mappedString.connect(self.setMaxTime)
 
         self.mapper4 = QtCore.QSignalMapper(self)
         for sra in self.ui.menuSerial_Baud_Rate.actions():
             self.mapper4.setMapping(sra, sra.text())
             sra.triggered.connect(self.mapper4.map)
-        self.mapper4.mapped['QString'].connect(self.setBaudRate)
+        self.mapper4.mappedString.connect(self.setBaudRate)
         
         self.ui.menuSelecionar_Porta.aboutToShow.connect(self.populatePorts)
 
@@ -107,11 +108,11 @@ class mainwindow(QtWidgets.QMainWindow):
         self.ui.canal2.layout().addWidget(self.genpanel[1])
         self.ui.canal3.layout().addWidget(self.genpanel[2])
         self.ui.canal4.layout().addWidget(self.genpanel[3])
-        for cc in self.ui.tabWidget.findChildren(QComboBox, QtCore.QRegExp("comboType.*")):
+        for cc in self.ui.tabWidget.findChildren(QComboBox, QtCore.QRegularExpression("comboType.*")):
             cc.activated.connect(self.changeGeneratorConfig)
-        for cc in self.ui.tabWidget.findChildren(QDoubleSpinBox, QtCore.QRegExp("spinAmpl.*|spinFreq.*")):
+        for cc in self.ui.tabWidget.findChildren(QDoubleSpinBox, QtCore.QRegularExpression("spinAmpl.*|spinFreq.*")):
             cc.editingFinished.connect(self.changeGeneratorConfig)
-        for cc in self.ui.tabWidget.findChildren(QCheckBox, QtCore.QRegExp("checkEnable.*")):
+        for cc in self.ui.tabWidget.findChildren(QCheckBox, QtCore.QRegularExpression("checkEnable.*")):
             cc.toggled.connect(self.plotOutConfig)
             cc.toggled.connect(self.changeGeneratorConfig)
         
@@ -137,10 +138,10 @@ class mainwindow(QtWidgets.QMainWindow):
         self.changeADCConfig()
         self.configControl()
 
-        saveplussc = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+S"), self, self.saveFile)
-        saveplus2sc = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+Shift+S"), self, self.savePlus2)
-        initstop = QtWidgets.QShortcut(QtGui.QKeySequence("Space"), self, self.kSpace)
-        stepfocus = QtWidgets.QShortcut(QtGui.QKeySequence("Alt+P"), self, self.pFocus)
+        saveplussc = QtGui.QShortcut(QtGui.QKeySequence("Ctrl+S"), self, self.saveFile)
+        saveplus2sc = QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Shift+S"), self, self.savePlus2)
+        initstop = QtGui.QShortcut(QtGui.QKeySequence("Space"), self, self.kSpace)
+        stepfocus = QtGui.QShortcut(QtGui.QKeySequence("Alt+P"), self, self.pFocus)
         self.ui.actionSavePlus.triggered.connect(self.savePlus)
         self.ui.actionDefineWorkdir.triggered.connect(self.defWorkdir)
         self.flagsaveplus = False

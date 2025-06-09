@@ -1,21 +1,30 @@
-from pathlib import Path
 import sys
 
-from PySide2 import QtWidgets
+from PySide6 import QtWidgets
 
 from .mainwindow import mainwindow
 from .driverhardware import driverhardware
 from .dataman import dataman
 from .figures import MyFigQtGraph
+import qdarktheme
+
 
 app = QtWidgets.QApplication([])
-app.setStyle('Fusion')
+
+palette = qdarktheme.load_palette(theme="light")
+stylesheet = qdarktheme.load_stylesheet(theme="dark")
+app.setPalette(palette)
+
+# qdarktheme.setup_theme("light")
+
+# app.setStyleSheet(qdarktheme.load_stylesheet("light"))
+
 
 drv = driverhardware()
 dman = dataman(drv)
-mfig = MyFigQtGraph(dman)
+# mfig = MyFigQtGraph(dman, font=self.mainfont)
 
-mwindow = mainwindow(app, drv, dman, mfig)
+mwindow = mainwindow(app, drv, dman)
 
 mwindow.show()
 

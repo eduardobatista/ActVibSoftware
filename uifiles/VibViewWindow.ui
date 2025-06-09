@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1209</width>
+    <width>1378</width>
     <height>732</height>
    </rect>
   </property>
@@ -15,6 +15,12 @@
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
+  </property>
+  <property name="font">
+   <font>
+    <family>Fira Sans</family>
+    <pointsize>10</pointsize>
+   </font>
   </property>
   <property name="windowTitle">
    <string>ActVib</string>
@@ -30,10 +36,10 @@
        </sizepolicy>
       </property>
       <property name="frameShape">
-       <enum>QFrame::NoFrame</enum>
+       <enum>QFrame::Shape::NoFrame</enum>
       </property>
       <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
+       <enum>QFrame::Shadow::Raised</enum>
       </property>
       <property name="lineWidth">
        <number>0</number>
@@ -53,11 +59,6 @@
        </property>
        <item>
         <widget class="QLabel" name="label_2">
-         <property name="font">
-          <font>
-           <bold>true</bold>
-          </font>
-         </property>
          <property name="text">
           <string>Mode:</string>
          </property>
@@ -70,11 +71,6 @@
            <width>110</width>
            <height>0</height>
           </size>
-         </property>
-         <property name="font">
-          <font>
-           <bold>true</bold>
-          </font>
          </property>
          <property name="styleSheet">
           <string notr="true"/>
@@ -94,7 +90,7 @@
        <item>
         <spacer name="horizontalSpacer_3">
          <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+          <enum>Qt::Orientation::Horizontal</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
@@ -106,11 +102,6 @@
        </item>
        <item>
         <widget class="QLabel" name="label_4">
-         <property name="font">
-          <font>
-           <bold>true</bold>
-          </font>
-         </property>
          <property name="text">
           <string>Elapsed Time:</string>
          </property>
@@ -130,14 +121,8 @@
            <height>0</height>
           </size>
          </property>
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-           <bold>true</bold>
-          </font>
-         </property>
          <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
+          <enum>QFrame::Shape::StyledPanel</enum>
          </property>
          <property name="lineWidth">
           <number>2</number>
@@ -146,14 +131,14 @@
           <string> 0 s</string>
          </property>
          <property name="alignment">
-          <set>Qt::AlignCenter</set>
+          <set>Qt::AlignmentFlag::AlignCenter</set>
          </property>
         </widget>
        </item>
        <item>
         <spacer name="horizontalSpacer_2">
          <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+          <enum>Qt::Orientation::Horizontal</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
@@ -165,11 +150,6 @@
        </item>
        <item>
         <widget class="QLabel" name="label_5">
-         <property name="font">
-          <font>
-           <bold>true</bold>
-          </font>
-         </property>
          <property name="text">
           <string>Time Delay:</string>
          </property>
@@ -189,27 +169,21 @@
            <height>0</height>
           </size>
          </property>
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-           <bold>true</bold>
-          </font>
-         </property>
          <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
+          <enum>QFrame::Shape::StyledPanel</enum>
          </property>
          <property name="text">
           <string>0 s</string>
          </property>
          <property name="alignment">
-          <set>Qt::AlignCenter</set>
+          <set>Qt::AlignmentFlag::AlignCenter</set>
          </property>
         </widget>
        </item>
        <item>
         <spacer name="horizontalSpacer">
          <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+          <enum>Qt::Orientation::Horizontal</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
@@ -221,11 +195,6 @@
        </item>
        <item>
         <widget class="QLabel" name="label_6">
-         <property name="font">
-          <font>
-           <bold>true</bold>
-          </font>
-         </property>
          <property name="text">
           <string>Sample Time:</string>
          </property>
@@ -245,27 +214,21 @@
            <height>0</height>
           </size>
          </property>
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-           <bold>true</bold>
-          </font>
-         </property>
          <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
+          <enum>QFrame::Shape::StyledPanel</enum>
          </property>
          <property name="text">
           <string>0 us</string>
          </property>
          <property name="alignment">
-          <set>Qt::AlignCenter</set>
+          <set>Qt::AlignmentFlag::AlignCenter</set>
          </property>
         </widget>
        </item>
        <item>
         <spacer name="horizontalSpacer_4">
          <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+          <enum>Qt::Orientation::Horizontal</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
@@ -277,11 +240,6 @@
        </item>
        <item>
         <widget class="QLabel" name="label_3">
-         <property name="font">
-          <font>
-           <bold>true</bold>
-          </font>
-         </property>
          <property name="text">
           <string>Error Flag:</string>
          </property>
@@ -295,22 +253,17 @@
            <height>0</height>
           </size>
          </property>
-         <property name="font">
-          <font>
-           <bold>true</bold>
-          </font>
-         </property>
          <property name="styleSheet">
           <string notr="true"/>
          </property>
          <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
+          <enum>QFrame::Shape::StyledPanel</enum>
          </property>
          <property name="text">
           <string>0</string>
          </property>
          <property name="alignment">
-          <set>Qt::AlignCenter</set>
+          <set>Qt::AlignmentFlag::AlignCenter</set>
          </property>
         </widget>
        </item>
@@ -320,10 +273,10 @@
     <item>
      <widget class="QFrame" name="frame">
       <property name="frameShape">
-       <enum>QFrame::NoFrame</enum>
+       <enum>QFrame::Shape::NoFrame</enum>
       </property>
       <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
+       <enum>QFrame::Shadow::Raised</enum>
       </property>
       <property name="lineWidth">
        <number>0</number>
@@ -392,7 +345,7 @@
              <number>0</number>
             </property>
             <property name="elideMode">
-             <enum>Qt::ElideLeft</enum>
+             <enum>Qt::TextElideMode::ElideLeft</enum>
             </property>
             <property name="tabBarAutoHide">
              <bool>false</bool>
@@ -535,10 +488,10 @@
              <string notr="true"/>
             </property>
             <property name="frameShape">
-             <enum>QFrame::Box</enum>
+             <enum>QFrame::Shape::Box</enum>
             </property>
             <property name="frameShadow">
-             <enum>QFrame::Sunken</enum>
+             <enum>QFrame::Shadow::Sunken</enum>
             </property>
             <layout class="QHBoxLayout" name="horizontalLayout_5">
              <property name="spacing">
@@ -562,10 +515,10 @@
           <item>
            <widget class="QFrame" name="frame_4">
             <property name="frameShape">
-             <enum>QFrame::Box</enum>
+             <enum>QFrame::Shape::Box</enum>
             </property>
             <property name="frameShadow">
-             <enum>QFrame::Sunken</enum>
+             <enum>QFrame::Shadow::Sunken</enum>
             </property>
             <layout class="QHBoxLayout" name="horizontalLayout_2">
              <property name="spacing">
@@ -589,7 +542,7 @@
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Notes:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="alignment">
-                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
                </property>
               </widget>
              </item>
@@ -614,10 +567,10 @@
                 </size>
                </property>
                <property name="frameShape">
-                <enum>QFrame::NoFrame</enum>
+                <enum>QFrame::Shape::NoFrame</enum>
                </property>
                <property name="frameShadow">
-                <enum>QFrame::Plain</enum>
+                <enum>QFrame::Shadow::Plain</enum>
                </property>
               </widget>
              </item>
@@ -654,10 +607,10 @@
              <bool>false</bool>
             </property>
             <property name="frameShape">
-             <enum>QFrame::StyledPanel</enum>
+             <enum>QFrame::Shape::StyledPanel</enum>
             </property>
             <property name="frameShadow">
-             <enum>QFrame::Raised</enum>
+             <enum>QFrame::Shadow::Raised</enum>
             </property>
             <layout class="QVBoxLayout" name="plotLayout2">
              <property name="spacing">
@@ -777,17 +730,17 @@
              </sizepolicy>
             </property>
             <property name="frameShape">
-             <enum>QFrame::StyledPanel</enum>
+             <enum>QFrame::Shape::StyledPanel</enum>
             </property>
             <property name="frameShadow">
-             <enum>QFrame::Raised</enum>
+             <enum>QFrame::Shadow::Raised</enum>
             </property>
             <layout class="QVBoxLayout" name="plotOutLayout">
              <property name="spacing">
               <number>3</number>
              </property>
              <property name="sizeConstraint">
-              <enum>QLayout::SetDefaultConstraint</enum>
+              <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
              </property>
              <property name="leftMargin">
               <number>0</number>
@@ -843,11 +796,17 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1209</width>
+     <width>1378</width>
      <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuArquivo">
+    <property name="font">
+     <font>
+      <family>Fira Sans</family>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
     <property name="locale">
      <locale language="English" country="UnitedStates"/>
     </property>
