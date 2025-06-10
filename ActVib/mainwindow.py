@@ -300,7 +300,6 @@ class mainwindow(QtWidgets.QMainWindow):
             try:
                 aux = Path.home() / opts[0]
                 aux.mkdir(parents=True,exist_ok=True)
-                print(aux)
                 self.workdir = aux
                 self.resumeAutomator.emit()
             except BaseException as ex:
@@ -428,15 +427,6 @@ class mainwindow(QtWidgets.QMainWindow):
         if (wkdir != "") and Path(wkdir).is_dir():
             self.workdir = Path(wkdir)
             self.ui.statusbar.showMessage(f"Working directory set to: {self.workdir}")
-        # print(wkdir)
-        # print(type(wkdir))
-        # fdg = QFileDialog(self, "Choose the working directory (workdir)", Path.home())
-        # fdg.setFileMode(QFileDialog.DirectoryOnly)
-        # if fdg.exec():
-        #     dirnames = fdg.selectedFiles()
-        #     if dirnames is not None:
-        #         if dirnames[0] != '':
-        #             self.workdir = dirnames[0]
 
 
     def readConfig(self):        
@@ -606,7 +596,6 @@ class mainwindow(QtWidgets.QMainWindow):
             self.ofig.dacenable = [True,True,False,False]
         else: 
             self.ofig.dacenable = [aa.isGeneratorOn() for aa in self.genpanel]
-        # print(self.ofig.dacenable)
         self.ofig.resetFigure()
 
 
@@ -653,7 +642,6 @@ class mainwindow(QtWidgets.QMainWindow):
             self.ctrlfig.hide()
         aux = settings.value('MFig')
         if aux is not None:
-            # print(aux)
             self.mfig.parseConfigString(aux)
         aux = settings.value('CtrlFig')
         if aux is not None:
@@ -815,8 +803,17 @@ class mainwindow(QtWidgets.QMainWindow):
             self.mfig.setSamplingPeriod(self.dataman.samplingperiod)
             self.ofig.setSamplingPeriod(self.dataman.samplingperiod)
             self.ctrlfig.setSamplingPeriod(self.dataman.samplingperiod)
-            self.ui.statusbar.clearMessage()   
-
+            self.ui.statusbar.clearMessage()
+            if self.FSampling in (250,333,500,1000): # Freqs for MPU6050:                
+                for spanel in self.imupanel:
+                    if spanel.ui.comboType.currentText() == "LSM6DS3":
+                        spanel.ui.comboType.setCurrentIndex(0)
+                        spanel.typechanged()
+            else: # Freqs for LSM6DS3:            
+                for spanel in self.imupanel:
+                    if spanel.ui.comboType.currentText() == "MPU6050":
+                        spanel.ui.comboType.setCurrentIndex(0)
+                        spanel.typechanged()
 
     def populatePorts(self):
         self.ui.menuSelecionar_Porta.clear()
@@ -832,7 +829,6 @@ class mainwindow(QtWidgets.QMainWindow):
         
 
     def setPort(self, portasel):
-        # print(portasel)
         if not self.dataman.flagrodando:
             if portasel.startswith(">"):
                 portasel = portasel[1:]
@@ -892,7 +888,6 @@ class mainwindow(QtWidgets.QMainWindow):
             if self.lastSavedExtension == ".csv":
                 txtfilter = 'CSV file (*.csv);; Feather file (*.feather)'
             filename = QFileDialog.getSaveFileName(self, "Salvar Arquivo", getenv('HOME'), txtfilter)
-            # print(filename)
             if filename[0].endswith(".csv"):
                 self.lastSavedExtension = ".csv"
             elif filename[0].endswith(".feather"):

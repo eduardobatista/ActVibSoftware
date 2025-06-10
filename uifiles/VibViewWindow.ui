@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1225</width>
+    <width>1076</width>
     <height>732</height>
    </rect>
   </property>
@@ -784,7 +784,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1225</width>
+     <width>1076</width>
      <height>21</height>
     </rect>
    </property>
@@ -822,11 +822,13 @@
      <property name="title">
       <string>Sampling Rate</string>
      </property>
+     <addaction name="actionMPU6050"/>
      <addaction name="action1_ms"/>
      <addaction name="action2_ms"/>
      <addaction name="action3_ms"/>
      <addaction name="action4_ms"/>
      <addaction name="separator"/>
+     <addaction name="actionLSM6DS3"/>
      <addaction name="action104"/>
      <addaction name="action208_Hz"/>
      <addaction name="action416_Hz"/>
@@ -1068,6 +1070,27 @@
   <action name="action104">
    <property name="text">
     <string>104 Hz</string>
+   </property>
+  </action>
+  <action name="actionteste">
+   <property name="text">
+    <string>teste</string>
+   </property>
+  </action>
+  <action name="actionMPU6050">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>MPU6050:</string>
+   </property>
+  </action>
+  <action name="actionLSM6DS3">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>LSM6DS3:</string>
    </property>
   </action>
  </widget>
