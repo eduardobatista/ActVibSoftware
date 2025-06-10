@@ -224,7 +224,7 @@ class MyDataViewer(QDialog):
 
 class MyPathModelingDialog():
 
-    def __init__(self,dataman,driver):
+    def __init__(self,dataman,driver):        
         self.dataman = dataman
         self.driver = driver
         self.pdialog = QDialog()
@@ -239,12 +239,12 @@ class MyPathModelingDialog():
         elif self.endtime > 10:
             self.starttime = 2
         else: 
-            self.starttime = 0
+            self.starttime = 0        
         self.pdialog.ui.spinEndTime.setMaximum(self.endtime)
         self.pdialog.ui.spinEndTime.setValue(self.endtime)
         self.pdialog.ui.spinStartTime.setMaximum(self.endtime)
         self.pdialog.ui.spinStartTime.setValue(self.starttime)
-        self.pdialog.ui.bRunModeling.clicked.connect(self.runModeling)
+        self.pdialog.ui.bRunModeling.clicked.connect(self.runModeling)        
         self.gwidget = pg.GraphicsLayoutWidget()
         self.pdialog.ui.plotLayout.addWidget(self.gwidget)
         self.pdialog.ui.bOpenFile.clicked.connect(self.openFile)
@@ -255,6 +255,7 @@ class MyPathModelingDialog():
         self.pdialog.ui.bCheck.clicked.connect(self.checkPaths)
         self.datafromfile = None
         self.dataman.hasPaths = False
+
         
     def openFile(self):
         filename = QFileDialog.getOpenFileName(self.pdialog, "Open File",

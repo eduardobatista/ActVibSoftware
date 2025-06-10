@@ -188,8 +188,8 @@ class mainwindow(QtWidgets.QMainWindow):
                 if genenabled:
                     self.genpanel[idxoutput].setGeneratorConfig(opts[2], float(opts[3]), float(opts[4]))
                 self.changeGeneratorConfig(idxoutput)
-            else: 
-                dialogmsg += f" Error: {str(ex)}"
+            else:
+                dialogmsg += f" Error: {msg}, {opts}"
                 self.automator.stop()
             self.resumeAutomator.emit()
         elif msg == "ConfigIMU":
@@ -205,7 +205,7 @@ class mainwindow(QtWidgets.QMainWindow):
                     self.imupanel[idximu].ui.comboFilter.setCurrentIndex(int(opts[6]))
                     self.imupanel[idximu].ui.comboFilter2.setCurrentIndex(int(opts[7]))
             else: 
-                dialogmsg += f" Error: {str(ex)}"
+                dialogmsg += f" Error: {msg}, {opts}"
                 self.automator.stop()
             self.resumeAutomator.emit()
         elif msg == "ConfigADC":
@@ -424,13 +424,19 @@ class mainwindow(QtWidgets.QMainWindow):
 
 
     def defWorkdir(self):
-        fdg = QFileDialog(self, "Choose the working directory (workdir)", Path.home())
-        fdg.setFileMode(QFileDialog.DirectoryOnly)
-        if fdg.exec():
-            dirnames = fdg.selectedFiles()
-            if dirnames is not None:
-                if dirnames[0] != '':
-                    self.workdir = dirnames[0]
+        wkdir = QFileDialog.getExistingDirectory(self, "Choose the working directory (workdir)", str(self.workdir))
+        if (wkdir != "") and Path(wkdir).is_dir():
+            self.workdir = Path(wkdir)
+            self.ui.statusbar.showMessage(f"Working directory set to: {self.workdir}")
+        # print(wkdir)
+        # print(type(wkdir))
+        # fdg = QFileDialog(self, "Choose the working directory (workdir)", Path.home())
+        # fdg.setFileMode(QFileDialog.DirectoryOnly)
+        # if fdg.exec():
+        #     dirnames = fdg.selectedFiles()
+        #     if dirnames is not None:
+        #         if dirnames[0] != '':
+        #             self.workdir = dirnames[0]
 
 
     def readConfig(self):        
@@ -614,13 +620,13 @@ class mainwindow(QtWidgets.QMainWindow):
 
 
     def changeGeneratorConfig(self,idx=None):
-        if idx:
-            generatorconfig = self.genpanel[idx].getGeneratorConfig()
-            self.driver.setGeneratorConfig(idx, **generatorconfig)
-        else:
-            for k in range(4):
-                generatorconfig = self.genpanel[k].getGeneratorConfig()
-                self.driver.setGeneratorConfig(k, **generatorconfig)
+        # if idx:
+        #     generatorconfig = self.genpanel[idx].getGeneratorConfig()
+        #     self.driver.setGeneratorConfig(idx, **generatorconfig)
+        # else:
+        for k in range(4):
+            generatorconfig = self.genpanel[k].getGeneratorConfig()
+            self.driver.setGeneratorConfig(k, **generatorconfig)
 
 
     def changeMPUConfig(self):
