@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'PathModeling.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.7.2
+## Created by: Qt User Interface Compiler version 6.9.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -15,16 +15,18 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QComboBox, QDialog, QDoubleSpinBox,
-    QFrame, QGridLayout, QHBoxLayout, QLabel,
-    QLineEdit, QProgressBar, QPushButton, QSizePolicy,
-    QSpinBox, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDialog,
+    QDoubleSpinBox, QFrame, QGridLayout, QGroupBox,
+    QHBoxLayout, QLabel, QLineEdit, QProgressBar,
+    QPushButton, QSizePolicy, QSpinBox, QVBoxLayout,
+    QWidget)
 
 class Ui_PathModelingDialog(object):
     def setupUi(self, PathModelingDialog):
         if not PathModelingDialog.objectName():
             PathModelingDialog.setObjectName(u"PathModelingDialog")
-        PathModelingDialog.resize(715, 495)
+        PathModelingDialog.resize(715, 554)
+        PathModelingDialog.setModal(True)
         self.verticalLayout = QVBoxLayout(PathModelingDialog)
         self.verticalLayout.setSpacing(1)
         self.verticalLayout.setObjectName(u"verticalLayout")
@@ -200,6 +202,104 @@ class Ui_PathModelingDialog(object):
 
         self.verticalLayout.addWidget(self.widget_2)
 
+        self.groupBox = QGroupBox(PathModelingDialog)
+        self.groupBox.setObjectName(u"groupBox")
+        self.horizontalLayout_3 = QHBoxLayout(self.groupBox)
+        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
+        self.horizontalLayout_3.setContentsMargins(0, 6, 0, 0)
+        self.widget_5 = QWidget(self.groupBox)
+        self.widget_5.setObjectName(u"widget_5")
+        self.widget_5.setStyleSheet(u"")
+        self.gridLayout_2 = QGridLayout(self.widget_5)
+        self.gridLayout_2.setObjectName(u"gridLayout_2")
+        self.gridLayout_2.setVerticalSpacing(3)
+        self.gridLayout_2.setContentsMargins(3, 3, 3, 3)
+        self.bSValuesSec = QPushButton(self.widget_5)
+        self.bSValuesSec.setObjectName(u"bSValuesSec")
+
+        self.gridLayout_2.addWidget(self.bSValuesSec, 0, 6, 1, 1)
+
+        self.spinSparsitySec = QSpinBox(self.widget_5)
+        self.spinSparsitySec.setObjectName(u"spinSparsitySec")
+        self.spinSparsitySec.setMinimum(1)
+        self.spinSparsitySec.setMaximum(1000)
+
+        self.gridLayout_2.addWidget(self.spinSparsitySec, 0, 4, 1, 1)
+
+        self.label_13 = QLabel(self.widget_5)
+        self.label_13.setObjectName(u"label_13")
+
+        self.gridLayout_2.addWidget(self.label_13, 1, 3, 1, 1)
+
+        self.label_11 = QLabel(self.widget_5)
+        self.label_11.setObjectName(u"label_11")
+
+        self.gridLayout_2.addWidget(self.label_11, 0, 3, 1, 1)
+
+        self.label_10 = QLabel(self.widget_5)
+        self.label_10.setObjectName(u"label_10")
+
+        self.gridLayout_2.addWidget(self.label_10, 0, 1, 1, 1)
+
+        self.infoFbk = QLineEdit(self.widget_5)
+        self.infoFbk.setObjectName(u"infoFbk")
+        self.infoFbk.setReadOnly(True)
+
+        self.gridLayout_2.addWidget(self.infoFbk, 1, 5, 1, 1)
+
+        self.checksvdfbk = QCheckBox(self.widget_5)
+        self.checksvdfbk.setObjectName(u"checksvdfbk")
+
+        self.gridLayout_2.addWidget(self.checksvdfbk, 1, 0, 1, 1)
+
+        self.infoSec = QLineEdit(self.widget_5)
+        self.infoSec.setObjectName(u"infoSec")
+        self.infoSec.setReadOnly(True)
+
+        self.gridLayout_2.addWidget(self.infoSec, 0, 5, 1, 1)
+
+        self.bSValuesFbk = QPushButton(self.widget_5)
+        self.bSValuesFbk.setObjectName(u"bSValuesFbk")
+
+        self.gridLayout_2.addWidget(self.bSValuesFbk, 1, 6, 1, 1)
+
+        self.spinBranchesSec = QSpinBox(self.widget_5)
+        self.spinBranchesSec.setObjectName(u"spinBranchesSec")
+        self.spinBranchesSec.setMinimum(1)
+        self.spinBranchesSec.setMaximum(10)
+
+        self.gridLayout_2.addWidget(self.spinBranchesSec, 0, 2, 1, 1)
+
+        self.spinBranchesFbk = QSpinBox(self.widget_5)
+        self.spinBranchesFbk.setObjectName(u"spinBranchesFbk")
+        self.spinBranchesFbk.setMinimum(1)
+        self.spinBranchesFbk.setMaximum(10)
+
+        self.gridLayout_2.addWidget(self.spinBranchesFbk, 1, 2, 1, 1)
+
+        self.label_12 = QLabel(self.widget_5)
+        self.label_12.setObjectName(u"label_12")
+
+        self.gridLayout_2.addWidget(self.label_12, 1, 1, 1, 1)
+
+        self.spinSparsityFbk = QSpinBox(self.widget_5)
+        self.spinSparsityFbk.setObjectName(u"spinSparsityFbk")
+        self.spinSparsityFbk.setMinimum(1)
+        self.spinSparsityFbk.setMaximum(1000)
+
+        self.gridLayout_2.addWidget(self.spinSparsityFbk, 1, 4, 1, 1)
+
+        self.checksvdsec = QCheckBox(self.widget_5)
+        self.checksvdsec.setObjectName(u"checksvdsec")
+
+        self.gridLayout_2.addWidget(self.checksvdsec, 0, 0, 1, 1)
+
+
+        self.horizontalLayout_3.addWidget(self.widget_5)
+
+
+        self.verticalLayout.addWidget(self.groupBox)
+
         self.bRunModeling = QPushButton(PathModelingDialog)
         self.bRunModeling.setObjectName(u"bRunModeling")
 
@@ -269,6 +369,15 @@ class Ui_PathModelingDialog(object):
         self.textStepSize.setText(QCoreApplication.translate("PathModelingDialog", u"0.05", None))
         self.label_6.setText(QCoreApplication.translate("PathModelingDialog", u"Weight averaging:", None))
         self.label_5.setText(QCoreApplication.translate("PathModelingDialog", u"Memory size:", None))
+        self.groupBox.setTitle(QCoreApplication.translate("PathModelingDialog", u"SVD Compression", None))
+        self.bSValuesSec.setText(QCoreApplication.translate("PathModelingDialog", u"Sing. Values", None))
+        self.label_13.setText(QCoreApplication.translate("PathModelingDialog", u"Sparsity:", None))
+        self.label_11.setText(QCoreApplication.translate("PathModelingDialog", u"Sparsity:", None))
+        self.label_10.setText(QCoreApplication.translate("PathModelingDialog", u"Branches:", None))
+        self.checksvdfbk.setText(QCoreApplication.translate("PathModelingDialog", u"Feedback with:", None))
+        self.bSValuesFbk.setText(QCoreApplication.translate("PathModelingDialog", u"Sing. Values", None))
+        self.label_12.setText(QCoreApplication.translate("PathModelingDialog", u"Branches:", None))
+        self.checksvdsec.setText(QCoreApplication.translate("PathModelingDialog", u"Secondary with:", None))
         self.bRunModeling.setText(QCoreApplication.translate("PathModelingDialog", u"Run...", None))
         self.bSaveToFile.setText(QCoreApplication.translate("PathModelingDialog", u"Save paths to file...", None))
         self.bUploadAndRec.setText(QCoreApplication.translate("PathModelingDialog", u"Upload and Record in Flash...", None))

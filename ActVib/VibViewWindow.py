@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'VibViewWindow.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.7.2
+## Created by: Qt User Interface Compiler version 6.9.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -471,7 +471,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 1076, 21))
+        self.menubar.setGeometry(QRect(0, 0, 1076, 20))
         self.menuArquivo = QMenu(self.menubar)
         self.menuArquivo.setObjectName(u"menuArquivo")
         self.menuArquivo.setFont(font)
@@ -549,7 +549,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"ActVib", None))
-        self.actionSalvar_dados.setText(QCoreApplication.translate("MainWindow", u"Save...", None))
+        self.actionSalvar_dados.setText(QCoreApplication.translate("MainWindow", u"&Save...", None))
         self.actionSair.setText(QCoreApplication.translate("MainWindow", u"Quit", None))
         self.actionCOM1.setText(QCoreApplication.translate("MainWindow", u"COM1", None))
         self.actionCOM2.setText(QCoreApplication.translate("MainWindow", u"COM2", None))
@@ -573,7 +573,7 @@ class Ui_MainWindow(object):
         self.action3_ms.setText(QCoreApplication.translate("MainWindow", u"500 Hz", None))
         self.action4_ms.setText(QCoreApplication.translate("MainWindow", u"1000 Hz", None))
         self.action5_ms.setText(QCoreApplication.translate("MainWindow", u"5 ms", None))
-        self.actionPathModeling.setText(QCoreApplication.translate("MainWindow", u"Path modeling...", None))
+        self.actionPathModeling.setText(QCoreApplication.translate("MainWindow", u"&Path modeling...", None))
         self.actionDataViewer.setText(QCoreApplication.translate("MainWindow", u"Data Viewer...", None))
         self.actionAdditional.setText(QCoreApplication.translate("MainWindow", u"Additional system setup...", None))
         self.actionAutomator.setText(QCoreApplication.translate("MainWindow", u"Automator...", None))
@@ -615,7 +615,7 @@ class Ui_MainWindow(object):
         self.tabSensors.setTabText(self.tabSensors.indexOf(self.adctab), QCoreApplication.translate("MainWindow", u"ADC", None))
         self.bInit.setText(QCoreApplication.translate("MainWindow", u"Start/Stop", None))
         self.bLimpar.setText(QCoreApplication.translate("MainWindow", u"Reset Data", None))
-        self.menuArquivo.setTitle(QCoreApplication.translate("MainWindow", u"File", None))
+        self.menuArquivo.setTitle(QCoreApplication.translate("MainWindow", u"&File", None))
         self.menuSelecionar_Porta.setTitle(QCoreApplication.translate("MainWindow", u"Port", None))
         self.menuSampling_Rate.setTitle(QCoreApplication.translate("MainWindow", u"Sampling Rate", None))
         self.menuMax_Time.setTitle(QCoreApplication.translate("MainWindow", u"Max Time", None))

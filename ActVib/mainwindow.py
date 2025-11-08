@@ -1,6 +1,7 @@
 from pathlib import Path
 from os import getenv
 import time
+import json
 
 import pandas as pd
 import numpy as np
@@ -160,6 +161,8 @@ class mainwindow(QtWidgets.QMainWindow):
 
         self.updater = Updater()
         self.updater.actionMessage.connect(self.updater.printMessage) 
+
+        
 
 
     def SFUpdate(self):
@@ -478,6 +481,17 @@ class mainwindow(QtWidgets.QMainWindow):
                 auxval2 = settings.value(f"XYZmap{k}")                
                 self.mfig.setXYZCheckMap(k,auxval2 if auxval2 is not None else [True,True,True])
             self.mfig.loadSensorChoices()
+        if settings.value("PathModelingOptions"):
+            aux = settings.value("PathModelingOptions")
+            try:
+                if isinstance(aux, (str, bytes)):
+                    self.pathmodelingoptions = json.loads(aux)
+                else:
+                    self.pathmodelingoptions = None
+            except Exception:
+                self.pathmodelingoptions = None
+        else:
+            self.pathmodelingoptions = None
         
 
     def writeConfig(self):
@@ -512,6 +526,8 @@ class mainwindow(QtWidgets.QMainWindow):
         for k in range(2):
             settings.setValue(f"SensorChoice{k}",self.mfig.plotchoice[k])
             settings.setValue(f"XYZmap{k}",self.mfig.getXYZCheckMap(k))
+        if self.pathmodelingoptions is not None:
+            settings.setValue("PathModelingOptions", json.dumps(self.pathmodelingoptions))
 
     def statusMessage(self, msg):
         if msg is None:
@@ -861,9 +877,12 @@ class mainwindow(QtWidgets.QMainWindow):
     def openPathModelingDialog(self):
         if not self.dataman.flagrodando:    
             self.driver.setPort(self.Port)        
-            self.pmd = MyPathModelingDialog(self.dataman,self.driver)
-            self.pmd.showPathModelingdDialog()
+            self.pmd = MyPathModelingDialog(self.dataman,self.driver,self.closePathModelingDialog)
+            self.pmd.showPathModelingdDialog(self.pathmodelingoptions)
     
+    def closePathModelingDialog(self, event):
+        self.pathmodelingoptions = self.pmd.getOptionsToSave()
+        event.accept()
 
     def openDataViewer(self):
         if not self.dataman.flagrodando:

@@ -422,8 +422,6 @@ class IMUPanel(QtWidgets.QWidget,StateSaver):
                 self.ui.comboAddress.setCurrentIndex(2)
             self.ui.comboFilter2.clear()
             self.ui.comboFilter2.addItems(["Auto","400 Hz","200 Hz","100 Hz","50 Hz"])
-            # self.ui.comboFilter.setEnabled(False)
-            # self.ui.comboFilter2.setEnabled(True)
 
     def typechanged(self):
         cmps = [self.ui.comboAddress,self.ui.comboAccRange,self.ui.comboGyroRange,self.ui.comboFilter2,self.ui.comboBus]
