@@ -5,6 +5,7 @@ import subprocess
 import shlex
 import shutil
 from threading import Thread
+import traceback
 
 from PySide6 import QtCore
 from PySide6.QtWidgets import QDialog
@@ -102,13 +103,17 @@ class Updater(QtCore.QObject):
                         except BaseException as ex:
                             fcmd[0] = "python"
                             self.actionMessage.emit("Python3 not found, attempting to use python....<br><br>",True)
-                        proc =  subprocess.Popen(fcmd,stdout=subprocess.PIPE,cwd=flashcmd.parent)
+                        proc =  subprocess.Popen(fcmd,stdout=subprocess.PIPE,cwd=flashcmd.parent,stderr=subprocess.PIPE)
                         while True:
-                            # line = proc.stdout.readline().decode()
+                            # line = proc.stdout.readline().decode()                            
                             line = proc.stdout.read(1).decode()
                             self.actionMessage.emit(line,False)
                             if not line:
                                 break
+                        errmsg = proc.stderr.read().decode()
+                        if errmsg:
+                            errmsg = errmsg.replace("\n","<br>")
+                            self.actionMessage.emit(f'<br><span style="color: red;"><strong>Error during flashing:</strong><br>{errmsg}<br></span>',True)
             self.actionMessage.emit("<br>Cleaning up...<br>",True)
             # TODO: Cleaning up needs to be improved.
             for fff in extractedfiles:
@@ -122,6 +127,6 @@ class Updater(QtCore.QObject):
                     ddir.rmdir()
             tmpdir.rmdir()
             self.actionMessage.emit("<strong>Finished!</strong>",True)
-        except BaseException as ex:
+        except BaseException as ex:            
             self.actionMessage.emit(f'<br><br><span style="color: red;"><strong>Error!</strong></span><br>{str(ex)}',True)
         self.flagrunning = False    
