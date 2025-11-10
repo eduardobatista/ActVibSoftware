@@ -2,7 +2,7 @@
 from threading import Thread,Event
 import time
 import pandas as pd
-from PySide6 import QtCore,QtGui,QtWidgets
+from PySide6 import QtCore,QtGui
 from PySide6.QtWidgets import QDialog
 from .AutomatorDialog import Ui_AutomatorDialog as AutomatorDialog
 

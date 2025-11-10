@@ -437,7 +437,7 @@
    <item>
     <widget class="QPushButton" name="bRunModeling">
      <property name="text">
-      <string>Run...</string>
+      <string>&amp;Run...</string>
      </property>
     </widget>
    </item>
@@ -475,7 +475,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Upload and Record in Flash...</string>
+         <string>&amp;Upload and Record in Flash...</string>
         </property>
        </widget>
       </item>
@@ -498,7 +498,7 @@
    <item>
     <widget class="QPushButton" name="bCheck">
      <property name="text">
-      <string>Check Recorded Paths</string>
+      <string>&amp;Check Recorded Paths</string>
      </property>
     </widget>
    </item>

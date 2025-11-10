@@ -533,6 +533,11 @@ class driverhardware:
             raise Exception("Sem resposta na gravação da flash.")
 
     def gravaCaminho(self, tipo, dados, pbar):
+        if (tipo == 'S') or (tipo == 'F'):
+            leadingbytes = dados[1]
+            dados = dados[0]
+        else:
+            leadingbytes = None
         BUFFER_SIZE = 64
         step = BUFFER_SIZE / 4
         pbar.setMaximum(dados.shape[0] - 2)
@@ -544,6 +549,8 @@ class driverhardware:
             pacoteextra = False
         self.serial.write(('W' + tipo).encode())
         self.serial.write(bytes([(dados.shape[0] * 4) >> 8, (dados.shape[0] * 4) & 0xFF]))
+        if leadingbytes is not None:
+            self.serial.write(leadingbytes)
         if self.serial.read(1) == b'k':
             for k in range(npacotes):
                 for w in dados[k * BUFFER_SIZE:k * BUFFER_SIZE + BUFFER_SIZE]:

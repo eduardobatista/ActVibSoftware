@@ -378,10 +378,10 @@ class Ui_PathModelingDialog(object):
         self.bSValuesFbk.setText(QCoreApplication.translate("PathModelingDialog", u"Sing. Values", None))
         self.label_12.setText(QCoreApplication.translate("PathModelingDialog", u"Branches:", None))
         self.checksvdsec.setText(QCoreApplication.translate("PathModelingDialog", u"Secondary with:", None))
-        self.bRunModeling.setText(QCoreApplication.translate("PathModelingDialog", u"Run...", None))
+        self.bRunModeling.setText(QCoreApplication.translate("PathModelingDialog", u"&Run...", None))
         self.bSaveToFile.setText(QCoreApplication.translate("PathModelingDialog", u"Save paths to file...", None))
-        self.bUploadAndRec.setText(QCoreApplication.translate("PathModelingDialog", u"Upload and Record in Flash...", None))
-        self.bCheck.setText(QCoreApplication.translate("PathModelingDialog", u"Check Recorded Paths", None))
+        self.bUploadAndRec.setText(QCoreApplication.translate("PathModelingDialog", u"&Upload and Record in Flash...", None))
+        self.bCheck.setText(QCoreApplication.translate("PathModelingDialog", u"&Check Recorded Paths", None))
         self.statusLabel.setText("")
     # retranslateUi
 

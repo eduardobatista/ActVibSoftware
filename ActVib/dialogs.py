@@ -2,6 +2,8 @@ import os
 from pathlib import Path
 import time
 
+from threading import Thread
+
 from PySide6 import (QtCore, QtWidgets)
 from PySide6.QtWidgets import (QDialog, QFileDialog)
 
@@ -15,6 +17,8 @@ from .PathModeling import Ui_PathModelingDialog as PathModelingDialog
 from .DataViewer import Ui_DataViewerDialog as DataViewerDialog
 from .Additional import Ui_AdditionalConfigDialog as AdditionalDialog
 from .DSP import FIRNLMS,easyFourier
+
+from .driverhardware import driverhardware
 
 class WorkdirManager():
 
@@ -79,7 +83,7 @@ class WorkdirManager():
 
 class MyAdditionalDialog(QDialog):
 
-    def __init__(self,driver):
+    def __init__(self,driver : driverhardware):
         super().__init__()
         self.driver = driver
         self.ui = AdditionalDialog()
@@ -249,9 +253,9 @@ class MyPathModelingDialog():
         self.pdialog.ui.plotLayout.addWidget(self.gwidget)
         self.pdialog.ui.bOpenFile.clicked.connect(self.openFile)
         self.pdialog.ui.bUploadAndRec.setEnabled(False)
-        self.pdialog.ui.bUploadAndRec.clicked.connect(self.recordData)
+        self.pdialog.ui.bUploadAndRec.clicked.connect(lambda: Thread(target=self.recordData).start())
         self.pdialog.ui.progressBar.setValue(0)  
-        self.pdialog.ui.bSaveToFile.clicked.connect(self.savePathsToFile)      
+        self.pdialog.ui.bSaveToFile.clicked.connect(self.savePathsToFile)
         self.pdialog.ui.bCheck.clicked.connect(self.checkPaths)
         self.pdialog.ui.bSValuesSec.clicked.connect(lambda: self.plotSValues('sec'))
         self.pdialog.ui.bSValuesFbk.clicked.connect(lambda: self.plotSValues('fbk'))
@@ -377,17 +381,30 @@ class MyPathModelingDialog():
         self.pdialog.exec_()
 
     def recordData(self):
+        self.pdialog.ui.bUploadAndRec.setEnabled(False)
         self.pdialog.ui.statusLabel.setText("")
         try:
             if not self.dataman.hasPaths:
                 raise Exception("Path data not found in memory.")
+            if self.pdialog.ui.checksvdsec.isChecked():
+                wsec = self.getCompressedPath("sec")
+                tiposec = 'S'
+            else:
+                wsec = self.dataman.secpath
+                tiposec = 's'
+            if self.pdialog.ui.checksvdfbk.isChecked():
+                wfbk = self.getCompressedPath("fbk")
+                tipofbk = 'F'
+            else:
+                wfbk = self.dataman.fbkpath
+                tipofbk = 'f'
             self.driver.closeSerial()
             time.sleep(0.2)
             self.driver.openSerial()
             self.driver.handshake()
-            self.driver.gravaCaminho('s', self.dataman.secpath, self.pdialog.ui.progressBar)
+            self.driver.gravaCaminho(tiposec, wsec, self.pdialog.ui.progressBar)
             self.driver.handshake()
-            self.driver.gravaCaminho('f', self.dataman.fbkpath, self.pdialog.ui.progressBar)
+            self.driver.gravaCaminho(tipofbk, wfbk, self.pdialog.ui.progressBar)
             self.driver.stopReadings()
             self.driver.openSerial()
             self.driver.handshake()
@@ -396,6 +413,35 @@ class MyPathModelingDialog():
             self.driver.stopReadings()
         except BaseException as ex:
             self.pdialog.ui.statusLabel.setText(f"Error: {ex}")
+        self.pdialog.ui.bUploadAndRec.setEnabled(True)
+
+    def format_W(self,W,R):
+        n_pad = W.shape[0] % R
+        W_pad = np.zeros(int(W.shape[0] + (R - n_pad)) if n_pad != 0 else W.shape[0])
+        W_pad[:W.shape[0]] = W
+        C = W_pad.shape[0]/R
+        lower_dim = min(R,C)
+        return  W_pad.reshape((int(lower_dim),-1),order = 'F')
+    
+    def getCompressedPath(self,ptype='sec'):
+        mem = self.pdialog.ui.spinMemSize.value()
+        B = self.pdialog.ui.spinBranchesSec.value() if ptype=='sec' else self.pdialog.ui.spinBranchesFbk.value()
+        R = self.pdialog.ui.spinSparsitySec.value() if ptype=='sec' else self.pdialog.ui.spinSparsityFbk.value()
+        C_chosen = int(np.ceil(mem / R))
+        W = self.format_W(self.dataman.secpath, R) if ptype=='sec' else self.format_W(self.dataman.fbkpath, C_chosen)
+        R = W.shape[0]
+        U,S,VT = np.linalg.svd(W)
+        SM = np.zeros((R,C_chosen))
+        np.fill_diagonal(SM,S)
+        US = U @ SM
+        C_weights = np.zeros((B,VT.shape[1]))
+        R_weights = np.zeros((B,U.shape[0]))
+        for i in range(B):
+            C_weights[i,:] = VT.T[:,i]
+            R_weights[i,:] = US[:,i]
+        # leadingbytes = [memsize,B,R,C_chosen]
+        leadingbytes = bytearray([(mem >> 8), (mem & 0xFF), (B & 0xFF), (R & 0xFF), (C_chosen & 0xFF)])
+        return (np.concatenate((C_weights.T.flatten(order='F'), R_weights.T.flatten(order='F'))),leadingbytes)
 
     def plotSValues(self,ptype='sec'):
         try:
@@ -403,25 +449,18 @@ class MyPathModelingDialog():
                 raise Exception("Path data not found in memory.")
             if ptype == 'sec':
                 wpath = self.dataman.secpath
-                svdcheck = self.pdialog.ui.checksvdsec.isChecked()
-                svdbranches = self.pdialog.ui.spinBranchesSec.value()
                 svdsparsity = self.pdialog.ui.spinSparsitySec.value()
             else:
                 wpath = self.dataman.fbkpath
-                svdcheck = self.pdialog.ui.checksvdfbk.isChecked()
-                svdbranches = self.pdialog.ui.spinBranchesFbk.value()
-                svdsparsity = self.pdialog.ui.spinSparsityFbk.value()
-            if svdcheck:
-                U,S,Vt = np.linalg.svd( np.reshape(wpath, (svdsparsity, -1)), full_matrices=False )
-                svalues = S
-            else:
-                svalues = np.abs( np.fft.fft(wpath) )
+                svdsparsity = self.pdialog.ui.spinSparsityFbk.value()        
+            WPath = self.format_W(wpath, svdsparsity)
+            U,S,Vt = np.linalg.svd( np.reshape(WPath, (svdsparsity, -1)), full_matrices=False )
+            svalues = S            
             pens = [pg.mkPen('r', width=2)]
-            item = self.gwidget.getItem(0,0)
-            if item is not None:
-                self.gwidget.removeItem(item)
+            self.gwidget.clear()
             myplot1 = self.gwidget.addPlot(row=0,col=0,labels={"bottom":"Index"})
-            myplot1.plot(svalues,pen=pens[0])
+            myplot1.addLegend(labelTextSize="7pt",offset=(0,50))
+            myplot1.plot(svalues,pen=pens[0],name=f"S-values of {ptype} path")            
             self.pdialog.ui.statusLabel.setText("S-values plotted.")
         except BaseException as ex:
             self.pdialog.ui.statusLabel.setText(f"Error: {ex}")
@@ -453,6 +492,12 @@ class MyPathModelingDialog():
                     self.pdialog.ui.statusLabel.setText("No file selected (Error 2).")
                     return
                 self.datafromfile = pd.read_feather(self.filename)
+                self.endtime = self.datafromfile.time.values[-1]
+                self.pdialog.ui.spinStartTime.setMaximum(self.endtime)
+                self.pdialog.ui.spinEndTime.setMaximum(self.endtime)
+                self.pdialog.ui.spinEndTime.setValue(self.endtime)
+                endtime = self.pdialog.ui.spinEndTime.value()
+                starttime = self.pdialog.ui.spinStartTime.value()
                 if "ctrl" not in self.datafromfile.columns:
                     self.pdialog.ui.statusLabel.setText("File not valid (Error 1).")
                     return
