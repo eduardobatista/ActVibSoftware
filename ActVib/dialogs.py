@@ -262,6 +262,16 @@ class MyPathModelingDialog():
         self.datafromfile = None
         self.dataman.hasPaths = False
         self.pdialog.closeEvent = closeEventCallback
+        self.pdialog.ui.checkUseFeedback.stateChanged.connect(self.checkUseFeedbackCallback)
+        self.pdialog.ui.checkUseSecondary.stateChanged.connect(self.checkUseSecondaryCallback)
+
+    def checkUseFeedbackCallback(self,state):
+        if self.pdialog.ui.checkUseFeedback.isChecked():
+            self.pdialog.ui.checkUseSecondary.setChecked(False)
+    
+    def checkUseSecondaryCallback(self,state):
+        if self.pdialog.ui.checkUseSecondary.isChecked():
+            self.pdialog.ui.checkUseFeedback.setChecked(False)
 
     def getOptionsToSave(self) -> dict:
         options = {
@@ -345,14 +355,6 @@ class MyPathModelingDialog():
                 myplot2.plot(self.dataman.fbkpath,pen=pens[3],name="Feedback Path from Memory")
 
             self.pdialog.ui.statusLabel.setText("Paths successfully read.")
-            # sqerror = 0.0
-            # for k in range(len(wsec)):
-            #     sqerror = sqerror + (wsec[k]-self.dataman.secpath[k])**2
-            # print(sqerror)
-            # sqerror = 0.0
-            # for k in range(len(wfbk)):
-            #     sqerror = sqerror + (wfbk[k]-self.dataman.fbkpath[k])**2
-            # print(sqerror)
         except BaseException as ex:
             self.pdialog.ui.statusLabel.setText(f"Error: {ex}")
 
@@ -423,39 +425,52 @@ class MyPathModelingDialog():
         lower_dim = min(R,C)
         return  W_pad.reshape((int(lower_dim),-1),order = 'F')
     
-    def getCompressedPath(self,ptype='sec'):
+    def getCompressedPath(self,ptype='sec',returnsingularvalues=False):
         mem = self.pdialog.ui.spinMemSize.value()
         B = self.pdialog.ui.spinBranchesSec.value() if ptype=='sec' else self.pdialog.ui.spinBranchesFbk.value()
         R = self.pdialog.ui.spinSparsitySec.value() if ptype=='sec' else self.pdialog.ui.spinSparsityFbk.value()
-        C_chosen = int(np.ceil(mem / R))
-        W = self.format_W(self.dataman.secpath, R) if ptype=='sec' else self.format_W(self.dataman.fbkpath, C_chosen)
-        R = W.shape[0]
-        U,S,VT = np.linalg.svd(W)
-        SM = np.zeros((R,C_chosen))
-        np.fill_diagonal(SM,S)
-        US = U @ SM
+        if ((ptype == 'sec') and (not self.pdialog.ui.checkUseFeedback.isChecked())) or \
+           ((ptype == 'fbk') and (not self.pdialog.ui.checkUseSecondary.isChecked())):
+            C_chosen = int(np.ceil(mem / R))
+            W = self.format_W(self.dataman.secpath, R) if ptype=='sec' else self.format_W(self.dataman.fbkpath, C_chosen)
+            R = W.shape[0]
+            U,S,VT = np.linalg.svd(W)
+            SM = np.zeros((R,C_chosen))
+            np.fill_diagonal(SM,S)
+            US = U @ SM            
+        else:
+            C_chosen = int(np.ceil(mem / R))
+            Waux = self.format_W(self.dataman.fbkpath, R) if ptype=='sec' else self.format_W(self.dataman.secpath, C_chosen)
+            _,_,VT = np.linalg.svd(Waux)
+            W = self.format_W(self.dataman.secpath, R) if ptype=='sec' else self.format_W(self.dataman.fbkpath, C_chosen)
+            R = W.shape[0]
+            US = W @ np.linalg.inv(VT)
         C_weights = np.zeros((B,VT.shape[1]))
-        R_weights = np.zeros((B,U.shape[0]))
+        R_weights = np.zeros((B,US.shape[0]))
         for i in range(B):
             C_weights[i,:] = VT.T[:,i]
             R_weights[i,:] = US[:,i]
         # leadingbytes = [memsize,B,R,C_chosen]
         leadingbytes = bytearray([(mem >> 8), (mem & 0xFF), (B & 0xFF), (R & 0xFF), (C_chosen & 0xFF)])
-        return (np.concatenate((C_weights.T.flatten(order='F'), R_weights.T.flatten(order='F'))),leadingbytes)
+        if returnsingularvalues:
+            return np.diag(US.T @ US)
+        else:
+            return (np.concatenate((C_weights.T.flatten(order='F'), R_weights.T.flatten(order='F'))),leadingbytes)
 
     def plotSValues(self,ptype='sec'):
         try:
             if not self.dataman.hasPaths:
                 raise Exception("Path data not found in memory.")
-            if ptype == 'sec':
-                wpath = self.dataman.secpath
-                svdsparsity = self.pdialog.ui.spinSparsitySec.value()
-            else:
-                wpath = self.dataman.fbkpath
-                svdsparsity = self.pdialog.ui.spinSparsityFbk.value()        
-            WPath = self.format_W(wpath, svdsparsity)
-            U,S,Vt = np.linalg.svd( np.reshape(WPath, (svdsparsity, -1)), full_matrices=False )
-            svalues = S            
+            # if ptype == 'sec':
+            #     wpath = self.dataman.secpath
+            #     svdsparsity = self.pdialog.ui.spinSparsitySec.value()
+            # else:
+            #     wpath = self.dataman.fbkpath
+            #     svdsparsity = self.pdialog.ui.spinSparsityFbk.value()        
+            # WPath = self.format_W(wpath, svdsparsity)
+            # U,S,Vt = np.linalg.svd( np.reshape(WPath, (svdsparsity, -1)), full_matrices=False )
+            # svalues = S
+            svalues = self.getCompressedPath(ptype,returnsingularvalues=True)            
             pens = [pg.mkPen('r', width=2)]
             self.gwidget.clear()
             myplot1 = self.gwidget.addPlot(row=0,col=0,labels={"bottom":"Index"})

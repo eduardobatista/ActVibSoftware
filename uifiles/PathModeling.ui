@@ -318,27 +318,17 @@
          <property name="verticalSpacing">
           <number>3</number>
          </property>
-         <item row="0" column="6">
-          <widget class="QPushButton" name="bSValuesSec">
+         <item row="0" column="1">
+          <widget class="QLabel" name="label_10">
            <property name="text">
-            <string>Sing. Values</string>
+            <string>Branches:</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="4">
-          <widget class="QSpinBox" name="spinSparsitySec">
-           <property name="minimum">
-            <number>1</number>
-           </property>
-           <property name="maximum">
-            <number>1000</number>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="3">
-          <widget class="QLabel" name="label_13">
+         <item row="0" column="5">
+          <widget class="QCheckBox" name="checkUseFeedback">
            <property name="text">
-            <string>Sparsity:</string>
+            <string>Use feedback path basis.</string>
            </property>
           </widget>
          </item>
@@ -349,48 +339,29 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="1">
-          <widget class="QLabel" name="label_10">
+         <item row="0" column="6">
+          <widget class="QPushButton" name="bSValuesSec">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="text">
-            <string>Branches:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="5">
-          <widget class="QLineEdit" name="infoFbk">
-           <property name="readOnly">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QCheckBox" name="checksvdfbk">
-           <property name="text">
-            <string>Feedback with:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="5">
-          <widget class="QLineEdit" name="infoSec">
-           <property name="readOnly">
-            <bool>true</bool>
+            <string>Singular Values</string>
            </property>
           </widget>
          </item>
          <item row="1" column="6">
           <widget class="QPushButton" name="bSValuesFbk">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="text">
-            <string>Sing. Values</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="2">
-          <widget class="QSpinBox" name="spinBranchesSec">
-           <property name="minimum">
-            <number>1</number>
-           </property>
-           <property name="maximum">
-            <number>10</number>
+            <string>Singular Values</string>
            </property>
           </widget>
          </item>
@@ -421,10 +392,51 @@
            </property>
           </widget>
          </item>
+         <item row="1" column="0">
+          <widget class="QCheckBox" name="checksvdfbk">
+           <property name="text">
+            <string>Feedback path with:</string>
+           </property>
+          </widget>
+         </item>
          <item row="0" column="0">
           <widget class="QCheckBox" name="checksvdsec">
            <property name="text">
-            <string>Secondary with:</string>
+            <string>Secondary path with:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="3">
+          <widget class="QLabel" name="label_13">
+           <property name="text">
+            <string>Sparsity:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="4">
+          <widget class="QSpinBox" name="spinSparsitySec">
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>1000</number>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="5">
+          <widget class="QCheckBox" name="checkUseSecondary">
+           <property name="text">
+            <string>Use secondary path basis.</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="2">
+          <widget class="QSpinBox" name="spinBranchesSec">
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>10</number>
            </property>
           </widget>
          </item>
