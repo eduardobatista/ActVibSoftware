@@ -80,9 +80,9 @@ class ControlPanel(QtWidgets.QWidget,StateSaver):
         self.ui.checkAlgOn.setChecked(False)
         # self.ui.checkAlgOn.setEnabled(False)
         # self.ui.checkAlgOn.toggled.connect(self.controlChanged)
-        self.ui.passoCtrl.setValidator(QtGui.QDoubleValidator(0.0, 1000.0, 2, self))
+        self.ui.passoCtrl.setValidator(QtGui.QDoubleValidator(0.0, 1000.0, 4, self))
         self.ui.passoCtrl.editingFinished.connect(self.validateStep)
-        self.ui.normCtrl.setValidator(QtGui.QDoubleValidator(0.0, 1000.0, 2, self))
+        self.ui.normCtrl.setValidator(QtGui.QDoubleValidator(0.0, 1000.0, 4, self))
         self.ui.normCtrl.editingFinished.connect(self.validateRegularization)
         self.controlChangeFunc = None
         self.oldctrlmu = float(self.ui.passoCtrl.text())
