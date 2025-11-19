@@ -801,6 +801,27 @@
     <property name="title">
      <string>&amp;File</string>
     </property>
+    <addaction name="actionSalvar_dados"/>
+    <addaction name="separator"/>
+    <addaction name="actionSavePlus"/>
+    <addaction name="actionDefineWorkdir"/>
+    <addaction name="actionWorkdirManager"/>
+    <addaction name="separator"/>
+    <addaction name="actionSair"/>
+   </widget>
+   <widget class="QMenu" name="menu_Tools">
+    <property name="title">
+     <string>&amp;Tools</string>
+    </property>
+    <addaction name="actionAutomator"/>
+    <addaction name="actionDataViewer"/>
+    <addaction name="actionPathModeling"/>
+    <addaction name="actionFirmware_Update"/>
+   </widget>
+   <widget class="QMenu" name="menuSetup">
+    <property name="title">
+     <string>&amp;Setup</string>
+    </property>
     <widget class="QMenu" name="menuSelecionar_Porta">
      <property name="title">
       <string>&amp;Port</string>
@@ -851,30 +872,15 @@
      <addaction name="action921600"/>
      <addaction name="action1000000"/>
     </widget>
-    <addaction name="actionSalvar_dados"/>
-    <addaction name="actionAdditional"/>
     <addaction name="menuSelecionar_Porta"/>
     <addaction name="menuSampling_Rate"/>
     <addaction name="menuMax_Time"/>
     <addaction name="menuSerial_Baud_Rate"/>
-    <addaction name="actionFirmware_Update"/>
-    <addaction name="separator"/>
-    <addaction name="actionSavePlus"/>
-    <addaction name="actionDefineWorkdir"/>
-    <addaction name="actionWorkdirManager"/>
-    <addaction name="separator"/>
-    <addaction name="actionSair"/>
-   </widget>
-   <widget class="QMenu" name="menu_Tools">
-    <property name="title">
-     <string>&amp;Tools</string>
-    </property>
-    <addaction name="actionAutomator"/>
-    <addaction name="actionDataViewer"/>
-    <addaction name="actionPathModeling"/>
+    <addaction name="actionAdditional"/>
    </widget>
    <addaction name="menuArquivo"/>
    <addaction name="menu_Tools"/>
+   <addaction name="menuSetup"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionSalvar_dados">
@@ -1091,6 +1097,11 @@
    </property>
    <property name="text">
     <string>LSM6DS3:</string>
+   </property>
+  </action>
+  <action name="actionTeste_2">
+   <property name="text">
+    <string>Teste...</string>
    </property>
   </action>
  </widget>
