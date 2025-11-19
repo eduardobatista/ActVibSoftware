@@ -119,6 +119,7 @@ class ControlPanel(QtWidgets.QWidget,StateSaver):
 
     def taskChanged(self):
         self.setEnabled(True,True)
+        self.controlChanged()
 
     def isTaskControl(self):
         return True if (self.ui.comboCtrlTask.currentIndex() == 0) else False

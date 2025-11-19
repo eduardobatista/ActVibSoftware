@@ -866,13 +866,6 @@ class mainwindow(QtWidgets.QMainWindow):
             self.wdman.showWorkdirManager()
 
 
-    def openUploadDialog(self):
-        if not self.dataman.flagrodando:
-            self.driver.setPort(self.Port)
-            self.upd = MyUploadDialog(self.driver,self.dataman)
-            self.upd.showUploadDialog()
-
-
     def openPathModelingDialog(self):
         if not self.dataman.flagrodando:    
             self.driver.setPort(self.Port)        
