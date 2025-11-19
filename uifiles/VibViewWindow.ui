@@ -803,7 +803,7 @@
     </property>
     <widget class="QMenu" name="menuSelecionar_Porta">
      <property name="title">
-      <string>Port</string>
+      <string>&amp;Port</string>
      </property>
      <addaction name="actionCOM1"/>
      <addaction name="actionCOM2"/>
@@ -820,7 +820,7 @@
     </widget>
     <widget class="QMenu" name="menuSampling_Rate">
      <property name="title">
-      <string>Sampling Rate</string>
+      <string>Sampling &amp;Rate</string>
      </property>
      <addaction name="actionMPU6050"/>
      <addaction name="action1_ms"/>
@@ -836,7 +836,7 @@
     </widget>
     <widget class="QMenu" name="menuMax_Time">
      <property name="title">
-      <string>Max Time</string>
+      <string>&amp;Max Time</string>
      </property>
      <addaction name="action10_min"/>
      <addaction name="action20_min"/>
@@ -844,7 +844,7 @@
     </widget>
     <widget class="QMenu" name="menuSerial_Baud_Rate">
      <property name="title">
-      <string>Serial Baud Rate</string>
+      <string>Serial &amp;Baud Rate</string>
      </property>
      <addaction name="action115200"/>
      <addaction name="action500000"/>
@@ -853,9 +853,6 @@
     </widget>
     <addaction name="actionSalvar_dados"/>
     <addaction name="actionUpload"/>
-    <addaction name="actionPathModeling"/>
-    <addaction name="actionDataViewer"/>
-    <addaction name="actionAutomator"/>
     <addaction name="actionAdditional"/>
     <addaction name="menuSelecionar_Porta"/>
     <addaction name="menuSampling_Rate"/>
@@ -869,7 +866,16 @@
     <addaction name="separator"/>
     <addaction name="actionSair"/>
    </widget>
+   <widget class="QMenu" name="menu_Tools">
+    <property name="title">
+     <string>&amp;Tools</string>
+    </property>
+    <addaction name="actionAutomator"/>
+    <addaction name="actionDataViewer"/>
+    <addaction name="actionPathModeling"/>
+   </widget>
    <addaction name="menuArquivo"/>
+   <addaction name="menu_Tools"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionSalvar_dados">
@@ -879,7 +885,7 @@
   </action>
   <action name="actionSair">
    <property name="text">
-    <string>Quit</string>
+    <string>&amp;Quit</string>
    </property>
   </action>
   <action name="actionCOM1">
@@ -944,7 +950,7 @@
   </action>
   <action name="actionUpload">
    <property name="text">
-    <string>Upload secondary and feedback responses...</string>
+    <string>&amp;Upload secondary and feedback responses...</string>
    </property>
   </action>
   <action name="actionDefineWorkdir">
@@ -999,17 +1005,17 @@
   </action>
   <action name="actionDataViewer">
    <property name="text">
-    <string>Data Viewer...</string>
+    <string>&amp;Data Viewer...</string>
    </property>
   </action>
   <action name="actionAdditional">
    <property name="text">
-    <string>Additional system setup...</string>
+    <string>&amp;Additional system setup...</string>
    </property>
   </action>
   <action name="actionAutomator">
    <property name="text">
-    <string>Automator...</string>
+    <string>&amp;Automator...</string>
    </property>
   </action>
   <action name="action10_min">
@@ -1029,7 +1035,7 @@
   </action>
   <action name="actionFirmware_Update">
    <property name="text">
-    <string>Firmware/Software Updater...</string>
+    <string>&amp;Firmware/Software Updater...</string>
    </property>
   </action>
   <action name="action115200">

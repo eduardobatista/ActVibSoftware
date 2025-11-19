@@ -256,6 +256,7 @@ class MyPathModelingDialog():
         self.pdialog.ui.bUploadAndRec.clicked.connect(lambda: Thread(target=self.recordData).start())
         self.pdialog.ui.progressBar.setValue(0)  
         self.pdialog.ui.bSaveToFile.clicked.connect(self.savePathsToFile)
+        self.pdialog.ui.bLoadPathsFromFile.clicked.connect(self.openPathsFile)
         self.pdialog.ui.bCheck.clicked.connect(self.checkPaths)
         self.pdialog.ui.bSValuesSec.clicked.connect(lambda: self.plotSValues('sec'))
         self.pdialog.ui.bSValuesFbk.clicked.connect(lambda: self.plotSValues('fbk'))
@@ -357,6 +358,22 @@ class MyPathModelingDialog():
             self.pdialog.ui.statusLabel.setText("Paths successfully read.")
         except BaseException as ex:
             self.pdialog.ui.statusLabel.setText(f"Error: {ex}")
+
+    def openPathsFile(self):
+        filename = QFileDialog.getOpenFileName(self.pdialog, "Open File",
+                                               os.getenv('HOME'), 'feather (*.feather)')
+        if (filename[0] != ''):
+            try:               
+                datafromfile = pd.read_feather(filename[0])
+                if (datafromfile.columns[0] != 'wsec') or (datafromfile.columns[1] != 'wfbk'):
+                    raise Exception("Invalid dataframe.")
+                self.dataman.secpath = datafromfile.wsec.values
+                self.dataman.fbkpath = datafromfile.wfbk.values
+                self.dataman.hasPaths = True
+                self.pdialog.ui.statusLabel.setText("Paths successfully loaded into memory.")
+                self.plotPaths()
+            except Exception as err:
+                self.pdialog.ui.statusLabel.setText(f"Error: {err}")
 
 
     def savePathsToFile(self):        
@@ -523,18 +540,32 @@ class MyPathModelingDialog():
                     dsec = self.datafromfile.err[timemask].values
                 else:
                     raise BaseException("Path modeling recording not found (file not open)")
-                
 
             # dfbk = dfbk - np.mean(dfbk)
             # dsec = dsec - np.mean(dsec)  
 
             filt = FIRNLMS(N,mu,psi,wwavgwindow=Navg)
             filt.run(x,dfbk)
-            self.wfbk = filt.wwavg
+            # self.wfbk = filt.wwavg
             filt2 = FIRNLMS(N,mu,psi,wwavgwindow=Navg)
             filt2.run(x,dsec)
-            self.wsec = filt2.wwavg
+            # self.wsec = filt2.wwavg
 
+            self.dataman.hasPaths = True
+            self.dataman.fbkpath = filt.wwavg
+            self.dataman.secpath = filt2.wwavg
+
+            self.plotPaths()
+
+            self.pdialog.ui.statusLabel.setText("Success! Paths are available in memory for upload.")
+            self.pdialog.ui.bUploadAndRec.setEnabled(True)
+
+        except BaseException as ex:
+            self.pdialog.ui.statusLabel.setText(f"Error: {ex}.")
+        
+
+    def plotPaths(self):
+        if self.dataman.hasPaths:
             pens = [pg.mkPen('r', width=1), pg.mkPen('b', width=1)]
             item = self.gwidget.getItem(0,0)
             if item is not None:
@@ -543,26 +574,18 @@ class MyPathModelingDialog():
             if item2 is not None:
                 self.gwidget.removeItem(item2)
             myplot1 = self.gwidget.addPlot(row=0,col=0)
-            myplot1.plot(self.wsec,pen=pens[0])
-            myplot1.plot(self.wfbk,pen=pens[1])
+            myplot1.plot(self.dataman.secpath,pen=pens[0])
+            myplot1.plot(self.dataman.fbkpath,pen=pens[1])
 
             myplot2 = self.gwidget.addPlot(row=1,col=0)
             splfreq = (1/self.dataman.samplingperiod)
-            magdb1,freqs1 = easyFourier(self.wsec,splfreq)
+            magdb1,freqs1 = easyFourier(self.dataman.secpath,splfreq)
             myplot2.plot(freqs1,magdb1,pen=pens[0])
-            magdb2,freqs2 = easyFourier(self.wfbk,splfreq)
+            magdb2,freqs2 = easyFourier(self.dataman.fbkpath,splfreq)
             myplot2.plot(freqs2,magdb2,pen=pens[1])  
 
-            self.dataman.hasPaths = True
-            self.dataman.fbkpath = self.wfbk
-            self.dataman.secpath = self.wsec
 
-            self.pdialog.ui.statusLabel.setText("Success! Paths are available in memory for upload.")
-            self.pdialog.ui.bUploadAndRec.setEnabled(True)
 
-        except BaseException as ex:
-            self.pdialog.ui.statusLabel.setText(f"Error: {ex}.")
-        
 
 class MyUploadDialog():
 
