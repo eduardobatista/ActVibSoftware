@@ -284,7 +284,7 @@ class mainwindow(QtWidgets.QMainWindow):
             self.bInit(stoptime=int(opts[0])) 
             self.automatorWaitingStart = True
         elif msg == "AlgOn":
-            self.ctrlpanel.ui.checkAlgOn.setChecked(True if (opts[0] == "True") else False)  
+            self.ctrlpanel.ui.checkAlgOn.setChecked(True if (opts[0].lower() == "true") else False)  
             self.resumeAutomator.emit() 
         elif msg == "Stopping":
             if self.dataman.flagrodando:
