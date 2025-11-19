@@ -7,13 +7,13 @@ import pandas as pd
 import numpy as np
 
 from PySide6 import QtWidgets, QtGui, QtCore
-from PySide6.QtWidgets import QMessageBox, QFileDialog, QCheckBox, QComboBox, QDoubleSpinBox, QSpinBox
+from PySide6.QtWidgets import QMessageBox, QFileDialog, QCheckBox, QComboBox, QDoubleSpinBox
 
 from .VibViewWindow import Ui_MainWindow
 
 from .figures import (CtrlFigQtGraph, FigOutputQtGraph, MyFigQtGraph)
 
-from .dialogs import (WorkdirManager, MyUploadDialog, MyPathModelingDialog, MyDataViewer, MyAdditionalDialog)
+from .dialogs import (WorkdirManager, MyPathModelingDialog, MyDataViewer, MyAdditionalDialog)
 
 from .panels import (IMUPanel,GeneratorPanel,ControlPanel,ADCPanel)
 
@@ -84,7 +84,6 @@ class mainwindow(QtWidgets.QMainWindow):
 
         self.ui.actionSair.triggered.connect(self.closeEvent)
         self.ui.actionSalvar_dados.triggered.connect(self.saveFile)
-        self.ui.actionUpload.triggered.connect(self.openUploadDialog)
         self.ui.actionWorkdirManager.triggered.connect(self.openWorkdirManager)
         self.ui.actionPathModeling.triggered.connect(self.openPathModelingDialog)
         self.ui.actionDataViewer.triggered.connect(self.openDataViewer)

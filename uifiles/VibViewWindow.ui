@@ -852,7 +852,6 @@
      <addaction name="action1000000"/>
     </widget>
     <addaction name="actionSalvar_dados"/>
-    <addaction name="actionUpload"/>
     <addaction name="actionAdditional"/>
     <addaction name="menuSelecionar_Porta"/>
     <addaction name="menuSampling_Rate"/>
@@ -946,11 +945,6 @@
   <action name="actionCOM12">
    <property name="text">
     <string>COM12</string>
-   </property>
-  </action>
-  <action name="actionUpload">
-   <property name="text">
-    <string>&amp;Upload secondary and feedback responses...</string>
    </property>
   </action>
   <action name="actionDefineWorkdir">
