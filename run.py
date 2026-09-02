@@ -1,3 +1,5 @@
-if __name__ == '__main__':
-    from ActVib import __main__    
-    __main__()
+from ActVib.__main__ import main
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

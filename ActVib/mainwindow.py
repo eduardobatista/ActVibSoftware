@@ -1,5 +1,4 @@
 from pathlib import Path
-from os import getenv
 import time
 import json
 
@@ -33,7 +32,7 @@ class mainwindow(QtWidgets.QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.mainfont = self.ui.centralwidget.font()
-        self.Port = "COM3"
+        self.Port = None
         self.TSampling = 4000   # 4000 us is the default
         self.FSampling = 250  # 250 Hz is the default
         self.MaxTime = 10   # 10 min is the default
@@ -82,7 +81,7 @@ class mainwindow(QtWidgets.QMainWindow):
         
         self.ui.menuSelecionar_Porta.aboutToShow.connect(self.populatePorts)
 
-        self.ui.actionSair.triggered.connect(self.closeEvent)
+        self.ui.actionSair.triggered.connect(self.close)
         self.ui.actionSalvar_dados.triggered.connect(self.saveFile)
         self.ui.actionWorkdirManager.triggered.connect(self.openWorkdirManager)
         self.ui.actionPathModeling.triggered.connect(self.openPathModelingDialog)
@@ -158,15 +157,17 @@ class mainwindow(QtWidgets.QMainWindow):
         self.automator.actionMessage.connect(self.processActions)
         self.resumeAutomator.connect(self.automator.resume)
 
-        self.updater = Updater()
+        self.updater = Updater(self.driver)
         self.updater.actionMessage.connect(self.updater.printMessage) 
 
         
 
 
     def SFUpdate(self):
-        self.updater.showUpdaterDialog(self.Port)
-        # fupd.runUpdate(self.porta)
+        if self.dataman.flagrodando:
+            self.ui.statusbar.showMessage("Stop data acquisition before updating.")
+        else:
+            self.updater.showUpdaterDialog(self.Port)
     
 
     def showAutomator(self):
@@ -407,7 +408,7 @@ class mainwindow(QtWidgets.QMainWindow):
                         'sensorref': self.ui.comboRef.currentText(),
                         'sensorerro': self.ui.comboErro.currentText()
                     }
-                    mddf = mddf.append(fdata, ignore_index=True)
+                    mddf = pd.concat([mddf, pd.DataFrame([fdata])], ignore_index=True)
                     mddf.reset_index()
                     mddf.to_feather(mdatafile)
                     try:
@@ -445,9 +446,16 @@ class mainwindow(QtWidgets.QMainWindow):
                     w.setValue(int(settings.value(w.objectName())))
                 elif (type(w) == QtWidgets.QLineEdit):
                     w.setText(settings.value(w.objectName()))
-        if (settings.value("Porta") is not None):
-            self.Port = settings.value("Porta")
-            self.setPort(self.Port)
+        saved_port = settings.value("Porta")
+        ports = list(self.driver.listPorts())
+        if saved_port and any(port.device == str(saved_port) for port in ports):
+            self.setPort(str(saved_port))
+        else:
+            preferred = [port for port in ports if port.vid in (0x10C4, 0x1A86)]
+            if len(preferred) == 1:
+                self.setPort(preferred[0].device)
+            elif len(ports) == 1:
+                self.setPort(ports[0].device)
         if (settings.value("FSampling") is not None):
             self.setSampling(settings.value("FSampling"))  
         if (settings.value("MaxTime") is not None):
@@ -455,7 +463,8 @@ class mainwindow(QtWidgets.QMainWindow):
         if (settings.value("BaudRate") is not None):
             self.setBaudRate(settings.value("BaudRate"))  
         if (settings.value("WorkDir") is not None):
-            self.workdir = settings.value("WorkDir")
+            saved_workdir = Path(settings.value("WorkDir"))
+            self.workdir = saved_workdir if saved_workdir.is_dir() else Path.home()
         if (settings.value("LastDataFolder") is not None):
             self.dataman.lastdatafolder = Path(settings.value("LastDataFolder"))
         if (settings.value("PreDistEnMap") is not None):
@@ -506,14 +515,17 @@ class mainwindow(QtWidgets.QMainWindow):
                 settings.setValue(w.objectName(), w.value())
             elif (type(w) == QtWidgets.QLineEdit):
                 settings.setValue(w.objectName(), w.text())
-        settings.setValue("Porta", self.Port)
+        if self.Port:
+            settings.setValue("Porta", self.Port)
+        else:
+            settings.remove("Porta")
         settings.setValue("FSampling", str(self.FSampling) + " Hz")
         settings.setValue("MaxTime", str(self.MaxTime) + " min")
         settings.setValue("BaudRate", str(self.BaudRate))
         settings.setValue("MFig", self.mfig.getConfigString())
         settings.setValue("OFig", self.ofig.getConfigString())
         settings.setValue("CtrlFig", self.ctrlfig.getConfigString())
-        settings.setValue('WorkDir', self.workdir)
+        settings.setValue('WorkDir', str(self.workdir))
         settings.setValue("LastDataFolder", str(self.dataman.lastdatafolder))
         settings.setValue("PreDistEnMap", self.driver.predistenablemap)
         settings.setValue("PreDistCoefs", self.driver.predistcoefs)
@@ -671,6 +683,8 @@ class mainwindow(QtWidgets.QMainWindow):
 
 
     def initChecks(self):
+        if not self.Port:
+            raise RuntimeError("Select a serial port before starting the acquisition.")
         if self.ctrlpanel.isControlOn():
             errimuidx = self.ctrlpanel.getErrorIMU()           
             if not self.imupanel[errimuidx].isIMUEnabled():
@@ -833,7 +847,11 @@ class mainwindow(QtWidgets.QMainWindow):
     def populatePorts(self):
         self.ui.menuSelecionar_Porta.clear()
         ports = self.driver.listPorts()
-        for port, desc, hwid in sorted(ports):
+        if not ports:
+            action = self.ui.menuSelecionar_Porta.addAction("No serial ports found")
+            action.setEnabled(False)
+            return
+        for port, desc, hwid in sorted(ports, key=lambda item: item.device):
             # print("{}: {} [{}]".format(port, desc, hwid))
             if port == self.Port:
                 port = f">{port}"
@@ -844,7 +862,7 @@ class mainwindow(QtWidgets.QMainWindow):
         
 
     def setPort(self, portasel):
-        if not self.dataman.flagrodando:
+        if portasel and not self.dataman.flagrodando:
             if portasel.startswith(">"):
                 portasel = portasel[1:]
             self.Port = portasel
@@ -867,7 +885,9 @@ class mainwindow(QtWidgets.QMainWindow):
 
 
     def openPathModelingDialog(self):
-        if not self.dataman.flagrodando:    
+        if not self.Port:
+            self.ui.statusbar.showMessage("Select a serial port before opening Path Modeling.")
+        elif not self.dataman.flagrodando:
             self.driver.setPort(self.Port)        
             self.pmd = MyPathModelingDialog(self.dataman,self.driver,self.closePathModelingDialog)
             self.pmd.showPathModelingdDialog(self.pathmodelingoptions)
@@ -898,7 +918,7 @@ class mainwindow(QtWidgets.QMainWindow):
             txtfilter = 'Feather file (*.feather);; CSV file (*.csv)'
             if self.lastSavedExtension == ".csv":
                 txtfilter = 'CSV file (*.csv);; Feather file (*.feather)'
-            filename = QFileDialog.getSaveFileName(self, "Salvar Arquivo", getenv('HOME'), txtfilter)
+            filename = QFileDialog.getSaveFileName(self, "Salvar Arquivo", str(Path.home()), txtfilter)
             if filename[0].endswith(".csv"):
                 self.lastSavedExtension = ".csv"
             elif filename[0].endswith(".feather"):
@@ -923,22 +943,21 @@ class mainwindow(QtWidgets.QMainWindow):
 
 
     def closeEvent(self, event):
-        if not event:
-            self.writeConfig()
-            event = QtGui.QCloseEvent()
-            event.accept = self.close
-            event.ignore = (lambda *args: None)
+        if self.updater.flagrunning:
+            self.ui.statusbar.showMessage("Wait for the firmware update to finish before closing.")
+            event.ignore()
+            return
         if self.dataman.flagrodando:
             self.ui.statusbar.showMessage("Pare as leituras antes de fechar...")
             event.ignore()
-        elif not self.dataman.flagsaved:
+            return
+        if not self.dataman.flagsaved:
             reply = QMessageBox.question(self, 'Saindo', 'Existem dados não salvos, deseja mesmo sair?',
                                          QMessageBox.No | QMessageBox.Yes, QMessageBox.No)
-            if reply == QMessageBox.Yes:
-                self.writeConfig()
-                event.accept()
-            else:
+            if reply != QMessageBox.Yes:
                 event.ignore()
-        else:
-            self.writeConfig()
-            event.accept()
+                return
+        self.writeConfig()
+        if self.driver.serial and self.driver.serial.is_open:
+            self.driver.closeSerial()
+        event.accept()

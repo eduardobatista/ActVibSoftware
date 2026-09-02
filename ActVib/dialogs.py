@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 import time
 
@@ -149,8 +148,9 @@ class MyDataViewer(QDialog):
          e.ignore()
 
     def dropEvent(self, e):
-        droppedFile = Path(e.mimeData().text())
-        if str(droppedFile).endswith(".feather"):
+        urls = e.mimeData().urls()
+        droppedFile = Path(urls[0].toLocalFile()) if urls else None
+        if droppedFile and droppedFile.suffix.lower() == ".feather":
             self.openFile(droppedFile)
         else:
             self.ui.statusLabel.setText("File is not in feather format.")
@@ -167,14 +167,14 @@ class MyDataViewer(QDialog):
                     if self.dataman.lastdatafolder.is_dir():
                         refdir = str(self.dataman.lastdatafolder)
                     else: 
-                        refdir = os.getenv('HOME')                    
+                        refdir = str(Path.home())
                 else:         
-                    refdir = os.getenv('HOME')                
+                    refdir = str(Path.home())
                 filename = QFileDialog.getOpenFileName(self, "Open File",
                                                 refdir, 'feather (*.feather)')
                 if filename[0] != '':
                     auxf = Path(filename[0])
-                    self.dataman.lastdatafolder = auxf.parent if auxf.exists() else os.getenv('HOME')
+                    self.dataman.lastdatafolder = auxf.parent if auxf.exists() else Path.home()
             if (filename[0] != ''):
                 self.ui.fileName.setText(str(filename[0]))
                 self.datafromfile = pd.read_feather(filename[0])
@@ -311,7 +311,7 @@ class MyPathModelingDialog():
 
     def openFile(self):
         filename = QFileDialog.getOpenFileName(self.pdialog, "Open File",
-                                               os.getenv('HOME'), 'feather (*.feather)')
+                                               str(Path.home()), 'feather (*.feather)')
         if (filename[0] != ''):
             self.pdialog.ui.fileName.setText(filename[0])
             self.datafromfile = pd.read_feather(filename[0])
@@ -361,7 +361,7 @@ class MyPathModelingDialog():
 
     def openPathsFile(self):
         filename = QFileDialog.getOpenFileName(self.pdialog, "Open File",
-                                               os.getenv('HOME'), 'feather (*.feather)')
+                                               str(Path.home()), 'feather (*.feather)')
         if (filename[0] != ''):
             try:               
                 datafromfile = pd.read_feather(filename[0])
@@ -382,7 +382,7 @@ class MyPathModelingDialog():
             return
         else:
             self.pdialog.ui.statusLabel.setText("")
-        filename = QFileDialog.getSaveFileName(self.pdialog, "Save File", os.getenv('HOME'), 'feather (*.feather)')
+        filename = QFileDialog.getSaveFileName(self.pdialog, "Save File", str(Path.home()), 'feather (*.feather)')
         if (filename[0] != ''):
             try:                
                 dftosave = pd.DataFrame({
@@ -582,4 +582,4 @@ class MyPathModelingDialog():
             magdb1,freqs1 = easyFourier(self.dataman.secpath,splfreq)
             myplot2.plot(freqs1,magdb1,pen=pens[0])
             magdb2,freqs2 = easyFourier(self.dataman.fbkpath,splfreq)
-            myplot2.plot(freqs2,magdb2,pen=pens[1])  
+            myplot2.plot(freqs2,magdb2,pen=pens[1])

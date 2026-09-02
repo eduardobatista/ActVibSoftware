@@ -1,27 +1,29 @@
 import sys
 
+import qdarktheme
 from PySide6 import QtWidgets
 from PySide6.QtGui import QFont
 
-from .mainwindow import mainwindow
-from .driverhardware import driverhardware
 from .dataman import dataman
-import qdarktheme
+from .driverhardware import driverhardware
+from .mainwindow import mainwindow
 
-app = QtWidgets.QApplication([])
 
-qdarktheme.setup_theme("light")
+def main():
+    app = QtWidgets.QApplication(sys.argv)
+    app.setApplicationName("ActVib")
+    app.setOrganizationName("ActVib")
 
-font = QFont("Fira Sans", 10)
-app.setFont(font)
+    qdarktheme.setup_theme("light")
+    app.setFont(QFont("Fira Sans", 10))
 
-print(app.font())
+    drv = driverhardware()
+    dman = dataman(drv)
+    window = mainwindow(app, drv, dman)
+    window.show()
 
-drv = driverhardware()
-dman = dataman(drv)
+    return app.exec()
 
-mwindow = mainwindow(app, drv, dman)
 
-mwindow.show()
-
-sys.exit(app.exec_())
+if __name__ == "__main__":
+    raise SystemExit(main())

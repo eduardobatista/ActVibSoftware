@@ -538,31 +538,36 @@ class driverhardware:
             dados = dados[0]
         else:
             leadingbytes = None
-        BUFFER_SIZE = 64
-        step = BUFFER_SIZE / 4
-        pbar.setMaximum(dados.shape[0] - 2)
+        buffer_size = 64
+        floats_per_packet = buffer_size // 4
+        data_size = dados.shape[0] * 4
+        if not 0 < dados.shape[0] <= 3000:
+            raise ValueError("Path data must contain between 1 and 3000 values.")
+        pbar.setMaximum(data_size)
         pbar.setValue(0)
-        npacotes = (dados.shape[0] * 4) // BUFFER_SIZE
-        if ((dados.shape[0] * 4) % BUFFER_SIZE) > 0:
-            pacoteextra = True
-        else:
-            pacoteextra = False
+        packet_count, remainder = divmod(dados.shape[0], floats_per_packet)
         self.serial.write(('W' + tipo).encode())
-        self.serial.write(bytes([(dados.shape[0] * 4) >> 8, (dados.shape[0] * 4) & 0xFF]))
+        self.serial.write(bytes([data_size >> 8, data_size & 0xFF]))
         if leadingbytes is not None:
             self.serial.write(leadingbytes)
-        if self.serial.read(1) == b'k':
-            for k in range(npacotes):
-                for w in dados[k * BUFFER_SIZE:k * BUFFER_SIZE + BUFFER_SIZE]:
-                    self.serial.write(bytearray(struct.pack("f", w)))
-                bb = self.serial.read(2)
-                pbar.setValue(pbar.value() + (bb[0] << 8) + bb[1])
-            if pacoteextra:
-                for w in dados[npacotes * BUFFER_SIZE:]:
-                    self.serial.write(bytearray(struct.pack("f", w)))
-                buf = self.serial.read(2)
-                pbar.setValue(pbar.value() + (bb[0] << 8) + bb[1])
-        pbar.setValue(dados.shape[0] - 2)
+        if self.serial.read(1) != b'k':
+            raise RuntimeError("Device did not acknowledge the path upload.")
+        for packet_index in range(packet_count):
+            start = packet_index * floats_per_packet
+            packet = dados[start:start + floats_per_packet]
+            self.serial.write(struct.pack(f"<{len(packet)}f", *packet))
+            response = self.serial.read(2)
+            if len(response) != 2:
+                raise RuntimeError("Incomplete response during path upload.")
+            pbar.setValue(pbar.value() + int.from_bytes(response, "big"))
+        if remainder:
+            packet = dados[packet_count * floats_per_packet:]
+            self.serial.write(struct.pack(f"<{len(packet)}f", *packet))
+            response = self.serial.read(2)
+            if len(response) != 2:
+                raise RuntimeError("Incomplete response during path upload.")
+            pbar.setValue(pbar.value() + int.from_bytes(response, "big"))
+        pbar.setValue(data_size)
 
 
     def readPaths(self):

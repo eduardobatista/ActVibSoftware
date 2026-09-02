@@ -3,3 +3,7 @@ ActVib/__pycache__
 .pylintrc
 installer
 .venv
+__pycache__/
+*.py[cod]
+.coverage
+site/
