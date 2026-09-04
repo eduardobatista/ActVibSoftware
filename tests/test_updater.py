@@ -151,7 +151,7 @@ class FirmwareArchiveTests(unittest.TestCase):
                 )
 
         command = popen.call_args.args[0]
-        self.assertEqual(command[0], str(flasher_path))
+        self.assertEqual(command[0], str(flasher_path.resolve()))
         self.assertNotIn("-m", command)
         self.assertEqual(command[-2:], ["0x10000", str(firmware)])
 
