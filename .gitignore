@@ -4,6 +4,7 @@ ActVib/__pycache__
 installer/build
 installer/dist
 installer/output
+installer/*_version_info.txt
 .venv
 __pycache__/
 *.py[cod]

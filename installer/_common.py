@@ -28,19 +28,15 @@ def windows_version_tuple(version: str) -> tuple[int, int, int, int]:
 
 
 def write_version_file(version: str, output_path: Path, *, description: str, filename: str) -> Path:
-    """Write a PyInstaller version-info file (see ``pyi-grab_version`` format)."""
+    """Write a PyInstaller version-info file (see ``pyi-grab_version`` format).
+
+    PyInstaller loads this file with ``eval()`` (not ``exec()``), evaluating
+    it in a namespace that already provides ``VSVersionInfo``,
+    ``FixedFileInfo``, ``StringFileInfo``, etc. It must therefore contain a
+    single expression: no ``import`` statements or assignments.
+    """
     file_version = windows_version_tuple(version)
     content = f'''# UTF-8
-from PyInstaller.utils.win32.versioninfo import (
-    FixedFileInfo,
-    StringFileInfo,
-    StringTable,
-    StringStruct,
-    VarFileInfo,
-    VarStruct,
-    VSVersionInfo,
-)
-
 VSVersionInfo(
   ffi=FixedFileInfo(
     filevers={file_version!r},
