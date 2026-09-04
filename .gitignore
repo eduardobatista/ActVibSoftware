@@ -1,9 +1,12 @@
 .vscode
 ActVib/__pycache__
 .pylintrc
-installer
+installer/build
+installer/dist
+installer/output
 .venv
 __pycache__/
 *.py[cod]
 .coverage
 site/
+dist/

@@ -90,6 +90,17 @@ class Updater(QtCore.QObject):
 
     def startSWUpdate(self):
         self.udialog.ui.messageArea.clear()
+        if getattr(sys, "frozen", False):
+            self.actionMessage.emit(
+                "ActVib was installed with the Windows installer. Download the "
+                "latest installer or portable ZIP from the Releases page below, "
+                "close ActVib, and run the new installer (it will replace the "
+                "current installation).\n\n"
+                f"Releases: {self.SOFTWARE_RELEASES_URL}\n",
+                False,
+            )
+            return
+
         try:
             installed_version = version("actvibsoftware")
         except PackageNotFoundError:
@@ -312,13 +323,36 @@ class Updater(QtCore.QObject):
             "files": validated_files,
         }
 
-    def _flash(self, plan, firmware_files, working_directory):
+    @staticmethod
+    def _flasher_command():
+        """Return the base command used to invoke esptool.
+
+        In a normal (non-frozen) installation, esptool is a regular Python
+        dependency, so it is invoked as ``python -u -m esptool``. In a
+        PyInstaller-frozen build there is no ``python`` executable available,
+        so a small companion executable (built from a separate PyInstaller
+        spec) that simply forwards its arguments to ``esptool.main()`` is
+        bundled alongside the main application, under a ``flasher``
+        subdirectory.
+        """
+        if getattr(sys, "frozen", False):
+            flasher_name = "ActVibFlash.exe" if sys.platform == "win32" else "ActVibFlash"
+            flasher_path = Path(sys.executable).resolve().parent / "flasher" / flasher_name
+            if not flasher_path.exists():
+                raise RuntimeError(
+                    f"Firmware flasher helper not found at {flasher_path}. "
+                    "Reinstall ActVib or report this issue."
+                )
+            return [str(flasher_path)]
+
         python = Path(sys.prefix) / (
             "Scripts/python.exe" if sys.platform == "win32" else "bin/python"
         )
         if not python.exists():
             python = Path(sys.executable)
+        return [str(python), "-u", "-m", "esptool"]
 
+    def _flash(self, plan, firmware_files, working_directory):
         arguments = [
             "--chip",
             plan["chip"],
@@ -343,7 +377,7 @@ class Updater(QtCore.QObject):
             arguments.extend((offset, str(filename)))
 
         process = subprocess.Popen(
-            [str(python), "-u", "-m", "esptool", *arguments],
+            [*Updater._flasher_command(), *arguments],
             cwd=working_directory,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,

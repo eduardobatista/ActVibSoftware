@@ -1,5 +1,6 @@
 import hashlib
 import json
+import sys
 import tempfile
 import unittest
 import zipfile
@@ -116,6 +117,54 @@ class FirmwareArchiveTests(unittest.TestCase):
         self.assertIn("4MB", command)
         self.assertEqual(command[-2:], ["0x10000", str(firmware)])
         self.assertNotIn("shell", popen.call_args.kwargs)
+
+    def test_esptool_command_uses_flasher_helper_when_frozen(self):
+        process = mock.Mock(stdout=None)
+        process.wait.return_value = 0
+        updater = SimpleNamespace(port="SERIAL_PORT")
+        plan = {
+            "chip": "esp32",
+            "baud": 460800,
+            "before": "default-reset",
+            "after": "hard-reset",
+        }
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            firmware = Path(temp_dir) / "firmware.bin"
+            fake_root = Path(temp_dir) / "install"
+            flasher_dir = fake_root / "flasher"
+            flasher_dir.mkdir(parents=True)
+            flasher_name = "ActVibFlash.exe" if sys.platform == "win32" else "ActVibFlash"
+            flasher_path = flasher_dir / flasher_name
+            flasher_path.write_text("")
+            fake_exe = fake_root / (
+                "ActVib.exe" if sys.platform == "win32" else "ActVib"
+            )
+
+            with mock.patch("ActVib.updater.sys.frozen", True, create=True), \
+                mock.patch("ActVib.updater.sys.executable", str(fake_exe)), \
+                mock.patch(
+                    "ActVib.updater.subprocess.Popen", return_value=process
+                ) as popen:
+                Updater._flash(
+                    updater, plan, [("0x10000", firmware)], Path(temp_dir)
+                )
+
+        command = popen.call_args.args[0]
+        self.assertEqual(command[0], str(flasher_path))
+        self.assertNotIn("-m", command)
+        self.assertEqual(command[-2:], ["0x10000", str(firmware)])
+
+    def test_flasher_command_raises_when_helper_missing(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            fake_exe = Path(temp_dir) / "install" / (
+                "ActVib.exe" if sys.platform == "win32" else "ActVib"
+            )
+            fake_exe.parent.mkdir(parents=True)
+            with mock.patch("ActVib.updater.sys.frozen", True, create=True), \
+                mock.patch("ActVib.updater.sys.executable", str(fake_exe)):
+                with self.assertRaisesRegex(RuntimeError, "flasher helper not found"):
+                    Updater._flasher_command()
 
 
 if __name__ == "__main__":

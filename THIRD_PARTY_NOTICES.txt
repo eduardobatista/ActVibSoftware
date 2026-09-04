@@ -1,0 +1,32 @@
+ActVib Windows Installer — Third-Party Notices
+================================================
+
+The ActVib Windows installer and portable ZIP bundle the following
+third-party software. Each retains its own license; ActVib's own MIT license
+(see LICENSE in this folder) applies only to ActVib's own source code.
+
+- Qt / PySide6 (LGPLv3, with GPLv2/GPLv3 alternative terms) —
+  https://www.qt.io/licensing/
+  ActVib uses the unmodified, dynamically loaded PySide6 Essentials
+  distribution. See https://doc.qt.io/qtforpython/licenses.html for details
+  on your rights under the LGPL, including the right to relink against a
+  modified version of Qt.
+
+- Apache Arrow / PyArrow (Apache License 2.0) —
+  https://github.com/apache/arrow/blob/main/LICENSE.txt
+  See the bundled NOTICE.txt for required attributions.
+
+- NumPy, SciPy, pandas, pyqtgraph, pyserial, PyQtDarkTheme (BSD/MIT-style
+  licenses) — see each project's repository for full license text.
+
+- esptool, esp_rfc2217_server, espefuse, espsecure (GPLv2 or later) —
+  https://github.com/espressif/esptool/blob/master/LICENSE
+  esptool is bundled as a separate helper executable (ActVibFlash.exe,
+  under the "flasher" folder), invoked by ActVib as an independent process.
+  Corresponding source code for the exact esptool version bundled is
+  available from the project above; the version number is recorded in the
+  ActVibFlash executable's version information (right-click > Properties >
+  Details).
+
+This file is not exhaustive; consult each dependency's own distribution for
+complete license terms.

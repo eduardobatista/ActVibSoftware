@@ -1,6 +1,6 @@
 [project]
 name = "actvibsoftware"
-version = "0.9.0"
+version = "0.9.1"
 description = "Monitoring and active control of laboratory vibration experiments"
 readme = "README.md"
 authors = [{ name = "Eduardo Batista" }]
@@ -40,6 +40,14 @@ Firmware = "https://github.com/eduardobatista/ActVibFirmware"
 
 [project.gui-scripts]
 actvib = "ActVib.__main__:main"
+
+[dependency-groups]
+# Only used to build the Windows installer/portable ZIP (see installer/).
+# Not part of the published wheel/sdist dependencies.
+packaging = [
+    "pyinstaller==6.22.0",
+    "pyinstaller-hooks-contrib>=2025.8",
+]
 
 [build-system]
 requires = ["uv_build>=0.12.5,<0.13"]

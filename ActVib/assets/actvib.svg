@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e3a5f"/>
+      <stop offset="100%" stop-color="#0f1f33"/>
+    </linearGradient>
+    <linearGradient id="wave" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#3ddc97"/>
+      <stop offset="100%" stop-color="#38a3d1"/>
+    </linearGradient>
+  </defs>
+
+  <circle cx="128" cy="128" r="120" fill="url(#bg)"/>
+  <circle cx="128" cy="128" r="120" fill="none" stroke="#0a1622" stroke-width="4"/>
+
+  <!-- Vibration waveform -->
+  <path d="M 36 138
+           C 55 90, 75 90, 92 138
+           C 109 186, 129 186, 146 138
+           C 163 90, 183 90, 200 138
+           C 209 162, 214 162, 220 148"
+        fill="none" stroke="url(#wave)" stroke-width="10"
+        stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Baseline / reference axis -->
+  <line x1="36" y1="138" x2="220" y2="138" stroke="#8fb8d6" stroke-width="2" stroke-dasharray="4 6" opacity="0.55"/>
+
+  <!-- Control target marker -->
+  <circle cx="128" cy="70" r="9" fill="#f4b942"/>
+  <circle cx="128" cy="70" r="9" fill="none" stroke="#0a1622" stroke-width="2"/>
+</svg>
